@@ -1,7 +1,6 @@
 package de.jaskerx.btegteleportation.bungee.commands;
 
 
-import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,7 +8,6 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
 import de.jaskerx.btegteleportation.bungee.main.Main;
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -67,9 +65,11 @@ public class TeleportCommand extends Command implements TabExecutor {
 	public static void teleport(ProxiedPlayer p, ProxiedPlayer t) {
 		
 		Server serverOld = p.getServer();
+		requestCoords(p, serverOld);
 		p.sendMessage(Main.getFormattedMessage("Du wirst zu " + t.getName() + " teleportiert..."));
 		
 		ByteArrayDataOutput out = ByteStreams.newDataOutput();
+		out.writeUTF("teleport");
 		out.writeUTF(p.getUniqueId().toString());
         out.writeUTF(t.getUniqueId().toString());
         if(serverOld.getInfo().getName().equals(t.getServer().getInfo().getName())) {
@@ -79,6 +79,14 @@ public class TeleportCommand extends Command implements TabExecutor {
         	out.writeUTF("false");
         }
         t.getServer().getInfo().sendData("Teleportation", out.toByteArray());
+	}
+	
+	private static void requestCoords(ProxiedPlayer p, Server s) {
+		ByteArrayDataOutput out = ByteStreams.newDataOutput();
+		out.writeUTF("getLocation");
+		out.writeUTF(p.getUniqueId().toString());
+		out.writeUTF(s.getInfo().getName());
+		s.getInfo().sendData("Teleportation", out.toByteArray());
 	}
 
 }
