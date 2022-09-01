@@ -1,7 +1,5 @@
 package de.jaskerx.btegteleportation.bukkit.listeners;
 
-import java.time.LocalTime;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,6 +28,10 @@ public class PlayerJoinListener implements Listener {
 			} else {
 				Main.pendingTps.remove(p.getUniqueId());
 			}
+		}
+		if(Main.pendingTpBacks.containsKey(p.getUniqueId())) {
+			p.teleport(Main.pendingTpBacks.get(p.getUniqueId()));
+			Main.pendingTpBacks.remove(p.getUniqueId());
 		}
 	}
 	

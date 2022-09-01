@@ -23,3 +23,6 @@ commands:
   tphere:
     description: Teleport a player to you.
     usage: /tphere [player]
+  tpback:
+    description: Teleport back to the location you have been teleported from.
+    usage: /tpback
