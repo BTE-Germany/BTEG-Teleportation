@@ -8,3 +8,4 @@ This is a plugin creating the ability to teleport players to other players betwe
  | tpa, tpaccept, tpadeny, tpacancel | Send teleport requests and manage them. | teleportation.tpa | 
  | tp | Teleport to another player. |  teleportation.tp | 
  | tphere | Teleport another player to you. | teleportation.tphere | 
+ | tpback | Teleport back to the location you have been teleported from. | teleportation.tpback | 
