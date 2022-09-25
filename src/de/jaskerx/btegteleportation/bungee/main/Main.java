@@ -1,6 +1,8 @@
 package de.jaskerx.btegteleportation.bungee.main;
 
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 import de.jaskerx.btegteleportation.bungee.commands.TeleportCommand;
@@ -19,7 +21,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 public class Main extends Plugin {
 	
 	public static HashMap<UUID, LastLocation> lastLocations = new HashMap<>();
-
+	
 	@Override
 	public void onEnable() {
 		
@@ -33,7 +35,7 @@ public class Main extends Plugin {
 		
 		ProxyServer.getInstance().getPluginManager().registerListener(this, new PluginMsgListener());
 		
-		ProxyServer.getInstance().registerChannel("Teleportation");	
+		ProxyServer.getInstance().registerChannel("Teleportation");
 	}
 	
 	public static BaseComponent[] getFormattedMessage(String text) {
