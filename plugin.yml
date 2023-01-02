@@ -1,5 +1,5 @@
 name: BTEGTeleportation
 version: 1.0
-main: de.jaskerx.btegteleportation.bungee.main.Main
+main: de.jaskerx.bteg.teleportation.bungee.main.Main
 author: JaskerX
 description: This is a plugin creating the ability to teleport players to other players between servers in the network.

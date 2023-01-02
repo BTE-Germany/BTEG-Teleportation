@@ -1,4 +1,4 @@
-package de.jaskerx.btegteleportation.bungee.main;
+package de.jaskerx.bteg.teleportation.bungee.main;
 
 public class LastLocation {
 

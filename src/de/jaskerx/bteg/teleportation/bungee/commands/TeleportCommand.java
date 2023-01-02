@@ -1,4 +1,4 @@
-package de.jaskerx.btegteleportation.bungee.commands;
+package de.jaskerx.bteg.teleportation.bungee.commands;
 
 
 import java.util.HashSet;
@@ -7,7 +7,7 @@ import java.util.Set;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
-import de.jaskerx.btegteleportation.bungee.main.Main;
+import de.jaskerx.bteg.teleportation.bungee.main.Main;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;

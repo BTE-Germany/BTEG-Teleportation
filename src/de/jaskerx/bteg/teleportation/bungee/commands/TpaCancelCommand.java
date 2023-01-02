@@ -1,4 +1,4 @@
-package de.jaskerx.btegteleportation.bungee.commands;
+package de.jaskerx.bteg.teleportation.bungee.commands;
 
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;

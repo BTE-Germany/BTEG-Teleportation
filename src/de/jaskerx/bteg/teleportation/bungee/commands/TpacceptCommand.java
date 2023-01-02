@@ -1,11 +1,11 @@
-package de.jaskerx.btegteleportation.bungee.commands;
+package de.jaskerx.bteg.teleportation.bungee.commands;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import de.jaskerx.btegteleportation.bungee.main.Main;
+import de.jaskerx.bteg.teleportation.bungee.main.Main;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -13,12 +13,12 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 
-public class TpaDenyCommand extends Command implements TabExecutor {
+public class TpacceptCommand extends Command implements TabExecutor {
 
-	public TpaDenyCommand() {
-		super("TpaDeny");
+	public TpacceptCommand() {
+		super("Tpaccept");
 	}
-	
+
 	@Override
 	public void execute(CommandSender sender, String[] args) {
 
@@ -35,8 +35,8 @@ public class TpaDenyCommand extends Command implements TabExecutor {
 				ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
 				if(target != null) {
 					if(TpaCommand.tpas.containsKey(target.getUniqueId()) && TpaCommand.tpas.get(target.getUniqueId()).equals(p.getUniqueId())) {
-						target.sendMessage(Main.getFormattedMessage("Deine Anfrage wurde abgelehnt!"));
-						p.sendMessage(Main.getFormattedMessage("Du hast die Anfrage von " + target.getName() + " abgelehnt."));
+						target.sendMessage(Main.getFormattedMessage("Deine Anfrage wurde angenommen!"));
+						TeleportCommand.teleport(target, p);
 						TpaCommand.tpas.remove(target.getUniqueId());
 					} else {
 						p.sendMessage(Main.getFormattedMessage("Du hast keine Anfrage von diesem Spieler erhalten!"));
@@ -48,8 +48,8 @@ public class TpaDenyCommand extends Command implements TabExecutor {
 				for(Map.Entry<UUID, UUID> entry : TpaCommand.tpas.entrySet()) {
 					if(entry.getValue().equals(p.getUniqueId())) {
 						ProxiedPlayer target = ProxyServer.getInstance().getPlayer(entry.getKey());
-						target.sendMessage(Main.getFormattedMessage("Deine Anfrage wurde abgelehnt!"));
-						p.sendMessage(Main.getFormattedMessage("Du hast die Anfrage von " + target.getName() + " abgelehnt."));
+						target.sendMessage(Main.getFormattedMessage("Deine Anfrage wurde angenommen!"));
+						TeleportCommand.teleport(target, p);
 						TpaCommand.tpas.remove(target.getUniqueId());
 						return;
 					}

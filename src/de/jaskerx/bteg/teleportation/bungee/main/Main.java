@@ -1,18 +1,18 @@
-package de.jaskerx.btegteleportation.bungee.main;
+package de.jaskerx.bteg.teleportation.bungee.main;
 
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 
-import de.jaskerx.btegteleportation.bungee.commands.TeleportCommand;
-import de.jaskerx.btegteleportation.bungee.commands.TpBackCommand;
-import de.jaskerx.btegteleportation.bungee.commands.TpHereCommand;
-import de.jaskerx.btegteleportation.bungee.commands.TpaCancelCommand;
-import de.jaskerx.btegteleportation.bungee.commands.TpaCommand;
-import de.jaskerx.btegteleportation.bungee.commands.TpaDenyCommand;
-import de.jaskerx.btegteleportation.bungee.commands.TpacceptCommand;
-import de.jaskerx.btegteleportation.bungee.listeners.PluginMsgListener;
+import de.jaskerx.bteg.teleportation.bungee.commands.TeleportCommand;
+import de.jaskerx.bteg.teleportation.bungee.commands.TpBackCommand;
+import de.jaskerx.bteg.teleportation.bungee.commands.TpHereCommand;
+import de.jaskerx.bteg.teleportation.bungee.commands.TpaCancelCommand;
+import de.jaskerx.bteg.teleportation.bungee.commands.TpaCommand;
+import de.jaskerx.bteg.teleportation.bungee.commands.TpaDenyCommand;
+import de.jaskerx.bteg.teleportation.bungee.commands.TpacceptCommand;
+import de.jaskerx.bteg.teleportation.bungee.listeners.PluginMsgListener;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;

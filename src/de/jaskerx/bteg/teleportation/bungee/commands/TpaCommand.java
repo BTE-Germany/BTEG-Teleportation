@@ -1,11 +1,11 @@
-package de.jaskerx.btegteleportation.bungee.commands;
+package de.jaskerx.bteg.teleportation.bungee.commands;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import de.jaskerx.btegteleportation.bungee.main.Main;
+import de.jaskerx.bteg.teleportation.bungee.main.Main;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;

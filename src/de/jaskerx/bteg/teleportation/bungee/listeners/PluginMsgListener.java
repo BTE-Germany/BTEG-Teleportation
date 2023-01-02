@@ -1,12 +1,12 @@
-package de.jaskerx.btegteleportation.bungee.listeners;
+package de.jaskerx.bteg.teleportation.bungee.listeners;
 
 import java.util.UUID;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 
-import de.jaskerx.btegteleportation.bungee.main.LastLocation;
-import de.jaskerx.btegteleportation.bungee.main.Main;
+import de.jaskerx.bteg.teleportation.bungee.main.LastLocation;
+import de.jaskerx.bteg.teleportation.bungee.main.Main;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
