@@ -1,4 +1,4 @@
-package de.jaskerx.btegteleportation.bukkit.main;
+package de.jaskerx.bteg.teleportation.bukkit.main;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -6,8 +6,8 @@ import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import de.jaskerx.btegteleportation.bukkit.listeners.PlayerJoinListener;
-import de.jaskerx.btegteleportation.bukkit.listeners.PluginMsgListener;
+import de.jaskerx.bteg.teleportation.bukkit.listeners.PlayerJoinListener;
+import de.jaskerx.bteg.teleportation.bukkit.listeners.PluginMsgListener;
 
 public class Main extends JavaPlugin {
 

@@ -1,4 +1,4 @@
-package de.jaskerx.btegteleportation.bukkit.listeners;
+package de.jaskerx.bteg.teleportation.bukkit.listeners;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -6,7 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import de.jaskerx.btegteleportation.bukkit.main.Main;
+import de.jaskerx.bteg.teleportation.bukkit.main.Main;
 
 
 public class PlayerJoinListener implements Listener {

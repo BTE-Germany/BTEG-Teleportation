@@ -1,4 +1,4 @@
-package de.jaskerx.btegteleportation.bukkit.main;
+package de.jaskerx.bteg.teleportation.bukkit.main;
 
 import java.util.Calendar;
 

@@ -1,4 +1,4 @@
-package de.jaskerx.btegteleportation.bukkit.listeners;
+package de.jaskerx.bteg.teleportation.bukkit.listeners;
 
 import java.util.UUID;
 
@@ -11,8 +11,8 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
-import de.jaskerx.btegteleportation.bukkit.main.Main;
-import de.jaskerx.btegteleportation.bukkit.main.PendingTpPlayer;
+import de.jaskerx.bteg.teleportation.bukkit.main.Main;
+import de.jaskerx.bteg.teleportation.bukkit.main.PendingTpPlayer;
 
 public class PluginMsgListener implements PluginMessageListener {
 	
