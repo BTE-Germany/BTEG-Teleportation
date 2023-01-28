@@ -1,0 +1,3 @@
+name: TeleportationBungee
+version: '${project.version}'
+main: de.btegermany.teleportation.TeleportationBungee
