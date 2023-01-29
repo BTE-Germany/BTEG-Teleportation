@@ -1,3 +1,4 @@
 name: TeleportationBungee
 version: '${project.version}'
-main: de.btegermany.teleportation.TeleportationBungee
+main: de.btegermany.teleportation.TeleportationBungee.TeleportationBungee
+author: Leander, JaskerX
