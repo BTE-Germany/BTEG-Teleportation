@@ -43,7 +43,6 @@ public class GeoData {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestProperty("Accept", "application/json");
 
-            GeoLocation location = new GeoLocation(lat, lon);
             BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
             StringBuilder builder = new StringBuilder();
             reader.lines().forEach(builder::append);
@@ -51,6 +50,7 @@ public class GeoData {
             con.disconnect();
 
             if(response.has("address")) {
+                GeoLocation location = new GeoLocation(lat, lon);
                 JSONObject address = response.getJSONObject("address");
 
                 if(address.has("city")) {
@@ -66,7 +66,9 @@ public class GeoData {
                 return location;
             }
 
-        } catch (IOException e) {}
+        } catch (IOException e) {
+            return null;
+        }
 
         return null;
     }

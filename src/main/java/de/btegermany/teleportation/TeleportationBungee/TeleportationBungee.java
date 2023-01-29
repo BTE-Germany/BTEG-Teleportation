@@ -29,6 +29,7 @@ public class TeleportationBungee extends Plugin {
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpaCancelCommand());
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpHereCommand());
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpBackCommand());
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpllCommand());
 
         ProxyServer.getInstance().getPluginManager().registerListener(this, new PluginMsgListener());
 

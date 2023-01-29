@@ -1,11 +1,17 @@
 package de.btegermany.teleportation.TeleportationBungee.commands;
 
-import net.buildtheearth.terraminusminus.dataset.IScalarDataset;
+import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
+import de.btegermany.teleportation.TeleportationBungee.geo.GeoData;
+import de.btegermany.teleportation.TeleportationBungee.util.PluginMessenger;
+/*import net.buildtheearth.terraminusminus.dataset.IScalarDataset;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorPipelines;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
 import net.buildtheearth.terraminusminus.generator.GeneratorDatasets;
-import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
+import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;*/
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 import net.md_5.bungee.protocol.Location;
@@ -14,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class TpllCommand extends Command implements TabExecutor {
 
-    private static final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
+    //private static final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
     public TpllCommand() {
         super("tpll", null, "tpl");
     }
@@ -26,29 +32,39 @@ public class TpllCommand extends Command implements TabExecutor {
             if (sender.hasPermission("bteg.tpll")) {
 
                 double[] coordinates = new double[2];
-                coordinates[1] = Double.parseDouble(args[0].replace(",", ""));
-                coordinates[0] = Double.parseDouble(args[1]);
+                coordinates[0] = Double.parseDouble(args[0].replace(",", ""));
+                coordinates[1] = Double.parseDouble(args[1]);
 
-                double[] mcCoordinates = new double[0];
+/*                double[] mcCoordinates = new double[0];
                 try {
-                    mcCoordinates = bteGeneratorSettings.projection().fromGeo(coordinates[0], coordinates[1]);
+                    mcCoordinates = bteGeneratorSettings.projection().fromGeo(coordinates[1], coordinates[0]);
                 } catch (OutOfProjectionBoundsException e) {
                     e.printStackTrace();
                 }
-                String location = mcCoordinates[0] + " " + getHeight((int) mcCoordinates[0], (int) mcCoordinates[1]).join() + " " + mcCoordinates[1];
 
-//OSM fragen auf welchem server diese location liegt
+                double mcCoordinatesY = getHeight((int) mcCoordinates[0], (int) mcCoordinates[1]).join();*/
 
-                ///an bukkit plugin
+                //TODO: remove (only for testing)
+                double[] mcCoordinates = new double[] {111.222, 33.44};
+                double mcCoordinatesY = 666.999;
 
-                sender.sendMessage("§b§lBTEG §7» §7Teleporting to " + coordinates[1] + ", " + coordinates[0] + ".");
+                String location = mcCoordinates[0] + " " + mcCoordinatesY + " " + mcCoordinates[1];
+                ServerInfo targetServer = GeoData.getServerFromLocation(coordinates[0], coordinates[1]);
+                if(targetServer == null) {
+                    sender.sendMessage(TeleportationBungee.getFormattedMessage("Der Ort konnte nicht gefunden werden!"));
+                    return;
+                }
+
+                PluginMessenger.teleportToCoords((ProxiedPlayer) sender, targetServer, mcCoordinates[0], mcCoordinatesY, mcCoordinates[1]);
+
+                sender.sendMessage(new ComponentBuilder("§b§lBTEG §7» §7Teleporting to " + coordinates[1] + ", " + coordinates[0] + ".").create());
                 return;
             } else {
-                sender.sendMessage("§b§lBTEG §7» §7No permission for /tpll");
+                sender.sendMessage(new ComponentBuilder("§b§lBTEG §7» §7No permission for /tpll").create());
                 return;
             }
         }else {
-            sender.sendMessage("§b§lBTEG §7»  §7Usage: /tpll <longitudes> <latitudes>");
+            sender.sendMessage(new ComponentBuilder("§b§lBTEG §7»  §7Usage: /tpll <longitudes> <latitudes>").create());
             return;
         }
     }
@@ -58,7 +74,7 @@ public class TpllCommand extends Command implements TabExecutor {
         return null;
     }
 
-    public static CompletableFuture<Double> getHeight(double adjustedLon, double adjustedLat) {
+/*    public static CompletableFuture<Double> getHeight(double adjustedLon, double adjustedLat) {
         CompletableFuture<Double> altFuture;
         try {
             GeneratorDatasets datasets = new GeneratorDatasets(bteGeneratorSettings);
@@ -71,6 +87,6 @@ public class TpllCommand extends Command implements TabExecutor {
             altFuture = CompletableFuture.completedFuture(0.0);
         }
         return altFuture;
-    }
+    }*/
 
 }

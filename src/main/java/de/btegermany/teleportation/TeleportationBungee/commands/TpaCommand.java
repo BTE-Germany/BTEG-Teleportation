@@ -33,7 +33,7 @@ public class TpaCommand extends Command implements TabExecutor {
 
             ProxiedPlayer p = (ProxiedPlayer) sender;
             if(!p.hasPermission("teleportation.tpa")) {
-                p.sendMessage(new ComponentBuilder("§b$lBTEG $7> §cDu §cbist §cnicht §cberechtigt, §cdiesen §cCommand §causzuführen!").create());
+                p.sendMessage(new ComponentBuilder("§b§lBTEG §7> §cDu §cbist §cnicht §cberechtigt, §cdiesen §cCommand §causzuführen!").create());
                 return;
             }
 
@@ -55,7 +55,7 @@ public class TpaCommand extends Command implements TabExecutor {
                 compDeny.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/tpadeny " + p.getName()));
 
                 tpas.put(p.getUniqueId(), target.getUniqueId());
-                target.sendMessage(new ComponentBuilder("§b§lBTEG §7> §6Du §6hast §6eine §6Teleport-Anfrage §6von §6" + p.getDisplayName() + " �6erhalten. �6Nutze ").append(compAccept).append(" �6zum �6Akzeptieren �6und ").append(compDeny).append(" �6zum �6Ablehnen �6der �6Anfrage.").create());
+                target.sendMessage(new ComponentBuilder("§b§lBTEG §7> §6Du §6hast §6eine §6Teleport-Anfrage §6von §6" + p.getDisplayName() + " §6erhalten. §6Nutze ").append(compAccept).append(" §6zum §6Akzeptieren §6und ").append(compDeny).append(" §6zum §6Ablehnen §6der §6Anfrage.").create());
                 p.sendMessage(TeleportationBungee.getFormattedMessage("Die Anfrage wurde gesendet! Um sie abzubrechen, nutze /tpacancel."));
             } else {
                 p.sendMessage(TeleportationBungee.getFormattedMessage("Der Spieler wurde nicht gefunden!"));

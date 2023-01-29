@@ -9,6 +9,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
+import de.btegermany.teleportation.TeleportationBungee.util.PluginMessenger;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -64,6 +65,11 @@ public class TeleportCommand extends Command implements TabExecutor {
 
 
     public static void teleport(ProxiedPlayer p, ProxiedPlayer t) {
+        p.sendMessage(TeleportationBungee.getFormattedMessage("Du wirst zu " + t.getName() + " teleportiert..."));
+        PluginMessenger.teleportToPlayer(p, t);
+    }
+
+    /*public static void teleport(ProxiedPlayer p, ProxiedPlayer t) {
 
         Server serverOld = p.getServer();
         requestCoords(p, serverOld);
@@ -88,6 +94,6 @@ public class TeleportCommand extends Command implements TabExecutor {
         out.writeUTF(p.getUniqueId().toString());
         out.writeUTF(s.getInfo().getName());
         s.getInfo().sendData(TeleportationBungee.PLUGIN_CHANNEL, out.toByteArray());
-    }
+    }*/
 
 }
