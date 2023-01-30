@@ -8,10 +8,12 @@ public class GeoServer {
 
     ServerInfo serverInfo;
     List<String> states;
+    List<String> cities;
 
-    public GeoServer(ServerInfo serverInfo, List<String> states) {
+    public GeoServer(ServerInfo serverInfo, List<String> states, List<String> cities) {
         this.serverInfo = serverInfo;
         this.states = states;
+        this.cities = cities;
     }
 
 
@@ -23,5 +25,9 @@ public class GeoServer {
 
     public List<String> getStates() {
         return states;
+    }
+
+    public List<String> getCities() {
+        return cities;
     }
 }

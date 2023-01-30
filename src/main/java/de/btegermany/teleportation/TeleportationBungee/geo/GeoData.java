@@ -27,9 +27,19 @@ public class GeoData {
             return null;
         }
 
-        for(GeoServer server : geoServers) {
-            for(String state : server.getStates()) {
-                if(state.equalsIgnoreCase(location.getState())) {
+        if (location.getCity() != null) {
+            for (GeoServer server : geoServers) {
+                for (String city : server.getCities()) {
+                    if (city.equalsIgnoreCase(location.getCity())) {
+                        return server.getServerInfo();
+                    }
+                }
+            }
+        }
+
+        for (GeoServer server : geoServers) {
+            for (String state : server.getStates()) {
+                if (state.equalsIgnoreCase(location.getState())) {
                     return server.getServerInfo();
                 }
             }
@@ -42,6 +52,7 @@ public class GeoData {
         try {
             URL url = new URL("https://nominatim.openstreetmap.org/reverse?lat=" + lat + "&lon=" + lon + "&format=json&zoom=" + zoom);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestProperty("User-Agent", "BuildTheEarthGermany-Teleportation");
             con.setRequestProperty("Accept", "application/json");
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
@@ -97,8 +108,9 @@ public class GeoData {
 
             for(String server : config.getKeys()) {
                 ServerInfo serverInfo = ProxyServer.getInstance().getServerInfo(server);
-                List<String> states = new ArrayList<>(config.getStringList(server));
-                geoServers.add(new GeoServer(serverInfo, states));
+                List<String> states = new ArrayList<>(config.getStringList(server + ".bundesländer"));
+                List<String> cities = new ArrayList<>(config.getStringList(server + ".städte"));
+                geoServers.add(new GeoServer(serverInfo, states, cities));
             }
 
         } catch (IOException e) {
