@@ -4,11 +4,11 @@ import static de.btegermany.teleportation.TeleportationBungee.TeleportationBunge
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
 import de.btegermany.teleportation.TeleportationBungee.geo.GeoData;
 import de.btegermany.teleportation.TeleportationBungee.util.PluginMessenger;
-/*import net.buildtheearth.terraminusminus.dataset.IScalarDataset;
+import net.buildtheearth.terraminusminus.dataset.IScalarDataset;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorPipelines;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
 import net.buildtheearth.terraminusminus.generator.GeneratorDatasets;
-import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;*/
+import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -21,7 +21,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class TpllCommand extends Command implements TabExecutor {
 
-    //private static final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
+    private static final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
     public TpllCommand() {
         super("tpll", null, "tpl");
     }
@@ -36,18 +36,14 @@ public class TpllCommand extends Command implements TabExecutor {
                 coordinates[0] = Double.parseDouble(args[0].replace(",", ""));
                 coordinates[1] = Double.parseDouble(args[1]);
 
-/*                double[] mcCoordinates = new double[0];
+               double[] mcCoordinates = new double[0];
                 try {
                     mcCoordinates = bteGeneratorSettings.projection().fromGeo(coordinates[1], coordinates[0]);
                 } catch (OutOfProjectionBoundsException e) {
                     e.printStackTrace();
                 }
 
-                double mcCoordinatesY = getHeight((int) mcCoordinates[0], (int) mcCoordinates[1]).join();*/
-
-                //TODO: remove (only for testing)
-                double[] mcCoordinates = new double[] {111.222, 33.44};
-                double mcCoordinatesY = 666.999;
+                double mcCoordinatesY = getHeight((int) mcCoordinates[0], (int) mcCoordinates[1]).join();
 
                 String location = mcCoordinates[0] + " " + mcCoordinatesY + " " + mcCoordinates[1];
                 ServerInfo targetServer = GeoData.getServerFromLocation(coordinates[0], coordinates[1]);
@@ -58,7 +54,7 @@ public class TpllCommand extends Command implements TabExecutor {
 
                 PluginMessenger.teleportToCoords((ProxiedPlayer) sender, targetServer, mcCoordinates[0], mcCoordinatesY, mcCoordinates[1]);
 
-                sender.sendMessage(getFormattedMessage("Teleporting to " + coordinates[1] + ", " + coordinates[0] + "."));
+                sender.sendMessage(getFormattedMessage("Teleporting to " + coordinates[0] + ", " + coordinates[1] + "."));
                 return;
             } else {
                 sender.sendMessage(getFormattedMessage("No permission for /tpll"));
@@ -75,7 +71,7 @@ public class TpllCommand extends Command implements TabExecutor {
         return null;
     }
 
-/*    public static CompletableFuture<Double> getHeight(double adjustedLon, double adjustedLat) {
+    public static CompletableFuture<Double> getHeight(double adjustedLon, double adjustedLat) {
         CompletableFuture<Double> altFuture;
         try {
             GeneratorDatasets datasets = new GeneratorDatasets(bteGeneratorSettings);
@@ -88,6 +84,6 @@ public class TpllCommand extends Command implements TabExecutor {
             altFuture = CompletableFuture.completedFuture(0.0);
         }
         return altFuture;
-    }*/
+    }
 
 }
