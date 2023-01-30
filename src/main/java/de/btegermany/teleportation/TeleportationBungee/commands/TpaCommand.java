@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import static de.btegermany.teleportation.TeleportationBungee.TeleportationBungee.getFormattedMessage;
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -38,7 +39,7 @@ public class TpaCommand extends Command implements TabExecutor {
             }
 
             if(args.length != 1) {
-                p.sendMessage(TeleportationBungee.getFormattedMessage("Bitte gib einen Spieler an!"));
+                p.sendMessage(getFormattedMessage("Bitte gib einen Spieler an!"));
                 return;
             }
             ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
@@ -56,9 +57,9 @@ public class TpaCommand extends Command implements TabExecutor {
 
                 tpas.put(p.getUniqueId(), target.getUniqueId());
                 target.sendMessage(new ComponentBuilder("§b§lBTEG §7> §6Du §6hast §6eine §6Teleport-Anfrage §6von §6" + p.getDisplayName() + " §6erhalten. §6Nutze ").append(compAccept).append(" §6zum §6Akzeptieren §6und ").append(compDeny).append(" §6zum §6Ablehnen §6der §6Anfrage.").create());
-                p.sendMessage(TeleportationBungee.getFormattedMessage("Die Anfrage wurde gesendet! Um sie abzubrechen, nutze /tpacancel."));
+                p.sendMessage(getFormattedMessage("Die Anfrage wurde gesendet! Um sie abzubrechen, nutze /tpacancel."));
             } else {
-                p.sendMessage(TeleportationBungee.getFormattedMessage("Der Spieler wurde nicht gefunden!"));
+                p.sendMessage(getFormattedMessage("Der Spieler wurde nicht gefunden!"));
             }
         }
     }
@@ -81,12 +82,12 @@ public class TpaCommand extends Command implements TabExecutor {
         if(tpas.containsKey(p.getUniqueId())) {
             ProxiedPlayer target = ProxyServer.getInstance().getPlayer(tpas.get(p.getUniqueId()));
             tpas.remove(p.getUniqueId());
-            p.sendMessage(TeleportationBungee.getFormattedMessage("Die Anfrage wurde abgebrochen."));
+            p.sendMessage(getFormattedMessage("Die Anfrage wurde abgebrochen."));
             if(target != null) {
-                target.sendMessage(TeleportationBungee.getFormattedMessage(p.getDisplayName() + " hat die Anfrage abgebrochen!"));
+                target.sendMessage(getFormattedMessage(p.getDisplayName() + " hat die Anfrage abgebrochen!"));
             }
         } else {
-            p.sendMessage(TeleportationBungee.getFormattedMessage("Du hast keine Anfrage gestellt!"));
+            p.sendMessage(getFormattedMessage("Du hast keine Anfrage gestellt!"));
         }
     }
 

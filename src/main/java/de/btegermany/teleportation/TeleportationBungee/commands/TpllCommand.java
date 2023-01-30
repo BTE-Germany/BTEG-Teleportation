@@ -1,5 +1,6 @@
 package de.btegermany.teleportation.TeleportationBungee.commands;
 
+import static de.btegermany.teleportation.TeleportationBungee.TeleportationBungee.getFormattedMessage;
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
 import de.btegermany.teleportation.TeleportationBungee.geo.GeoData;
 import de.btegermany.teleportation.TeleportationBungee.util.PluginMessenger;
@@ -51,20 +52,20 @@ public class TpllCommand extends Command implements TabExecutor {
                 String location = mcCoordinates[0] + " " + mcCoordinatesY + " " + mcCoordinates[1];
                 ServerInfo targetServer = GeoData.getServerFromLocation(coordinates[0], coordinates[1]);
                 if(targetServer == null) {
-                    sender.sendMessage(TeleportationBungee.getFormattedMessage("Der Ort konnte nicht gefunden werden!"));
+                    sender.sendMessage(getFormattedMessage("Location could not be found!"));
                     return;
                 }
 
                 PluginMessenger.teleportToCoords((ProxiedPlayer) sender, targetServer, mcCoordinates[0], mcCoordinatesY, mcCoordinates[1]);
 
-                sender.sendMessage(new ComponentBuilder("§b§lBTEG §7» §7Teleporting to " + coordinates[1] + ", " + coordinates[0] + ".").create());
+                sender.sendMessage(getFormattedMessage("Teleporting to " + coordinates[1] + ", " + coordinates[0] + "."));
                 return;
             } else {
-                sender.sendMessage(new ComponentBuilder("§b§lBTEG §7» §7No permission for /tpll").create());
+                sender.sendMessage(getFormattedMessage("No permission for /tpll"));
                 return;
             }
         }else {
-            sender.sendMessage(new ComponentBuilder("§b§lBTEG §7»  §7Usage: /tpll <longitudes> <latitudes>").create());
+            sender.sendMessage(getFormattedMessage("Usage: /tpll <longitudes> <latitudes>"));
             return;
         }
     }

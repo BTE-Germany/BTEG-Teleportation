@@ -17,6 +17,7 @@ public class PluginMsgListener implements Listener {
     @EventHandler
     public void onPluginMessage(PluginMessageEvent event) {
 
+        //TODO: remove???
         if(event.getTag().equals(TeleportationBungee.PLUGIN_CHANNEL)) {
             ByteArrayDataInput in = ByteStreams.newDataInput(event.getData());
             if(in.readUTF().equals("coords")) {

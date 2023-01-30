@@ -1,5 +1,6 @@
 package de.btegermany.teleportation.TeleportationBungee.geo;
 
+import static de.btegermany.teleportation.TeleportationBungee.TeleportationBungee.getInstance;
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -76,7 +77,7 @@ public class GeoData {
     public static void loadGeoServers() {
         geoServers = new ArrayList<>();
         ConfigurationProvider provider = YamlConfiguration.getProvider(YamlConfiguration.class);
-        File dir = TeleportationBungee.getInstance().getDataFolder();
+        File dir = getInstance().getDataFolder();
         if(!dir.getParentFile().exists()) dir.getParentFile().mkdir();
         if(!dir.exists()) dir.mkdir();
         File configFile = new File(dir, "config.yaml");
@@ -101,7 +102,7 @@ public class GeoData {
             }
 
         } catch (IOException e) {
-            TeleportationBungee.getInstance().getLogger().info("Config unter \"" + configFile.getPath() + "\" (und damit die Aufteilung der Bundesländer auf die Server) konnte nicht geladen werden!");
+            getInstance().getLogger().info("Config unter \"" + configFile.getPath() + "\" (und damit die Aufteilung der Bundesländer auf die Server) konnte nicht geladen werden!");
             e.printStackTrace();
         }
     }

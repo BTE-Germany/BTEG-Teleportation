@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import static de.btegermany.teleportation.TeleportationBungee.TeleportationBungee.getFormattedMessage;
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -36,27 +37,27 @@ public class TpacceptCommand extends Command implements TabExecutor {
                 ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
                 if(target != null) {
                     if(TpaCommand.tpas.containsKey(target.getUniqueId()) && TpaCommand.tpas.get(target.getUniqueId()).equals(p.getUniqueId())) {
-                        target.sendMessage(TeleportationBungee.getFormattedMessage("Deine Anfrage wurde angenommen!"));
+                        target.sendMessage(getFormattedMessage("Deine Anfrage wurde angenommen!"));
                         TeleportCommand.teleport(target, p);
                         TpaCommand.tpas.remove(target.getUniqueId());
                     } else {
-                        p.sendMessage(TeleportationBungee.getFormattedMessage("Du hast keine Anfrage von diesem Spieler erhalten!"));
+                        p.sendMessage(getFormattedMessage("Du hast keine Anfrage von diesem Spieler erhalten!"));
                     }
                 } else {
-                    p.sendMessage(TeleportationBungee.getFormattedMessage("Der Spieler wurde nicht gefunden!"));
+                    p.sendMessage(getFormattedMessage("Der Spieler wurde nicht gefunden!"));
                 }
             } else if(args.length == 0 && requests == 1) {
                 for(Map.Entry<UUID, UUID> entry : TpaCommand.tpas.entrySet()) {
                     if(entry.getValue().equals(p.getUniqueId())) {
                         ProxiedPlayer target = ProxyServer.getInstance().getPlayer(entry.getKey());
-                        target.sendMessage(TeleportationBungee.getFormattedMessage("Deine Anfrage wurde angenommen!"));
+                        target.sendMessage(getFormattedMessage("Deine Anfrage wurde angenommen!"));
                         TeleportCommand.teleport(target, p);
                         TpaCommand.tpas.remove(target.getUniqueId());
                         return;
                     }
                 }
             } else {
-                p.sendMessage(TeleportationBungee.getFormattedMessage("Bitte gib den Spieler an, der die Anfrage gesendet hat!"));
+                p.sendMessage(getFormattedMessage("Bitte gib den Spieler an, der die Anfrage gesendet hat!"));
             }
         }
     }
@@ -74,7 +75,7 @@ public class TpacceptCommand extends Command implements TabExecutor {
                     }
                 }
                 if(!TpaCommand.tpas.containsValue(player.getUniqueId())) {
-                    player.sendMessage(TeleportationBungee.getFormattedMessage("Du hast keine Anfragen erhalten."));;
+                    player.sendMessage(getFormattedMessage("Du hast keine Anfragen erhalten."));
                 }
             }
         }

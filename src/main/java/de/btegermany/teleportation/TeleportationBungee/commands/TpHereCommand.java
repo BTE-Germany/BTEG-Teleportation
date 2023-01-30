@@ -3,6 +3,7 @@ package de.btegermany.teleportation.TeleportationBungee.commands;
 import java.util.HashSet;
 import java.util.Set;
 
+import static de.btegermany.teleportation.TeleportationBungee.TeleportationBungee.getFormattedMessage;
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -28,7 +29,7 @@ public class TpHereCommand extends Command implements TabExecutor {
             }
 
             if(args.length != 1) {
-                p.sendMessage(TeleportationBungee.getFormattedMessage("Bitte gib einen Spieler an!"));
+                p.sendMessage(getFormattedMessage("Bitte gib einen Spieler an!"));
                 return;
             }
             ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
@@ -36,10 +37,10 @@ public class TpHereCommand extends Command implements TabExecutor {
 
             if(target != null) {
 
-                p.sendMessage(TeleportationBungee.getFormattedMessage(target.getName() + " wird zu dir teleportiert..."));
+                p.sendMessage(getFormattedMessage(target.getName() + " wird zu dir teleportiert..."));
                 TeleportCommand.teleport(target, p);
             } else {
-                p.sendMessage(TeleportationBungee.getFormattedMessage("Der Spieler wurde nicht gefunden!"));
+                p.sendMessage(getFormattedMessage("Der Spieler wurde nicht gefunden!"));
             }
         }
     }
