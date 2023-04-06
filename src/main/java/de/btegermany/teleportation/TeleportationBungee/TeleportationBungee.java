@@ -1,12 +1,12 @@
 package de.btegermany.teleportation.TeleportationBungee;
 
-import java.util.*;
-
-import de.btegermany.teleportation.TeleportationBungee.LastLocation;
-
-import de.btegermany.teleportation.TeleportationBungee.commands.*;
+import de.btegermany.teleportation.TeleportationBungee.command.*;
 import de.btegermany.teleportation.TeleportationBungee.geo.GeoData;
-import de.btegermany.teleportation.TeleportationBungee.listeners.PluginMsgListener;
+import de.btegermany.teleportation.TeleportationBungee.listener.PluginMsgListener;
+import de.btegermany.teleportation.TeleportationBungee.registry.RegistriesProvider;
+import de.btegermany.teleportation.TeleportationBungee.util.Database;
+import de.btegermany.teleportation.TeleportationBungee.util.PluginMessenger;
+import de.btegermany.teleportation.TeleportationBungee.util.Utils;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -14,28 +14,38 @@ import net.md_5.bungee.api.plugin.Plugin;
 
 public class TeleportationBungee extends Plugin {
 
-    public static HashMap<UUID, LastLocation> lastLocations = new HashMap<>();
     public static String PLUGIN_CHANNEL = "bungeecord:btegtp";
-    public static TeleportationBungee instance;
+    private static TeleportationBungee instance;
+    private Database database;
 
     @Override
     public void onEnable() {
         instance = this;
 
-        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TeleportCommand());
-        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpaCommand());
-        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpacceptCommand());
-        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpaDenyCommand());
-        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpaCancelCommand());
-        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpHereCommand());
-        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpBackCommand());
-        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpllCommand());
+        RegistriesProvider registriesProvider = new RegistriesProvider();
+        PluginMessenger pluginMessenger = new PluginMessenger();
+        Utils utils = new Utils(pluginMessenger, registriesProvider);
+        GeoData geoData = new GeoData(this);
+        geoData.loadGeoServers();
+        database = new Database(this);
+        database.connect();
 
-        //ProxyServer.getInstance().getPluginManager().registerListener(this, new PluginMsgListener());
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TeleportCommand(utils));
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpaCommand(utils, registriesProvider));
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpacceptCommand(utils, registriesProvider));
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpaDenyCommand(registriesProvider));
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpaCancelCommand(utils));
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpHereCommand(utils));
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpBackCommand(registriesProvider));
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpllCommand(geoData, pluginMessenger));
 
         ProxyServer.getInstance().registerChannel(PLUGIN_CHANNEL);
+        ProxyServer.getInstance().getPluginManager().registerListener(this, new PluginMsgListener(pluginMessenger, database, geoData, registriesProvider));
+    }
 
-        GeoData.loadGeoServers();
+    @Override
+    public void onDisable() {
+        database.disconnect();
     }
 
     public static BaseComponent[] getFormattedMessage(String text) {

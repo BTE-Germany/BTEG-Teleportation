@@ -1,12 +1,12 @@
 package de.btegermany.teleportation.TeleportationBungee.geo;
 
-import static de.btegermany.teleportation.TeleportationBungee.TeleportationBungee.getInstance;
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
+import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -19,9 +19,14 @@ import java.util.List;
 
 public class GeoData {
 
-    public static List<GeoServer> geoServers;
+    private final TeleportationBungee plugin;
+    private List<GeoServer> geoServers;
 
-    public static ServerInfo getServerFromLocation(double lat, double lon) {
+    public GeoData(TeleportationBungee plugin) {
+        this.plugin = plugin;
+    }
+
+    public ServerInfo getServerFromLocation(double lat, double lon) {
         GeoLocation location = getLocation(lat, lon, 10);
         if (location == null) {
             return null;
@@ -48,7 +53,7 @@ public class GeoData {
         return null;
     }
 
-    public static GeoLocation getLocation(double lat, double lon, int zoom) {
+    public GeoLocation getLocation(double lat, double lon, int zoom) {
         try {
             URL url = new URL("https://nominatim.openstreetmap.org/reverse?lat=" + lat + "&lon=" + lon + "&format=json&zoom=" + zoom);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -85,26 +90,21 @@ public class GeoData {
         return null;
     }
 
-    public static void loadGeoServers() {
+    public void loadGeoServers() {
         geoServers = new ArrayList<>();
         ConfigurationProvider provider = YamlConfiguration.getProvider(YamlConfiguration.class);
-        File dir = getInstance().getDataFolder();
+        File dir = plugin.getDataFolder();
         if(!dir.getParentFile().exists()) dir.getParentFile().mkdir();
         if(!dir.exists()) dir.mkdir();
         File configFile = new File(dir, "config.yaml");
 
         try {
-            Configuration config;
             if(!configFile.exists()) {
-                configFile.createNewFile();
-                config = provider.load(configFile);
-                for(String server : ProxyServer.getInstance().getServers().keySet()) {
-                    config.set(server, "");
+                try (InputStream inputStream = plugin.getResourceAsStream("config.yaml")) {
+                    FileUtils.copyInputStreamToFile(inputStream, configFile);
                 }
-                provider.save(config, configFile);
-            } else {
-                config = provider.load(configFile);
             }
+            Configuration config = provider.load(configFile);
 
             for(String server : config.getKeys()) {
                 ServerInfo serverInfo = ProxyServer.getInstance().getServerInfo(server);
@@ -114,9 +114,12 @@ public class GeoData {
             }
 
         } catch (IOException e) {
-            getInstance().getLogger().info("Config unter \"" + configFile.getPath() + "\" (und damit die Aufteilung der Bundesländer auf die Server) konnte nicht geladen werden!");
+            plugin.getLogger().info("Config unter \"" + configFile.getPath() + "\" (und damit die Aufteilung der Bundesländer auf die Server) konnte nicht geladen werden!");
             e.printStackTrace();
         }
     }
 
+    public List<GeoServer> getGeoServers() {
+        return geoServers;
+    }
 }
