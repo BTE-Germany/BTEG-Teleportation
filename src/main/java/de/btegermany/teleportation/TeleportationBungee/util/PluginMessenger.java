@@ -3,7 +3,6 @@ package de.btegermany.teleportation.TeleportationBungee.util;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
-import de.btegermany.teleportation.TeleportationBungee.Warp;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONArray;

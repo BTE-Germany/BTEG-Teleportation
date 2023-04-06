@@ -1,4 +1,4 @@
-package de.btegermany.teleportation.TeleportationBungee;
+package de.btegermany.teleportation.TeleportationBungee.util;
 
 public class Warp {
 

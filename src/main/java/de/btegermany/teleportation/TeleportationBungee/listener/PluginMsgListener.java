@@ -11,7 +11,7 @@ import com.google.common.io.ByteStreams;
 
 
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
-import de.btegermany.teleportation.TeleportationBungee.Warp;
+import de.btegermany.teleportation.TeleportationBungee.util.Warp;
 import de.btegermany.teleportation.TeleportationBungee.geo.GeoData;
 import de.btegermany.teleportation.TeleportationBungee.geo.GeoServer;
 import de.btegermany.teleportation.TeleportationBungee.registry.RegistriesProvider;
