@@ -27,8 +27,8 @@ public class ManageWarpsGui extends SinglePageWarpGuiAbstract {
         inventory.addHandler(new PagedInventoryClickHandler() {
             @Override
             public void handle(ClickHandler clickHandler) {
-                if(clickHandler.getCurrentItem().getItemMeta() == null) return;
-                switch (clickHandler.getCurrentItem().getItemMeta().getDisplayName()) {
+                if(clickHandler.getCurrentItem().getItemMeta() == null || clickHandler.getCurrentItem().getItemMeta().getDisplayName().length() < 3) return;
+                switch (clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2)) {
                     case "Löschen":
                         registriesProvider.getPlayersEnteringDeleteWarpIdRegistry().register(player);
                         player.closeInventory();

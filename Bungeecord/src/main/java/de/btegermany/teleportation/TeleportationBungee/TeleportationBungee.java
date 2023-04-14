@@ -31,13 +31,13 @@ import java.util.concurrent.TimeUnit;
 
 public class TeleportationBungee extends Plugin {
 
-    public static String PLUGIN_CHANNEL = "bungeecord:btegtp";
     private static TeleportationBungee instance;
+    public static final String PLUGIN_CHANNEL = "bungeecord:btegtp";
+    public static final ForgeChannel terramapMapSyncChannel = ForgeChannelRegistry.instance().get("terramap:mapsync");
+    public static final ForgeChannel terramapPluginChannel = ForgeChannelRegistry.instance().get("terramap:sh");
     private Database database;
     private RegistriesProvider registriesProvider;
     private GeoData geoData;
-    public static ForgeChannel terramapMapSyncChannel = ForgeChannelRegistry.instance().get("terramap:mapsync");
-    public static ForgeChannel terramapPluginChannel = ForgeChannelRegistry.instance().get("terramap:sh");
     private ScheduledExecutorService scheduledExecutorServiceCheckStateBorders;
     private final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
 
