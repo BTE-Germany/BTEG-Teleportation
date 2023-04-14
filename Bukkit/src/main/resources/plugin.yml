@@ -1,0 +1,32 @@
+name: BTEGTeleportation
+version: 1.0
+main: de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit
+author: JaskerX
+description: This is a plugin creating the ability to teleport players to other players between servers in the network.
+
+commands:
+  tp:
+    description: Teleport to another player.
+    usage: /de.jaskerx.bteg.teleportation.bukkit.tp [player]
+  tpa:
+    description: Send a teleportation request to another player.
+    usage: /tpa [player]
+  tpaccept:
+    description: Accept a teleportation request.
+    usage: /tpaccept (optional [player])
+  tpadeny:
+    description: Deny a teleportation request.
+    usage: /tpadeny (optional [player])
+  tpacancel:
+    description: Cancel a teleportation request.
+    usage: /tpacancel
+  tphere:
+    description: Teleport a player to you.
+    usage: /tphere [player]
+  tpback:
+    description: Teleport back to the location you have been teleported from.
+    usage: /tpback
+  nwarp:
+    usage: /nwarp
+    aliases:
+      - warp

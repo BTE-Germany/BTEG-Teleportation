@@ -1,0 +1,29 @@
+package de.btegermany.teleportation.TeleportationBukkit.tp;
+
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import java.util.UUID;
+
+public class PendingTpPlayer extends PendingTeleportationAbstract {
+
+    UUID targetUUID;
+
+    public PendingTpPlayer(UUID playerUUID, UUID targetUUID) {
+        super(playerUUID);
+        this.targetUUID = targetUUID;
+    }
+
+    @Override
+    public boolean canTeleport() {
+        return Bukkit.getPlayer(playerUUID) != null && Bukkit.getPlayer(playerUUID).isOnline() && Bukkit.getPlayer(targetUUID) != null && Bukkit.getPlayer(targetUUID).isOnline();
+    }
+
+    @Override
+    public void teleport() {
+        Player p = Bukkit.getPlayer(playerUUID);
+        Player t = Bukkit.getPlayer(targetUUID);
+        p.teleport(t);
+    }
+
+}
