@@ -5,11 +5,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 
 
+import de.btegermany.teleportation.TeleportationBungee.BukkitPlayer;
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
 import de.btegermany.teleportation.TeleportationBungee.util.Warp;
 import de.btegermany.teleportation.TeleportationBungee.geo.GeoData;
@@ -24,7 +26,9 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
+import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
+import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import org.json.JSONArray;
@@ -76,16 +80,16 @@ public class PluginMsgListener implements Listener {
 
                 switch (group) {
                     case "Alle":
-                        sendGuiData(player, metaTitle, server.getInfo(), pages, "SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height FROM warps ORDER BY name");
+                        sendGuiData(player, metaTitle, pages, "SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height FROM warps ORDER BY name");
                         break;
                     case "Städte":
-                        sendGuiData(player, metaTitle, server.getInfo(), pages, "SELECT city AS name, state FROM warps GROUP BY city ORDER BY city");
+                        sendGuiData(player, metaTitle, pages, "SELECT city AS name, state FROM warps GROUP BY city ORDER BY city");
                         break;
                     case "city":
-                        sendGuiData(player, metaTitle, server.getInfo(), pages, "SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height FROM warps WHERE city = '" + title + "' ORDER BY name");
+                        sendGuiData(player, metaTitle, pages, "SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height FROM warps WHERE city = '" + title + "' ORDER BY name");
                         break;
                     case "bl":
-                        sendGuiData(player, metaTitle, server.getInfo(), pages, "SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height FROM warps WHERE state = '" + title + "' ORDER BY name");
+                        sendGuiData(player, metaTitle, pages, "SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height FROM warps WHERE state = '" + title + "' ORDER BY name");
                         break;
                     case "server":
                         Optional<GeoServer> optional = geoData.getGeoServers().stream().filter(geoServer -> geoServer.getServerInfo().getName().equals(title)).findFirst();
@@ -118,7 +122,7 @@ public class PluginMsgListener implements Listener {
                                 gs.getCities().forEach(city -> builder.append(" AND city <> '").append(city).append("'"));
                             }
                         });
-                        sendGuiData(player, metaTitle, server.getInfo(), pages, "SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height FROM warps WHERE" + new String(builder) + " ORDER BY name");
+                        sendGuiData(player, metaTitle, pages, "SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height FROM warps WHERE" + new String(builder) + " ORDER BY name");
                         break;
                 }
                 break;
@@ -391,6 +395,44 @@ public class PluginMsgListener implements Listener {
                 }
                 break;
 
+            case "players_online":
+                String serverAddress = dataInput.readUTF();
+                Optional<ServerInfo> optionalServerInfo = ProxyServer.getInstance().getServers().values().stream().filter(si -> si.getSocketAddress().toString().contains(serverAddress)).findFirst();
+                if(!optionalServerInfo.isPresent()) {
+                    return;
+                }
+                ServerInfo serverInfo = optionalServerInfo.get();
+                JSONArray jsonArray = new JSONArray(dataInput.readUTF());
+
+                if(jsonArray.length() == 0) {
+                    List<BukkitPlayer> unregister = registriesProvider.getBukkitPlayersRegistry().getBukkitPlayers().values().stream().filter(bukkitPlayer -> bukkitPlayer.getServerInfo().equals(serverInfo)).collect(Collectors.toList());
+                    for(BukkitPlayer bukkitPlayer : unregister) {
+                        registriesProvider.getBukkitPlayersRegistry().unregister(bukkitPlayer.getProxiedPlayer());
+                    }
+                }
+
+                for(int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject playerObject = jsonArray.getJSONObject(i);
+                    playerUUID = UUID.fromString(playerObject.getString("player_uuid"));
+                    ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(playerUUID);
+                    if(proxiedPlayer == null || !proxiedPlayer.isConnected())  {
+                        continue;
+                    }
+                    x = playerObject.getDouble("x");
+                    y = playerObject.getDouble("y");
+                    z = playerObject.getDouble("z");
+                    yaw = playerObject.getFloat("yaw");
+                    pitch = playerObject.getFloat("pitch");
+                    String gameMode = playerObject.getString("gamemode").toLowerCase();
+                    BukkitPlayer bukkitPlayer = new BukkitPlayer(proxiedPlayer, serverInfo, x, y, z, yaw, pitch, gameMode);
+                    if(registriesProvider.getBukkitPlayersRegistry().isRegistered(bukkitPlayer.getProxiedPlayer())) {
+                        registriesProvider.getBukkitPlayersRegistry().replace(bukkitPlayer);
+                        continue;
+                    }
+                    registriesProvider.getBukkitPlayersRegistry().register(bukkitPlayer);
+                }
+                break;
+
         }
     }
 
@@ -443,11 +485,13 @@ public class PluginMsgListener implements Listener {
         }
     }
 
-    private void sendGuiData(ProxiedPlayer player, String title, ServerInfo serverInfo, int[] pages, String query) {
+    private void sendGuiData(ProxiedPlayer player, String title, int[] pages, String query) {
         loadGuiData(player, query, pages[0] == 0, () -> {
             JSONArray pagesData = new JSONArray();
             for (int page : pages) {
-                if(page + 1 > cachedGuiData.get(player.getUniqueId()).size()) continue;
+                if(page + 1 > cachedGuiData.get(player.getUniqueId()).size()) {
+                    continue;
+                }
                 JSONObject object = new JSONObject();
                 object.put("page", page);
                 JSONArray objectContent = new JSONArray();
@@ -455,7 +499,7 @@ public class PluginMsgListener implements Listener {
                 object.put("content", objectContent);
                 pagesData.put(object);
             }
-            pluginMessenger.sendGuiData(player, title, serverInfo, pagesData);
+            pluginMessenger.sendGuiData(player, title, pagesData);
         });
     }
 

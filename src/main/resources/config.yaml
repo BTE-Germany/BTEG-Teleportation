@@ -1,8 +1,1 @@
-# Beispiel für Server:
-# --------------------
-# Terra-1:
-#   bundesländer:
-#   - Niedersachsen
-#   städte:
-#   - Kiel
-# --------------------
+sqlite-database-path: plugins/TeleportationBungee/BTEGTeleportationBungee.db

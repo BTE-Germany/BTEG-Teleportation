@@ -1,0 +1,14 @@
+# Beispiel für Server:
+# --------------------
+#
+# Terra-3:
+#   isEarthServer: true
+#   bundesländer:
+#   - Niedersachsen
+#   städte:
+#   - Kiel
+#
+# Plot-1:
+#   tpll-passthrough: true
+#
+# --------------------

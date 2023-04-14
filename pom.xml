@@ -77,12 +77,13 @@
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
             <version>1.19-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.github.SmylerMC</groupId>
             <artifactId>terraminusminus</artifactId>
             <version>feature~bukkit-5907790da3-1</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -107,6 +108,20 @@
             <artifactId>commons-io</artifactId>
             <version>2.11.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>fr.thesmyler</groupId>
+            <artifactId>Bungee2Forge</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+            <version>5.0.0.Alpha2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+            <version>5.0.0.Alpha2</version>
+        </dependency>
     </dependencies>
 </project>

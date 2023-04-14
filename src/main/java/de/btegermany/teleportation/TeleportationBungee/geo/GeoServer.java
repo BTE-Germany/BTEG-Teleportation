@@ -6,14 +6,20 @@ import java.util.List;
 
 public class GeoServer {
 
-    ServerInfo serverInfo;
-    List<String> states;
-    List<String> cities;
+    private final ServerInfo serverInfo;
+    private final List<String> states;
+    private final List<String> cities;
+    private final boolean tpllPassthrough;
+    private final boolean isEarthServer;
+    private final boolean showPlayersOnTerramap;
 
-    public GeoServer(ServerInfo serverInfo, List<String> states, List<String> cities) {
+    public GeoServer(ServerInfo serverInfo, List<String> states, List<String> cities, boolean tpllPassthrough, boolean isEarthServer, boolean showPlayersOnTerramap) {
         this.serverInfo = serverInfo;
         this.states = states;
         this.cities = cities;
+        this.tpllPassthrough = tpllPassthrough;
+        this.isEarthServer = isEarthServer;
+        this.showPlayersOnTerramap = showPlayersOnTerramap;
     }
 
 
@@ -30,4 +36,17 @@ public class GeoServer {
     public List<String> getCities() {
         return cities;
     }
+
+    public boolean isTpllPassthrough() {
+        return tpllPassthrough;
+    }
+
+    public boolean isEarthServer() {
+        return isEarthServer;
+    }
+
+    public boolean shouldShowPlayersOnTerramap() {
+        return showPlayersOnTerramap;
+    }
+
 }

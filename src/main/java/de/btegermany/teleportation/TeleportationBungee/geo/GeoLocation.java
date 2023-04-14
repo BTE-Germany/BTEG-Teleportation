@@ -28,6 +28,10 @@ public class GeoLocation {
         this.city = city;
     }
 
+    public String getCountry() {
+        return country;
+    }
+
     public String getState() {
         return state;
     }

@@ -28,7 +28,7 @@ public class PluginMessenger {
         send(player, server, out.toByteArray());
     }
 
-    public void sendGuiData(ProxiedPlayer player, String title, ServerInfo server, JSONArray pagesData) {
+    public void sendGuiData(ProxiedPlayer player, String title, JSONArray pagesData) {
         JSONObject object = new JSONObject();
         object.put("title", title);
         object.put("player_uuid", player.getUniqueId().toString());
@@ -36,7 +36,7 @@ public class PluginMessenger {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("gui_data");
         out.writeUTF(object.toString());
-        server.sendData(TeleportationBungee.PLUGIN_CHANNEL, out.toByteArray());
+        player.getServer().sendData(TeleportationBungee.PLUGIN_CHANNEL, out.toByteArray());
     }
 
     public void sendWarpInfo(ProxiedPlayer proxiedPlayer, Warp warp, int responseNumber) {
@@ -58,8 +58,8 @@ public class PluginMessenger {
     }
 
     private void send(ProxiedPlayer player, ServerInfo server, byte[] bytes) {
-        if(!player.getServer().getInfo().equals(server)) player.connect(server);
         server.sendData(TeleportationBungee.PLUGIN_CHANNEL, bytes);
+        if(!player.getServer().getInfo().equals(server)) player.connect(server);
     }
 
 }

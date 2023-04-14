@@ -10,17 +10,21 @@ public class Database {
 
     private Connection connection;
     private final TeleportationBungee plugin;
+    private final String path;
 
-    public Database(TeleportationBungee plugin) {
+    public Database(TeleportationBungee plugin, String path) {
         this.plugin = plugin;
+        this.path = path;
     }
 
     public void connect() {
         File dir = plugin.getDataFolder();
         if(!dir.exists()) dir.mkdir();
         try {
+            //File dbFile = new File(path);
+            //plugin.getLogger().info("Connecting to SQLite DB: " + dbFile.getAbsolutePath());
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:plugins/" + dir.getName() + "/BTEGTeleportationBungee.db");
+            connection = DriverManager.getConnection("jdbc:sqlite:" + new File(dir, "BTEGTeleportationBungee.db").getAbsolutePath() /*dbFile.getAbsolutePath()*/);
 
             try(PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS warps ('id' INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT, 'name' TEXT NOT NULL, 'city' TEXT NOT NULL, 'state' TEXT NOT NULL, 'latitude' TEXT NOT NULL, 'longitude' TEXT NOT NULL, 'head_id' TEXT NULL DEFAULT NULL, 'yaw' REAL NOT NULL DEFAULT 0 , 'pitch' REAL NOT NULL DEFAULT 0, 'height' REAL NOT NULL)")) {
                 executeUpdateSync(preparedStatement);
