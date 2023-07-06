@@ -21,6 +21,7 @@ import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsExcepti
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -84,7 +85,7 @@ public class TeleportationBungee extends Plugin {
             terramapMapSyncChannel.send(playerSyncPacket, ProxyServer.getInstance().getPlayers().toArray(new ProxiedPlayer[0]));
         }, 0, 500, TimeUnit.MILLISECONDS);
 
-        startStateBorderCheck();
+        //startStateBorderCheck();
     }
 
     @Override
@@ -95,7 +96,7 @@ public class TeleportationBungee extends Plugin {
         terramapPluginChannel.deregisterAllPackets();
         BungeeToForgePlugin.onDisable(this);
 
-        this.scheduledExecutorServiceCheckStateBorders.shutdownNow();
+        //this.scheduledExecutorServiceCheckStateBorders.shutdownNow();
     }
 
     public void startStateBorderCheck() {
@@ -104,12 +105,11 @@ public class TeleportationBungee extends Plugin {
             this.registriesProvider.getBukkitPlayersRegistry().getBukkitPlayers().forEach((uuid, bukkitPlayer) -> {
                 try {
                     double[] coords = this.bteGeneratorSettings.projection().toGeo(bukkitPlayer.getX(), bukkitPlayer.getZ());
-                    this.geoData.getServerFromLocation(coords[1], coords[0]).thenAccept(serverInfo -> {
-                        if(!bukkitPlayer.getServerInfo().equals(serverInfo) && this.geoData.getGeoServers().stream().anyMatch(geoServer -> geoServer.getServerInfo().equals(serverInfo) && geoServer.isEarthServer()) && this.geoData.getGeoServers().stream().anyMatch(geoServer -> geoServer.getServerInfo().equals(bukkitPlayer.getServerInfo()) && geoServer.isEarthServer())) {
-                            bukkitPlayer.getProxiedPlayer().sendMessage(TeleportationBungee.getFormattedMessage("Dieses Bundesland liegt auf einem anderen Server, du wirst daher auf den richtigen Server gesendet!"));
-                            ProxyServer.getInstance().getPluginManager().dispatchCommand(bukkitPlayer.getProxiedPlayer(), "tpll " + coords[1] + " " + coords[0] + " yaw=" + bukkitPlayer.getYaw() + " pitch=" + bukkitPlayer.getPitch());
-                        }
-                    });
+                    ServerInfo serverInfo = this.geoData.getServerFromLocation(coords[1], coords[0]);
+                    if(!bukkitPlayer.getServerInfo().equals(serverInfo) && this.geoData.getGeoServers().stream().anyMatch(geoServer -> geoServer.getServerInfo().equals(serverInfo) && geoServer.isEarthServer()) && this.geoData.getGeoServers().stream().anyMatch(geoServer -> geoServer.getServerInfo().equals(bukkitPlayer.getServerInfo()) && geoServer.isEarthServer())) {
+                        bukkitPlayer.getProxiedPlayer().sendMessage(TeleportationBungee.getFormattedMessage("Dieses Bundesland liegt auf einem anderen Server, du wirst daher auf den richtigen Server gesendet!"));
+                        ProxyServer.getInstance().getPluginManager().dispatchCommand(bukkitPlayer.getProxiedPlayer(), "tpll " + coords[1] + " " + coords[0] + " yaw=" + bukkitPlayer.getYaw() + " pitch=" + bukkitPlayer.getPitch());
+                    }
                 } catch (OutOfProjectionBoundsException e) {
                     throw new RuntimeException(e);
                 }

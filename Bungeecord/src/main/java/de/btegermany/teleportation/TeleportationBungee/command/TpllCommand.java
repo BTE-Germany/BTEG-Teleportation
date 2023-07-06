@@ -1,25 +1,27 @@
 package de.btegermany.teleportation.TeleportationBungee.command;
 
+import de.btegermany.teleportation.TeleportationBungee.geo.CoordinateFormatConverter;
 import de.btegermany.teleportation.TeleportationBungee.geo.GeoData;
 import de.btegermany.teleportation.TeleportationBungee.geo.GeoServer;
 import de.btegermany.teleportation.TeleportationBungee.util.PluginMessenger;
 import net.buildtheearth.terraminusminus.dataset.IScalarDataset;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorPipelines;
-import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
 import net.buildtheearth.terraminusminus.generator.GeneratorDatasets;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 import static de.btegermany.teleportation.TeleportationBungee.TeleportationBungee.getFormattedMessage;
 
 public class TpllCommand extends Command {
 
-    private final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
     private final GeoData geoData;
     private final PluginMessenger pluginMessenger;
 
@@ -36,14 +38,20 @@ public class TpllCommand extends Command {
             return;
         }
 
+        args = Stream.of(args).filter(arg -> !arg.isEmpty()).toArray(String[]::new);
+
         ProxiedPlayer player = (ProxiedPlayer) sender;
-        Optional<GeoServer> optional = geoData.getGeoServers().stream().filter(geoServer -> geoServer.getServerInfo().equals(player.getServer().getInfo())).findFirst();
+        Optional<GeoServer> optional = geoData.getGeoServers().stream().filter(geoServer -> player.getServer().getInfo().equals(geoServer.getServerInfo())).findFirst();
         if(optional.isPresent() && optional.get().isTpllPassthrough()) {
             StringBuilder builder = new StringBuilder();
             for(String arg : args) {
                 builder.append(" ").append(arg);
             }
-            player.chat("/tpll" + builder);
+            if(player.getServer().getInfo().getName().equals("Vanilla-1")) {
+                this.pluginMessenger.performCommand(player, "tpc" + builder);
+                return;
+            }
+            this.pluginMessenger.performCommand(player, "tpll" + builder);
             return;
         }
 
@@ -51,15 +59,18 @@ public class TpllCommand extends Command {
 
             if (sender.hasPermission("bteg.tpll")) {
 
-                double[] coordinates = new double[2];
-                coordinates[0] = Double.parseDouble(args[0].replace("°", "").replace(",", ""));
-                coordinates[1] = Double.parseDouble(args[1].replace("°", ""));
+                double[] coordinates = CoordinateFormatConverter.toDegrees(args[0] + " " + args[1]);
+                if(coordinates == null) {
+                    sender.sendMessage(getFormattedMessage("Bitte überprüfe deine Koordinaten!"));
+                    return;
+                }
                 String heightRaw = null;
                 if(args.length >= 3 && args[2].matches("\\d+(.\\d+)?")) {
                     heightRaw = args[2];
                 }
                 float yaw = 12345;
                 float pitch = 12345;
+                String stayServer = null;
                 for(String arg : args) {
                     if(arg.startsWith("yaw=")) {
                         yaw = Float.parseFloat(arg.substring("yaw=".length()));
@@ -67,30 +78,33 @@ public class TpllCommand extends Command {
                     if(arg.startsWith("pitch=")) {
                         pitch = Float.parseFloat(arg.substring("pitch=".length()));
                     }
+                    if(arg.startsWith("stay=")) {
+                        stayServer = arg.substring("stay=".length());
+                    }
                 }
                 float yawFinal = yaw;
                 float pitchFinal = pitch;
 
-                double[] mcCoordinates = new double[0];
+                double[] mcCoordinates;
                 try {
-                    mcCoordinates = bteGeneratorSettings.projection().fromGeo(coordinates[1], coordinates[0]);
+                    mcCoordinates = GeoData.bteGeneratorSettings.projection().fromGeo(coordinates[1], coordinates[0]);
                 } catch (OutOfProjectionBoundsException e) {
-                    e.printStackTrace();
+                    player.sendMessage(getFormattedMessage("§cError: §cOutOfProjectionBoundsException"));
+                    return;
                 }
                 final double[] mcCoordinatesFinal = mcCoordinates;
 
-                double mcCoordinatesY = heightRaw != null ? Double.parseDouble(heightRaw) : getHeight((int) mcCoordinates[0], (int) mcCoordinates[1]).join();
+                double mcCoordinatesY = heightRaw != null ? Double.parseDouble(heightRaw) : getHeight((int) mcCoordinates[1], (int) mcCoordinates[0]).join();
 
-                geoData.getServerFromLocation(coordinates[0], coordinates[1]).thenAccept(targetServer -> {
-                    if (targetServer == null) {
-                        sender.sendMessage(getFormattedMessage("Location could not be found!"));
-                        return;
-                    }
+                ServerInfo targetServer = stayServer != null ? ProxyServer.getInstance().getServerInfo(stayServer) : geoData.getServerFromLocation(coordinates[0], coordinates[1]);
+                if (targetServer == null) {
+                    sender.sendMessage(getFormattedMessage("Location could not be found!"));
+                    return;
+                }
 
-                    pluginMessenger.teleportToCoords(player, targetServer, mcCoordinatesFinal[0], mcCoordinatesY, mcCoordinatesFinal[1], yawFinal, pitchFinal);
+                pluginMessenger.teleportToCoords(player, targetServer, mcCoordinatesFinal[0], mcCoordinatesY, mcCoordinatesFinal[1], yawFinal, pitchFinal);
 
-                    sender.sendMessage(getFormattedMessage("Teleporting to " + coordinates[0] + ", " + coordinates[1] + "."));
-                });
+                sender.sendMessage(getFormattedMessage("Teleporting to " + coordinates[0] + ", " + coordinates[1] + "."));
             } else {
                 sender.sendMessage(getFormattedMessage("No permission for /tpll"));
             }
@@ -103,7 +117,7 @@ public class TpllCommand extends Command {
     public CompletableFuture<Double> getHeight(double adjustedLon, double adjustedLat) {
         CompletableFuture<Double> altFuture;
         try {
-            GeneratorDatasets datasets = new GeneratorDatasets(bteGeneratorSettings);
+            GeneratorDatasets datasets = new GeneratorDatasets(GeoData.bteGeneratorSettings);
 
 
             altFuture = datasets.<IScalarDataset>getCustom(EarthGeneratorPipelines.KEY_DATASET_HEIGHTS)

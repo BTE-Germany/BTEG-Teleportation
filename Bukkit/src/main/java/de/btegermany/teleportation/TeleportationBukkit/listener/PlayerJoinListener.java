@@ -7,7 +7,7 @@ import de.btegermany.teleportation.TeleportationBukkit.tp.TeleportationHandler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 
 
 public class PlayerJoinListener implements Listener {
@@ -21,7 +21,7 @@ public class PlayerJoinListener implements Listener {
 	}
 
 	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent event) {
+	public void onPlayerJoin(PlayerLoginEvent event) {
 		
 		Player player = event.getPlayer();
 

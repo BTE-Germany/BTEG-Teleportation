@@ -12,14 +12,16 @@ public class GeoServer {
     private final boolean tpllPassthrough;
     private final boolean isEarthServer;
     private final boolean showPlayersOnTerramap;
+    private final String normenWarp;
 
-    public GeoServer(ServerInfo serverInfo, List<String> states, List<String> cities, boolean tpllPassthrough, boolean isEarthServer, boolean showPlayersOnTerramap) {
+    public GeoServer(ServerInfo serverInfo, List<String> states, List<String> cities, boolean tpllPassthrough, boolean isEarthServer, boolean showPlayersOnTerramap, String normenWarp) {
         this.serverInfo = serverInfo;
         this.states = states;
         this.cities = cities;
         this.tpllPassthrough = tpllPassthrough;
         this.isEarthServer = isEarthServer;
         this.showPlayersOnTerramap = showPlayersOnTerramap;
+        this.normenWarp = normenWarp;
     }
 
 
@@ -47,6 +49,10 @@ public class GeoServer {
 
     public boolean shouldShowPlayersOnTerramap() {
         return showPlayersOnTerramap;
+    }
+
+    public String getNormenWarp() {
+        return normenWarp;
     }
 
 }

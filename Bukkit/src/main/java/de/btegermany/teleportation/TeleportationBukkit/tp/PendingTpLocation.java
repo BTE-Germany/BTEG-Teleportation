@@ -28,14 +28,14 @@ public class PendingTpLocation extends PendingTeleportationAbstract {
 
     @Override
     public boolean canTeleport() {
-        return Bukkit.getPlayer(playerUUID) != null && Bukkit.getPlayer(playerUUID).isOnline();
+        return Bukkit.getPlayer(super.playerUUID) != null && Bukkit.getPlayer(super.playerUUID).isOnline();
     }
 
     @Override
     public void teleport() {
-        Player player = Bukkit.getPlayer(playerUUID);
+        Player player = Bukkit.getPlayer(super.playerUUID);
         Location location;
-        location = new Location(world, x, y, z);
+        location = new Location(world, x, y < -64 ? 3000 : y, z);
         location.setYaw(yaw != 12345 ? yaw : player.getLocation().getYaw());
         location.setPitch(pitch != 12345 ? pitch : player.getLocation().getPitch());
         player.teleport(location);

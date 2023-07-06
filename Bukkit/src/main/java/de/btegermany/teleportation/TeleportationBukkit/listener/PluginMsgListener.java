@@ -71,7 +71,7 @@ public class PluginMsgListener implements PluginMessageListener {
 						if(world == null) {
 							world = Bukkit.getWorlds().get(0);
 						}
-						if (!NumberConversions.isFinite(y)) {
+						if (Double.isNaN(y) || !NumberConversions.isFinite(y)) {
 							y = world.getHighestBlockYAt((int) x, (int) z);
 						}
 
@@ -193,6 +193,15 @@ public class PluginMsgListener implements PluginMessageListener {
 								registriesProvider.getPlayersEnteringChangeWarpIdRegistry().unregister(targetPlayer);
 								break;
 						}
+						break;
+
+					case "command_perform":
+						playerUUID = UUID.fromString(in.readUTF());
+						String command = in.readUTF();
+						targetPlayer = Bukkit.getPlayer(playerUUID);
+						if (!targetPlayer.isOnline()) return;
+
+						targetPlayer.performCommand(command);
 						break;
 
 				}

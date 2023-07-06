@@ -62,6 +62,9 @@ public class PlayerSyncPacket implements ForgePacket {
                 double playerX = player.getX();
                 double playerZ = player.getZ();
                 double[] coordinates = bteGeneratorSettings.projection().toGeo(playerX, playerZ);
+                if(coordinates == null) {
+                    continue;
+                }
 
                 // This only works because the BTE projection is conformal
                 double[] northVec = bteGeneratorSettings.projection().vector(playerX, playerZ, 0.0001, 0);

@@ -2,6 +2,7 @@ package de.btegermany.teleportation.TeleportationBungee.geo;
 
 import com.kno10.reversegeocode.query.ReverseGeocoder;
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
+import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
 import net.md_5.bungee.api.config.ServerInfo;
 import org.json.JSONObject;
 
@@ -15,51 +16,63 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 
 public class GeoData {
 
+    public static final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
     private final TeleportationBungee plugin;
     private List<GeoServer> geoServers;
     private final Map<Double, Map<Double, JSONObject>> cachedLocationResults;
+    private ReverseGeocoder rgc;
 
     public GeoData(TeleportationBungee plugin) {
         this.plugin = plugin;
         this.cachedLocationResults = new HashMap<>();
+
+        File osmLocationData = new File(plugin.getDataFolder(), "osm-location-data.bin");
+        if(osmLocationData.exists()) {
+            try {
+                this.rgc = new ReverseGeocoder(osmLocationData.getAbsolutePath());
+            } catch (IOException e) {
+                this.rgc = null;
+                plugin.getLogger().warning("File osm-location-data.bin is missing! Executing /tpll in online mode!");
+            }
+        } else {
+            this.rgc = null;
+            plugin.getLogger().warning("File osm-location-data.bin is missing! Executing /tpll in online mode!");
+        }
     }
 
-    public CompletableFuture<ServerInfo> getServerFromLocation(double lat, double lon) {
-        return CompletableFuture.supplyAsync(() -> {
-            GeoLocation location = getLocation(lat, lon);
-            if (location == null) {
-                return null;
-            }
+    public ServerInfo getServerFromLocation(double lat, double lon) {
+        GeoLocation location = getLocation(lat, lon);
+        if (location == null) {
+            return null;
+        }
 
-            if(!location.getCountry().equals("Deutschland")) {
-                return null;
-            }
+        if (!location.getCountry().equals("Deutschland")) {
+            return null;
+        }
 
-            if (location.getCity() != null) {
-                for (GeoServer server : geoServers) {
-                    for (String city : server.getCities()) {
-                        if (city.equalsIgnoreCase(location.getCity())) {
-                            return server.getServerInfo();
-                        }
-                    }
-                }
-            }
-
+        if (location.getCity() != null) {
             for (GeoServer server : geoServers) {
-                for (String state : server.getStates()) {
-                    if (state.equalsIgnoreCase(location.getState())) {
+                for (String city : server.getCities()) {
+                    if (city.equalsIgnoreCase(location.getCity())) {
                         return server.getServerInfo();
                     }
                 }
             }
+        }
 
-            return null;
-        });
+        for (GeoServer server : geoServers) {
+            for (String state : server.getStates()) {
+                if (state.equalsIgnoreCase(location.getState())) {
+                    return server.getServerInfo();
+                }
+            }
+        }
+
+        return null;
     }
 
     public GeoLocation getLocation(double lat, double lon) {
@@ -121,54 +134,49 @@ public class GeoData {
     }
 
     public GeoLocation getOfflineLocation(double lat, double lon) {
-        File osmLocationData = new File(plugin.getDataFolder(), "osm-location-data.bin");
-        if(!osmLocationData.exists()) {
-            plugin.getLogger().warning("File osm-location-data.bin is missing! Executing /tpll in online mode!");
+
+        if(this.rgc == null) {
             return null;
         }
-        try (ReverseGeocoder rgc = new ReverseGeocoder(osmLocationData.getAbsolutePath())) {
-            GeoLocation location = new GeoLocation(lat, lon);
-            StringBuilder cityBuilder = new StringBuilder();
-            StringBuilder stateBuilder = new StringBuilder();
-            StringBuilder countryBuilder = new StringBuilder();
-            for(String s : rgc.lookup((float) lon, (float) lat)) {
-                if(s.endsWith("6")) {
-                    for(char c : s.toCharArray()) {
-                        if(!String.valueOf(c).matches("[ [^\\s+]]")) {
-                            break;
-                        }
-                        cityBuilder.append(c);
+
+        GeoLocation location = new GeoLocation(lat, lon);
+        StringBuilder cityBuilder = new StringBuilder();
+        StringBuilder stateBuilder = new StringBuilder();
+        StringBuilder countryBuilder = new StringBuilder();
+        for(String s : rgc.lookup((float) lon, (float) lat)) {
+            if(s.endsWith("6")) {
+                for(char c : s.toCharArray()) {
+                    if(!String.valueOf(c).matches("[ [^\\s+]]")) {
+                        break;
                     }
-                }
-                if(s.endsWith("4")) {
-                    for(char c : s.toCharArray()) {
-                        if(!String.valueOf(c).matches("[ [^\\s+]]")) {
-                            break;
-                        }
-                        stateBuilder.append(c);
-                    }
-                }
-                if(s.endsWith("2")) {
-                    for(char c : s.toCharArray()) {
-                        if(!String.valueOf(c).matches("[ [^\\s+]]")) {
-                            break;
-                        }
-                        countryBuilder.append(c);
-                    }
+                    cityBuilder.append(c);
                 }
             }
-            if(cityBuilder.toString().isEmpty() || stateBuilder.toString().isEmpty() || countryBuilder.toString().isEmpty()) {
-                return null;
+            if(s.endsWith("4")) {
+                for(char c : s.toCharArray()) {
+                    if(!String.valueOf(c).matches("[ [^\\s+]]")) {
+                        break;
+                    }
+                    stateBuilder.append(c);
+                }
             }
-            location.setCity(cityBuilder.toString());
-            location.setState(stateBuilder.toString());
-            location.setCountry(countryBuilder.toString());
-
-            return location;
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            if(s.endsWith("2")) {
+                for(char c : s.toCharArray()) {
+                    if(!String.valueOf(c).matches("[ [^\\s+]]")) {
+                        break;
+                    }
+                    countryBuilder.append(c);
+                }
+            }
         }
+        /*if(cityBuilder.toString().isEmpty() || stateBuilder.toString().isEmpty() || countryBuilder.toString().isEmpty()) {
+            return null;
+        }*/
+        location.setCity(cityBuilder.toString());
+        location.setState(stateBuilder.toString());
+        location.setCountry(countryBuilder.toString());
+
+        return location;
     }
 
     public void setGeoServers(List<GeoServer> geoServers) {

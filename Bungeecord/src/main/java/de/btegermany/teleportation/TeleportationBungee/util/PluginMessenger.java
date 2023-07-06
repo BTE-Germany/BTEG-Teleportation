@@ -39,10 +39,10 @@ public class PluginMessenger {
         player.getServer().sendData(TeleportationBungee.PLUGIN_CHANNEL, out.toByteArray());
     }
 
-    public void sendWarpInfo(ProxiedPlayer proxiedPlayer, Warp warp, int responseNumber) {
+    public void sendWarpInfo(ProxiedPlayer player, Warp warp, int responseNumber) {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("warp_info");
-        out.writeUTF(proxiedPlayer.getUniqueId().toString());
+        out.writeUTF(player.getUniqueId().toString());
         out.writeUTF(String.valueOf(responseNumber));
         out.writeUTF(String.valueOf(warp.getId()));
         out.writeUTF(warp.getName());
@@ -54,12 +54,34 @@ public class PluginMessenger {
         out.writeUTF(String.valueOf(warp.getYaw()));
         out.writeUTF(String.valueOf(warp.getPitch()));
         out.writeUTF(String.valueOf(warp.getHeight()));
-        proxiedPlayer.getServer().sendData(TeleportationBungee.PLUGIN_CHANNEL, out.toByteArray());
+        player.getServer().sendData(TeleportationBungee.PLUGIN_CHANNEL, out.toByteArray());
+    }
+
+    public void performCommand(ProxiedPlayer player, String command) {
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("command_perform");
+        out.writeUTF(player.getUniqueId().toString());
+        out.writeUTF(command);
+        player.getServer().sendData(TeleportationBungee.PLUGIN_CHANNEL, out.toByteArray());
     }
 
     private void send(ProxiedPlayer player, ServerInfo server, byte[] bytes) {
-        server.sendData(TeleportationBungee.PLUGIN_CHANNEL, bytes);
-        if(!player.getServer().getInfo().equals(server)) player.connect(server);
+        if(!player.getServer().getInfo().equals(server)) {
+            player.connect(server);
+        }
+        new Thread(() -> {
+            while(!player.getServer().getInfo().equals(server)) {
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            server.sendData(TeleportationBungee.PLUGIN_CHANNEL, bytes);
+            TeleportationBungee.getInstance().getLogger().info("sent " + new String(bytes));
+            TeleportationBungee.getInstance().getLogger().info(player.getServer().getInfo().getName() + " " + server.getName());
+            TeleportationBungee.getInstance().getLogger().info("connect? " + !player.getServer().getInfo().equals(server));
+        }).start();
     }
 
 }

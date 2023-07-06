@@ -11,6 +11,7 @@ import de.btegermany.teleportation.TeleportationBungee.util.Database;
 import de.btegermany.teleportation.TeleportationBungee.util.LastLocation;
 import de.btegermany.teleportation.TeleportationBungee.util.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBungee.util.Warp;
+import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -29,6 +30,8 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import static de.btegermany.teleportation.TeleportationBungee.TeleportationBungee.getFormattedMessage;
 
 public class PluginMsgListener implements Listener {
 
@@ -56,6 +59,9 @@ public class PluginMsgListener implements Listener {
         int id;
         float yaw;
         float pitch;
+        double x;
+        double y;
+        double z;
 
         switch (dataInput.readUTF()) {
 
@@ -148,7 +154,7 @@ public class PluginMsgListener implements Listener {
                                 try {
                                     headId = resultSet.getString("headId");
                                 } catch (SQLException ignored) {}
-                                Warp warp = new Warp(id, name, city, state, latitude, longitude, headId, yawFinal, pitchFinal, height);
+                                Warp warp = new Warp(id, name, city, state, latitude, longitude, headId, yawFinal, pitchFinal, height, null);
                                 pluginMessenger.sendWarpInfo(player, warp, responseNumber);
                             } else {
                                 player.sendMessage(TeleportationBungee.getFormattedMessage("Es wurde kein Warp mit der Id " + id + " gefunden!"));
@@ -199,23 +205,30 @@ public class PluginMsgListener implements Listener {
                 String name = dataInput.readUTF();
                 String city = dataInput.readUTF();
                 String state = dataInput.readUTF();
-                double latitude = Double.parseDouble(dataInput.readUTF());
-                double longitude = Double.parseDouble(dataInput.readUTF());
+                x = Double.parseDouble(dataInput.readUTF());
+                z = Double.parseDouble(dataInput.readUTF());
+                double[] coordinates;
+                player = ProxyServer.getInstance().getPlayer(playerUUID);
+                if(player == null || !player.isConnected()) return;
+                try {
+                    coordinates = GeoData.bteGeneratorSettings.projection().toGeo(x, z);
+                } catch (OutOfProjectionBoundsException e) {
+                    player.sendMessage(getFormattedMessage("§cError: §cOutOfProjectionBoundsException"));
+                    return;
+                }
                 String headId = dataInput.readUTF();
                 yaw = Float.parseFloat(dataInput.readUTF());
                 pitch = Float.parseFloat(dataInput.readUTF());
                 double height = Double.parseDouble(dataInput.readUTF());
                 if(headId.equals("null")) headId = null;
-                player = ProxyServer.getInstance().getPlayer(playerUUID);
-                if(player == null || !player.isConnected()) return;
 
                 try {
                     PreparedStatement preparedStatement = database.getConnection().prepareStatement("INSERT INTO warps (name, city, state, latitude, longitude, head_id, yaw, pitch, height) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
                     preparedStatement.setString(1, name);
                     preparedStatement.setString(2, city);
                     preparedStatement.setString(3, state);
-                    preparedStatement.setString(4, String.valueOf(latitude));
-                    preparedStatement.setString(5, String.valueOf(longitude));
+                    preparedStatement.setString(4, String.valueOf(coordinates[1]));
+                    preparedStatement.setString(5, String.valueOf(coordinates[0]));
                     preparedStatement.setString(6, headId);
                     preparedStatement.setFloat(7, yaw);
                     preparedStatement.setFloat(8, pitch);
@@ -288,9 +301,9 @@ public class PluginMsgListener implements Listener {
 
             case "last_location":
                 playerUUID = UUID.fromString(dataInput.readUTF());
-                double x = Double.parseDouble(dataInput.readUTF());
-                double y = Double.parseDouble(dataInput.readUTF());
-                double z = Double.parseDouble(dataInput.readUTF());
+                x = Double.parseDouble(dataInput.readUTF());
+                y = Double.parseDouble(dataInput.readUTF());
+                z = Double.parseDouble(dataInput.readUTF());
                 yaw = Float.parseFloat(dataInput.readUTF());
                 pitch = Float.parseFloat(dataInput.readUTF());
                 player = ProxyServer.getInstance().getPlayer(playerUUID);
@@ -321,7 +334,13 @@ public class PluginMsgListener implements Listener {
                                 final float yawFinal = resultSet.getFloat("yaw");
                                 final float pitchFinal = resultSet.getFloat("pitch");
                                 final double heightFinal = resultSet.getDouble("height");
-                                Warp warp = new Warp(idFinal, nameFinal, cityFinal, stateFinal, latitudeFinal, longitudeFinal, null, yawFinal, pitchFinal, heightFinal);
+                                String stayServer = null;
+                                for(GeoServer geoServer : this.geoData.getGeoServers()) {
+                                    if(nameFinal.equals(geoServer.getNormenWarp())) {
+                                        stayServer = geoServer.getServerInfo().getName();
+                                    }
+                                }
+                                Warp warp = new Warp(idFinal, nameFinal, cityFinal, stateFinal, latitudeFinal, longitudeFinal, null, yawFinal, pitchFinal, heightFinal, stayServer);
                                 warpsSearch1.add(warp);
                             }
                             preparedStatement.close();
@@ -346,7 +365,7 @@ public class PluginMsgListener implements Listener {
                                         final float yawFinal = resultSet2.getFloat("yaw");
                                         final float pitchFinal = resultSet2.getFloat("pitch");
                                         final double heightFinal = resultSet2.getDouble("height");
-                                        Warp warp = new Warp(idFinal, nameFinal, cityFinal, stateFinal, latitudeFinal, longitudeFinal, null, yawFinal, pitchFinal, heightFinal);
+                                        Warp warp = new Warp(idFinal, nameFinal, cityFinal, stateFinal, latitudeFinal, longitudeFinal, null, yawFinal, pitchFinal, heightFinal, null);
                                         warpsSearch2.add(warp);
                                     }
                                     preparedStatement2.close();

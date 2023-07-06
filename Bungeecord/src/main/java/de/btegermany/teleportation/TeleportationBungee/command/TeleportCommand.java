@@ -27,7 +27,7 @@ public class TeleportCommand extends Command implements TabExecutor {
         if (sender instanceof ProxiedPlayer) {
 
             ProxiedPlayer player = (ProxiedPlayer) sender;
-            if(!player.hasPermission("teleportation.de.jaskerx.bteg.teleportation.bukkit.tp")) {
+            if(!player.hasPermission("teleportation.tp")) {
                 player.sendMessage(new ComponentBuilder("§b§lBTEG §7» §cDu §cbist §cnicht §cberechtigt, §cdiesen §cCommand §causzuführen!").create());
                 return;
             }

@@ -8,8 +8,6 @@ public class WarpInCreation {
     private String name;
     private String city;
     private String state;
-    private double latitude;
-    private double longitude;
     private String headId;
     private final Player player;
     private int currentQuestionIndex;
@@ -36,10 +34,6 @@ public class WarpInCreation {
                 setState(input);
                 break;
             case 3:
-                setLatitude(Double.parseDouble(input.split(" ")[0].replace(",", "")));
-                setLongitude(Double.parseDouble(input.split(" ")[1]));
-                break;
-            case 4:
                 setHeadId(input.equals("skip") ? null : input);
                 break;
         }
@@ -64,14 +58,6 @@ public class WarpInCreation {
         this.state = state;
     }
 
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
     public void setHeadId(String headId) {
         this.headId = headId;
     }
@@ -88,14 +74,6 @@ public class WarpInCreation {
         return state;
     }
 
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
     public String getHeadId() {
         return headId;
     }
@@ -103,4 +81,5 @@ public class WarpInCreation {
     public Player getPlayer() {
         return player;
     }
+
 }

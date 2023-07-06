@@ -7,7 +7,7 @@ description: This is a plugin creating the ability to teleport players to other 
 commands:
   tp:
     description: Teleport to another player.
-    usage: /de.jaskerx.bteg.teleportation.bukkit.tp [player]
+    usage: /tp [player]
   tpa:
     description: Send a teleportation request to another player.
     usage: /tpa [player]

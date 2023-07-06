@@ -11,6 +11,7 @@ import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.SinglePageW
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBukkit.util.Skulls;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -40,6 +41,7 @@ public class ManageWarpsGui extends SinglePageWarpGuiAbstract {
                         player.sendMessage(TeleportationBukkit.getFormattedMessage("Bitte gib nun die Id des Warps, den du ändern möchstest, in den Chat ein. Gib \"cancel\" ein, um den Vorgang abzubrechen."));
                         break;
                     case "Erstellen":
+                        player.sendMessage(ChatColor.RED + "ACHTUNG! Zum aktuellen Zeitpunkt wird der erstellte Warp nur auf der temporären Proxy und somit NICHT über einen Neustart hinaus gespeichert!");
                         registriesProvider.getWarpsInCreationRegistry().register(player);
                         player.closeInventory();
                         player.sendMessage(TeleportationBukkit.getFormattedMessage("Nun kannst du Angaben zum Warp machen. Gib \"cancel\" ein, um den Vorgang abzubrechen."));

@@ -61,8 +61,9 @@ public class ConfigReader {
                 if(showPlayersOnTerramapRaw != null) {
                     showPlayersOnTerramap = (boolean) showPlayersOnTerramapRaw;
                 }
+                String normenWarp = config.getString(serverName + ".normen-warp");
 
-                geoServers.add(new GeoServer(serverInfo, states, cities, tpllPassthrough, isEarthServer, showPlayersOnTerramap));
+                geoServers.add(new GeoServer(serverInfo, states, cities, tpllPassthrough, isEarthServer, showPlayersOnTerramap, normenWarp));
             }
             geoData.setGeoServers(geoServers);
 

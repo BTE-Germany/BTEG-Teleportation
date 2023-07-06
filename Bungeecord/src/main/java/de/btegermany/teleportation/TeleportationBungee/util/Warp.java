@@ -12,8 +12,9 @@ public class Warp {
     private final float yaw;
     private final float pitch;
     private final double height;
+    private final String stayServer;
 
-    public Warp(int id, String name, String city, String state, double latitude, double longitude, String headId, float yaw, float pitch, double height) {
+    public Warp(int id, String name, String city, String state, double latitude, double longitude, String headId, float yaw, float pitch, double height, String stayServer) {
         this.id = id;
         this.name = name;
         this.city = city;
@@ -24,10 +25,11 @@ public class Warp {
         this.yaw = yaw;
         this.pitch = pitch;
         this.height = height;
+        this.stayServer = stayServer;
     }
 
     public String getTpllCommand() {
-        return "tpll " + latitude + " " + longitude + " " + height + " yaw=" + yaw + " pitch=" + pitch;
+        return "tpll " + latitude + " " + longitude + " " + height + " yaw=" + yaw + " pitch=" + pitch + (stayServer != null ? " stay=" + stayServer : "");
     }
 
     // Getters

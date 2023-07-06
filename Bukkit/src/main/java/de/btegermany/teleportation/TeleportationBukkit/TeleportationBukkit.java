@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 
 public class TeleportationBukkit extends JavaPlugin {
 
-	private static TeleportationBukkit instance;
 	public static String PLUGIN_CHANNEL = "bungeecord:btegtp";
 	private static PagedInventoryAPI pagedInventoryAPI;
 	private PluginMessenger pluginMessenger;
@@ -25,8 +24,6 @@ public class TeleportationBukkit extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		instance = this;
-
 		pagedInventoryAPI = new PagedInventoryAPI(this);
 		this.pluginMessenger = new PluginMessenger(this);
 		RegistriesProvider registriesProvider = new RegistriesProvider();
@@ -68,11 +65,7 @@ public class TeleportationBukkit extends JavaPlugin {
 		this.scheduledExecutorServiceProxyPlayerSynchronization = Executors.newSingleThreadScheduledExecutor();
 		this.scheduledExecutorServiceProxyPlayerSynchronization.scheduleAtFixedRate(() -> {
 			this.pluginMessenger.send(new BukkitPlayersMessage(this.getServer().getOnlinePlayers()));
-		}, 0, 250, TimeUnit.MILLISECONDS);
-	}
-
-	public static TeleportationBukkit getInstance() {
-		return instance;
+		}, 0, 1000, TimeUnit.MILLISECONDS);
 	}
 
 	public static PagedInventoryAPI getPagedInventoryAPI() {

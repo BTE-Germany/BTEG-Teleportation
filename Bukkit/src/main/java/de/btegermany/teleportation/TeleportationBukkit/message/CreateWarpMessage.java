@@ -10,8 +10,8 @@ public class CreateWarpMessage extends PluginMessage {
         byteOutput.writeUTF(warp.getName());
         byteOutput.writeUTF(warp.getCity());
         byteOutput.writeUTF(warp.getState());
-        byteOutput.writeUTF(String.valueOf(warp.getLatitude()));
-        byteOutput.writeUTF(String.valueOf(warp.getLongitude()));
+        byteOutput.writeUTF(String.valueOf(warp.getPlayer().getLocation().getX()));
+        byteOutput.writeUTF(String.valueOf(warp.getPlayer().getLocation().getZ()));
         byteOutput.writeUTF(warp.getHeadId() != null ? warp.getHeadId() : "null");
         byteOutput.writeUTF(String.valueOf(warp.getPlayer().getLocation().getYaw()));
         byteOutput.writeUTF(String.valueOf(warp.getPlayer().getLocation().getPitch()));
