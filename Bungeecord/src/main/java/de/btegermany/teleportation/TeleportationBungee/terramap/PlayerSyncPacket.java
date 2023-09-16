@@ -55,7 +55,7 @@ public class PlayerSyncPacket implements ForgePacket {
         byteBuf.writeInt(this.players.length);
         try {
             for (BukkitPlayer player : this.players) {
-                if(geoData.getGeoServers().stream().anyMatch(geoServer -> geoServer.getServerInfo().equals(player.getServerInfo()) && !geoServer.shouldShowPlayersOnTerramap())) {
+                if(geoData.getGeoServers().stream().anyMatch(geoServer -> player.getServerInfo().equals(geoServer.getServerInfo()) && !geoServer.shouldShowPlayersOnTerramap())) {
                     continue;
                 }
 

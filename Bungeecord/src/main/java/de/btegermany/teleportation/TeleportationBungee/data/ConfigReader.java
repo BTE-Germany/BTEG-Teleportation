@@ -1,4 +1,4 @@
-package de.btegermany.teleportation.TeleportationBungee.util;
+package de.btegermany.teleportation.TeleportationBungee.data;
 
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
 import de.btegermany.teleportation.TeleportationBungee.geo.GeoData;
@@ -44,6 +44,9 @@ public class ConfigReader {
             List<GeoServer> geoServers = new ArrayList<>();
             for(String serverName : config.getKeys()) {
                 ServerInfo serverInfo = ProxyServer.getInstance().getServerInfo(serverName);
+                if(serverInfo == null) {
+                    this.plugin.getLogger().info("Couldn't find Server '" + serverName + "'");
+                }
                 List<String> states = new ArrayList<>(config.getStringList(serverName + ".bundesländer"));
                 List<String> cities = new ArrayList<>(config.getStringList(serverName + ".städte"));
                 boolean tpllPassthrough = false;
@@ -73,7 +76,9 @@ public class ConfigReader {
         }
     }
 
-    public String readDatabasePath() {
+    public List<String> readDatabaseConfig() {
+        List<String> data = new ArrayList<>();
+
         ConfigurationProvider provider = YamlConfiguration.getProvider(YamlConfiguration.class);
         File dir = plugin.getDataFolder();
         if(!dir.getParentFile().exists()) dir.getParentFile().mkdir();
@@ -88,11 +93,10 @@ public class ConfigReader {
             }
             Configuration config = provider.load(configFile);
 
-            String dbPath = config.getString("sqlite-database-path");
-            if(dbPath == null) {
-                plugin.getLogger().warning("No database path provided!");
-            }
-            return dbPath;
+            data.add(config.getString("database.mysql.url"));
+            data.add(config.getString("database.mysql.user"));
+            data.add(config.getString("database.mysql.password"));
+            return data;
 
         } catch (IOException e) {
             plugin.getLogger().warning("Config unter \"" + configFile.getPath() + "\" konnte nicht geladen werden!");

@@ -7,6 +7,10 @@
     <groupId>de.btegermany</groupId>
     <artifactId>teleportation</artifactId>
     <version>1.0</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>API</module>
+    </modules>
 
     <properties>
         <java.version>1.8</java.version>

@@ -1,1 +1,5 @@
-sqlite-database-path: plugins/TeleportationBungee/BTEGTeleportationBungee.db
+database:
+  mysql:
+    url: ""
+    user: ""
+    password: ""

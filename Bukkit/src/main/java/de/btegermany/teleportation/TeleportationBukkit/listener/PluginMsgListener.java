@@ -100,11 +100,23 @@ public class PluginMsgListener implements PluginMessageListener {
 								case "Städte":
 									new CitiesGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
 									break;
+								case "Events":
+									new EventsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
+									break;
+								case "Plotregionen":
+									new PlotsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
+									break;
+								case "Normen Hubs":
+									new NormenHubsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
+									break;
 								case "city":
 									new CitiesDetailGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
 									break;
 								case "bl":
 									new StatesDetailGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
+									break;
+								case "search":
+									new SearchResultsGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
 									break;
 								case "server":
 									new ServersDetailGui(targetPlayer, pluginMessenger, pagesData, title, registriesProvider).open();

@@ -8,15 +8,18 @@ import de.btegermany.teleportation.TeleportationBukkit.message.DeleteWarpMessage
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.message.WarpsSearchMessage;
 import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit.getFormattedErrorMessage;
 
-public class WarpCommand implements CommandExecutor {
+public class WarpCommand implements CommandExecutor, TabExecutor {
 
     private final PluginMessenger pluginMessenger;
     private final RegistriesProvider registriesProvider;
@@ -51,7 +54,6 @@ public class WarpCommand implements CommandExecutor {
                     return true;
                 }
                 registriesProvider.getWarpsInCreationRegistry().register(player);
-                player.sendMessage(ChatColor.RED + "ACHTUNG! Zum aktuellen Zeitpunkt wird der erstellte Warp nur auf der temporären Proxy und somit NICHT über einen Neustart hinaus gespeichert!");
                 player.sendMessage(TeleportationBukkit.getFormattedMessage("Nun kannst du Angaben zum Warp machen. Gib \"cancel\" ein, um den Vorgang abzubrechen."));
                 registriesProvider.getWarpsInCreationRegistry().getWarpInCreation(player).sendCurrentQuestion();
                 break;
@@ -60,7 +62,6 @@ public class WarpCommand implements CommandExecutor {
                     return true;
                 }
                 id = Integer.parseInt(args[1]);
-                player.sendMessage(ChatColor.RED + "ACHTUNG! Zum aktuellen Zeitpunkt wird der gelöschte Warp nur auf der temporären Proxy und somit NICHT über einen Neustart hinaus gespeichert!");
                 pluginMessenger.send(new DeleteWarpMessage(player, id));
                 break;
             case 3:
@@ -76,7 +77,6 @@ public class WarpCommand implements CommandExecutor {
                     return true;
                 }
                 registriesProvider.getWarpsGettingChangedRegistry().register(player, new WarpGettingChanged(id, column));
-                player.sendMessage(ChatColor.RED + "ACHTUNG! Zum aktuellen Zeitpunkt wird der geänderte Warp nur auf der temporären Proxy und somit NICHT über einen Neustart hinaus gespeichert!");
                 player.sendMessage(TeleportationBukkit.getFormattedMessage("Bitte gib nun den neuen Wert für \"" + column + "\" ein. Gib \"cancel\" ein, um den Vorgang abzubrechen."));
                 break;
         }
@@ -96,4 +96,8 @@ public class WarpCommand implements CommandExecutor {
         pluginMessenger.send(new WarpsSearchMessage(player, search));
     }
 
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        return new ArrayList<>();
+    }
 }

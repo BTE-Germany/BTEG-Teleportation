@@ -1,8 +1,9 @@
-package de.btegermany.teleportation.TeleportationBungee.util;
+package de.btegermany.teleportation.TeleportationBungee.message;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
+import de.btegermany.teleportation.TeleportationBungee.util.Warp;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONArray;
@@ -78,9 +79,9 @@ public class PluginMessenger {
                 }
             }
             server.sendData(TeleportationBungee.PLUGIN_CHANNEL, bytes);
-            TeleportationBungee.getInstance().getLogger().info("sent " + new String(bytes));
-            TeleportationBungee.getInstance().getLogger().info(player.getServer().getInfo().getName() + " " + server.getName());
-            TeleportationBungee.getInstance().getLogger().info("connect? " + !player.getServer().getInfo().equals(server));
+            //TeleportationBungee.getInstance().getLogger().info("sent " + new String(bytes));
+            //TeleportationBungee.getInstance().getLogger().info(player.getServer().getInfo().getName() + " " + server.getName());
+            //TeleportationBungee.getInstance().getLogger().info("connect? " + !player.getServer().getInfo().equals(server));
         }).start();
     }
 

@@ -18,7 +18,6 @@ public abstract class MultiplePagesDetailWarpGuiAbstract extends MultiplePagesWa
 
     @Override
     public void onStartup() {
-
         inventory.addHandler(new PagedInventoryClickHandler() {
             @Override
             public void handle(ClickHandler clickHandler) {
@@ -26,14 +25,14 @@ public abstract class MultiplePagesDetailWarpGuiAbstract extends MultiplePagesWa
                 List<String> lore = clickHandler.getCurrentItem().getItemMeta().getLore();
                 if(lore == null || lore.size() == 0) return;
                 Optional<String> optionalCommand = lore.stream().filter(s -> s.startsWith("/tpll")).findFirst();
-                Optional<String> optionalDrehung = lore.stream().filter(s -> s.startsWith("Drehung:")).findFirst();
+                Optional<String> optionalRotation = lore.stream().filter(s -> s.startsWith("Drehung:")).findFirst();
                 Optional<String> optionalHeight = lore.stream().filter(s -> s.startsWith("Höhe:")).findFirst();
-                if(!optionalCommand.isPresent() || !optionalDrehung.isPresent() || !optionalHeight.isPresent()) return;
+                if(!optionalCommand.isPresent() || !optionalRotation.isPresent() || !optionalHeight.isPresent()) return;
 
                 String command = optionalCommand.get();
-                String[] drehung = optionalDrehung.get().substring("Drehung: ".length()).replace(",", "").split(" ");
+                String[] rotation = optionalRotation.get().substring("Drehung: ".length()).replace(",", "").split(" ");
                 double height = Double.parseDouble(optionalHeight.get().substring("Höhe: ".length()));
-                pluginMessenger.send(new ExecuteCommandMessage(player.getUniqueId().toString(), command + " " + height + " yaw=" + drehung[0] + " pitch=" + drehung[1]));
+                pluginMessenger.send(new ExecuteCommandMessage(player.getUniqueId().toString(), command + " " + height + " yaw=" + rotation[0] + " pitch=" + rotation[1]));
             }
         });
     }

@@ -3,7 +3,7 @@ package de.btegermany.teleportation.TeleportationBungee.command;
 import de.btegermany.teleportation.TeleportationBungee.geo.CoordinateFormatConverter;
 import de.btegermany.teleportation.TeleportationBungee.geo.GeoData;
 import de.btegermany.teleportation.TeleportationBungee.geo.GeoServer;
-import de.btegermany.teleportation.TeleportationBungee.util.PluginMessenger;
+import de.btegermany.teleportation.TeleportationBungee.message.PluginMessenger;
 import net.buildtheearth.terraminusminus.dataset.IScalarDataset;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorPipelines;
 import net.buildtheearth.terraminusminus.generator.GeneratorDatasets;

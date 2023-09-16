@@ -7,11 +7,11 @@ public class WarpInCreation {
 
     private String name;
     private String city;
-    private String state;
+    private State state;
     private String headId;
     private final Player player;
     private int currentQuestionIndex;
-    private final String[] questions = new String[] {"Name eingeben:", "Stadt eingeben:", "Bundesland eingeben:", "Koordinaten eingeben:", "HeadId eingeben (optional, zum Überspringen \"skip\" eingeben):"};
+    private final String[] questions = new String[] {"Name eingeben:", "Stadt eingeben:", "Bundesland eingeben:", "HeadId eingeben (optional, zum Überspringen \"skip\" eingeben):"};
 
     public WarpInCreation(Player player) {
         this.player = player;
@@ -31,8 +31,15 @@ public class WarpInCreation {
                 setCity(input);
                 break;
             case 2:
-                setState(input);
-                break;
+                for(State state : State.values()) {
+                    if(state.displayName.equalsIgnoreCase(input) || state.abbreviation.equalsIgnoreCase(input)) {
+                        setState(state);
+                        currentQuestionIndex++;
+                        return;
+                    }
+                }
+                player.sendMessage(TeleportationBukkit.getFormattedMessage(String.format("§9\"%s\" §6ist weder Name noch eine gültige Abkürzung eines Bundeslandes. Bitte überprüfe deine Eingabe.", input)));
+                return;
             case 3:
                 setHeadId(input.equals("skip") ? null : input);
                 break;
@@ -54,7 +61,7 @@ public class WarpInCreation {
         this.city = city;
     }
 
-    public void setState(String state) {
+    public void setState(State state) {
         this.state = state;
     }
 
@@ -70,7 +77,7 @@ public class WarpInCreation {
         return city;
     }
 
-    public String getState() {
+    public State getState() {
         return state;
     }
 

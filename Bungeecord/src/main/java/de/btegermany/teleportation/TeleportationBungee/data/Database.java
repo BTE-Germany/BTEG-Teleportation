@@ -1,35 +1,27 @@
-package de.btegermany.teleportation.TeleportationBungee.util;
+package de.btegermany.teleportation.TeleportationBungee.data;
 
-import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
-
-import java.io.File;
 import java.sql.*;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class Database {
 
     private Connection connection;
-    private final TeleportationBungee plugin;
-    private final String path;
+    private final ConfigReader configReader;
 
-    public Database(TeleportationBungee plugin, String path) {
-        this.plugin = plugin;
-        this.path = path;
+    public Database(ConfigReader configReader) {
+        this.configReader = configReader;
     }
 
     public void connect() {
-        File dir = plugin.getDataFolder();
-        if(!dir.exists()) dir.mkdir();
+        List<String> configData = this.configReader.readDatabaseConfig();
         try {
-            //File dbFile = new File(path);
-            //plugin.getLogger().info("Connecting to SQLite DB: " + dbFile.getAbsolutePath());
-            Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:" + new File(dir, "BTEGTeleportationBungee.db").getAbsolutePath() /*dbFile.getAbsolutePath()*/);
+            this.connection = DriverManager.getConnection(configData.get(0), configData.get(1), configData.get(2));
 
-            try(PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS warps ('id' INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT, 'name' TEXT NOT NULL, 'city' TEXT NOT NULL, 'state' TEXT NOT NULL, 'latitude' TEXT NOT NULL, 'longitude' TEXT NOT NULL, 'head_id' TEXT NULL DEFAULT NULL, 'yaw' REAL NOT NULL DEFAULT 0 , 'pitch' REAL NOT NULL DEFAULT 0, 'height' REAL NOT NULL)")) {
-                executeUpdateSync(preparedStatement);
+            try(PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS warps (id INT NOT NULL UNIQUE PRIMARY KEY AUTO_INCREMENT, name VARCHAR(256) NOT NULL, city VARCHAR(256) NOT NULL, state VARCHAR(128) NOT NULL, latitude VARCHAR(128) NOT NULL, longitude VARCHAR(128) NOT NULL, head_id VARCHAR(256) NULL DEFAULT NULL, yaw FLOAT NOT NULL DEFAULT 0 , pitch FLOAT NOT NULL DEFAULT 0, height DOUBLE NOT NULL)")) {
+                this.executeUpdateSync(preparedStatement);
             }
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }

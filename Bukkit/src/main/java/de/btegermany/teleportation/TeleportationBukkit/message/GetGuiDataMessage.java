@@ -10,6 +10,7 @@ public class GetGuiDataMessage extends PluginMessage {
         byteOutput.writeUTF("get_gui_data");
         byteOutput.writeUTF(playerUUID);
         byteOutput.writeUTF(title);
+        //byteOutput.writeUTF(filter);
         byteOutput.writeUTF(new String(builder));
     }
 

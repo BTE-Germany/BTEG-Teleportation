@@ -7,14 +7,12 @@ import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
 import de.btegermany.teleportation.TeleportationBungee.geo.GeoData;
 import de.btegermany.teleportation.TeleportationBungee.geo.GeoServer;
 import de.btegermany.teleportation.TeleportationBungee.registry.RegistriesProvider;
-import de.btegermany.teleportation.TeleportationBungee.util.Database;
+import de.btegermany.teleportation.TeleportationBungee.data.Database;
 import de.btegermany.teleportation.TeleportationBungee.util.LastLocation;
-import de.btegermany.teleportation.TeleportationBungee.util.PluginMessenger;
+import de.btegermany.teleportation.TeleportationBungee.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBungee.util.Warp;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
@@ -27,8 +25,10 @@ import org.json.JSONObject;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static de.btegermany.teleportation.TeleportationBungee.TeleportationBungee.getFormattedMessage;
@@ -85,7 +85,24 @@ public class PluginMsgListener implements Listener {
                         sendGuiData(player, metaTitle, pages, "SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height FROM warps ORDER BY name");
                         break;
                     case "Städte":
-                        sendGuiData(player, metaTitle, pages, "SELECT city AS name, state FROM warps GROUP BY city ORDER BY city");
+                        sendGuiData(player, metaTitle, pages, "SELECT city AS name, state FROM warps GROUP BY city, state ORDER BY city");
+                        break;
+                    case "Events":
+                        sendGuiData(player, metaTitle, pages, "SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height FROM warps WHERE name LIKE '%[Event]' ORDER BY name");
+                        break;
+                    case "Plotregionen":
+                        sendGuiData(player, metaTitle, pages, "SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height FROM warps WHERE name LIKE '%[Plotgebiet]' ORDER BY name");
+                        break;
+                    case "Normen Hubs":
+                        List<String> normenHubsNames = geoData.getGeoServers().stream().map(GeoServer::getNormenWarp).filter(normenWarp -> normenWarp != null && !normenWarp.isEmpty()).collect(Collectors.toList());
+                        if(normenHubsNames.size() == 0) {
+                            return;
+                        }
+                        StringBuilder stringBuilder = new StringBuilder("name = '" + normenHubsNames.get(0) + "'");
+                        for(int i = 1; i < normenHubsNames.size(); i++) {
+                            stringBuilder.append(" OR name = '").append(normenHubsNames.get(i)).append("'");
+                        }
+                        sendGuiData(player, metaTitle, pages, "SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height FROM warps WHERE " + stringBuilder);
                         break;
                     case "city":
                         sendGuiData(player, metaTitle, pages, "SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height FROM warps WHERE city = '" + title + "' ORDER BY name");
@@ -223,7 +240,7 @@ public class PluginMsgListener implements Listener {
                 if(headId.equals("null")) headId = null;
 
                 try {
-                    PreparedStatement preparedStatement = database.getConnection().prepareStatement("INSERT INTO warps (name, city, state, latitude, longitude, head_id, yaw, pitch, height) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    PreparedStatement preparedStatement = database.getConnection().prepareStatement("INSERT INTO warps (name, city, state, latitude, longitude, head_id, yaw, pitch, height) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
                     preparedStatement.setString(1, name);
                     preparedStatement.setString(2, city);
                     preparedStatement.setString(3, state);
@@ -234,8 +251,11 @@ public class PluginMsgListener implements Listener {
                     preparedStatement.setFloat(8, pitch);
                     preparedStatement.setDouble(9, height);
                     database.executeUpdateAsync(preparedStatement).thenRun(() -> {
-                        player.sendMessage(TeleportationBungee.getFormattedMessage("Der Warp wurde erstellt!"));
                         try {
+                            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+                            if(generatedKeys.next()) {
+                                player.sendMessage(TeleportationBungee.getFormattedMessage(String.format("Der Warp wurde mit der Id §9\"%d\" §6erstellt!", generatedKeys.getInt(1))));
+                            }
                             preparedStatement.close();
                         } catch (SQLException e) {
                             throw new RuntimeException(e);
@@ -319,7 +339,7 @@ public class PluginMsgListener implements Listener {
                 if(player == null || !player.isConnected()) return;
 
                 try {
-                    PreparedStatement preparedStatement = database.getConnection().prepareStatement("SELECT id, name, city, state, latitude, longitude, yaw, pitch, height FROM warps WHERE name = ? COLLATE NOCASE");
+                    PreparedStatement preparedStatement = database.getConnection().prepareStatement("SELECT id, name, city, state, latitude, longitude, yaw, pitch, height FROM warps WHERE name LIKE ?");
                     preparedStatement.setString(1, search);
                     database.executeQueryAsync(preparedStatement).thenAccept(resultSet -> {
                         List<Warp> warpsSearch1 = new ArrayList<>();
@@ -350,7 +370,7 @@ public class PluginMsgListener implements Listener {
                                 return;
                             }
 
-                            PreparedStatement preparedStatement2 = database.getConnection().prepareStatement("SELECT id, name, city, state, latitude, longitude, yaw, pitch, height FROM warps WHERE city = ? COLLATE NOCASE LIMIT 10");
+                            PreparedStatement preparedStatement2 = database.getConnection().prepareStatement("SELECT id, name, city, state, latitude, longitude, yaw, pitch, height FROM warps WHERE city LIKE ?");
                             preparedStatement2.setString(1, search);
                             database.executeQueryAsync(preparedStatement2).thenAccept(resultSet2 -> {
                                 List<Warp> warpsSearch2 = new ArrayList<>();
@@ -375,7 +395,47 @@ public class PluginMsgListener implements Listener {
                                         return;
                                     }
 
-                                    if(warpsSearch1.size() > 0) {
+                                    final Map<Integer, List<JSONObject>> pagesMap = new HashMap<>();
+                                    final List<JSONObject> currentPage = new ArrayList<>();
+                                    Consumer<Warp> warpConsumer = warp -> {
+                                        JSONObject object = new JSONObject();
+                                        object.put("name", warp.getName());
+                                        object.put("state", warp.getState());
+                                        object.put("id", warp.getId());
+                                        object.put("latitude", warp.getLatitude());
+                                        object.put("longitude", warp.getLongitude());
+                                        object.put("city", warp.getCity());
+                                        object.put("yaw", warp.getYaw());
+                                        object.put("pitch", warp.getPitch());
+                                        object.put("height", warp.getHeight());
+                                        if(warp.getHeadId() != null) {
+                                            object.put("head_id", warp.getHeadId());
+                                        }
+                                        currentPage.add(object);
+                                        if(currentPage.size() == 36) {
+                                            pagesMap.put(pagesMap.size(), new ArrayList<>(currentPage));
+                                            currentPage.clear();
+                                        }
+                                    };
+                                    warpsSearch1.forEach(warpConsumer);
+                                    warpsSearch2.forEach(warpConsumer);
+                                    if(currentPage.size() > 0) {
+                                        pagesMap.put(pagesMap.size(), currentPage);
+                                    }
+
+                                    JSONArray pagesData = new JSONArray();
+                                    pagesMap.forEach((page, content) -> {
+                                        JSONObject object = new JSONObject();
+                                        object.put("page", page);
+                                        JSONArray objectContent = new JSONArray();
+                                        content.forEach(objectContent::put);
+                                        object.put("content", objectContent);
+                                        pagesData.put(object);
+                                    });
+
+                                    pluginMessenger.sendGuiData(player, String.format("search_%s", search), pagesData);
+
+                                    /*if(warpsSearch1.size() > 0) {
                                         player.sendMessage(TeleportationBungee.getFormattedMessage("Es wurden Warps mit diesem Namen gefunden:"));
                                     }
                                     for(Warp warp : warpsSearch1) {
@@ -394,7 +454,7 @@ public class PluginMsgListener implements Listener {
                                         button.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + warp.getTpllCommand()));
                                         player.sendMessage(text);
                                         player.sendMessage(button);
-                                    }
+                                    }*/
 
                                 } catch (SQLException e) {
                                     throw new RuntimeException(e);
@@ -458,7 +518,7 @@ public class PluginMsgListener implements Listener {
         }
         try {
             PreparedStatement preparedStatement = database.getConnection().prepareStatement(query);
-            database.executeQueryAsync(preparedStatement).thenAccept(resultSet -> {
+            ResultSet resultSet = database.executeQuerySync(preparedStatement);
                 Map<Integer, List<JSONObject>> pages = new HashMap<>();
                 try {
                     List<JSONObject> currentPage = new ArrayList<>();
@@ -494,7 +554,6 @@ public class PluginMsgListener implements Listener {
                 }
                 cachedGuiData.put(player.getUniqueId(), pages);
                 runnable.run();
-            });
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

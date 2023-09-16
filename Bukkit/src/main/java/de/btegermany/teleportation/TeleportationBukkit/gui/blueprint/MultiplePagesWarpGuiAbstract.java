@@ -1,6 +1,7 @@
 package de.btegermany.teleportation.TeleportationBukkit.gui.blueprint;
 
 import com.tchristofferson.pagedinventories.handlers.PagedInventoryCloseHandler;
+import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.util.Skulls;
 import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
@@ -59,7 +60,11 @@ public abstract class MultiplePagesWarpGuiAbstract extends WarpGuiAbstract {
 
     @Override
     public void open() {
-        if(inventory.getSize() == 0) return;
+        if(inventory.getSize() == 0) {
+            this.player.closeInventory();
+            this.player.sendMessage(TeleportationBukkit.getFormattedMessage("Leider wurden keine passenden Warps gefunden."));
+            return;
+        }
         super.open();
         registriesProvider.getMultiplePagesGuisRegistry().register(player, this);
     }

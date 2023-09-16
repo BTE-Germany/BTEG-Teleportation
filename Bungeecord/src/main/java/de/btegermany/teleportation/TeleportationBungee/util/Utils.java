@@ -1,6 +1,7 @@
 package de.btegermany.teleportation.TeleportationBungee.util;
 
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
+import de.btegermany.teleportation.TeleportationBungee.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBungee.registry.RegistriesProvider;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;

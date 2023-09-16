@@ -9,9 +9,9 @@ import de.btegermany.teleportation.TeleportationBungee.terramap.PlayerSyncPacket
 import de.btegermany.teleportation.TeleportationBungee.terramap.PluginHelloPacket;
 import de.btegermany.teleportation.TeleportationBungee.terramap.RegisterForUpdatePacket;
 import de.btegermany.teleportation.TeleportationBungee.terramap.TerramapListener;
-import de.btegermany.teleportation.TeleportationBungee.util.ConfigReader;
-import de.btegermany.teleportation.TeleportationBungee.util.Database;
-import de.btegermany.teleportation.TeleportationBungee.util.PluginMessenger;
+import de.btegermany.teleportation.TeleportationBungee.data.ConfigReader;
+import de.btegermany.teleportation.TeleportationBungee.data.Database;
+import de.btegermany.teleportation.TeleportationBungee.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBungee.util.Utils;
 import fr.thesmyler.bungee2forge.BungeeToForgePlugin;
 import fr.thesmyler.bungee2forge.api.ForgeChannel;
@@ -57,8 +57,7 @@ public class TeleportationBungee extends Plugin {
         Utils utils = new Utils(pluginMessenger, this.registriesProvider);
         ConfigReader configReader = new ConfigReader(this, this.geoData);
         configReader.readServers();
-        String dbPath = configReader.readDatabasePath();
-        this.database = new Database(this, dbPath);
+        this.database = new Database(configReader);
         this.database.connect();
 
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TeleportCommand(utils));
@@ -86,6 +85,9 @@ public class TeleportationBungee extends Plugin {
         }, 0, 500, TimeUnit.MILLISECONDS);
 
         //startStateBorderCheck();
+
+        //DatabaseConverter databaseConverter = new DatabaseConverter(this, database, new File(this.getDataFolder(), "BTEGTeleportationBungee.db"));
+        //databaseConverter.convertDbFileToDatabase();
     }
 
     @Override

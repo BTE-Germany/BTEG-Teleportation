@@ -30,14 +30,14 @@ public class CategoriesGui extends SinglePageWarpGuiAbstract {
                 if(clickHandler.getCurrentItem().getItemMeta() == null || clickHandler.getCurrentItem().getItemMeta().getDisplayName() == null || clickHandler.getCurrentItem().getItemMeta().getDisplayName().length() < 3) return;
                 switch(clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2)) {
                     case "Städte":
+                    case "Events":
+                    case "Plotregionen":
+                    case "Normen Hubs":
                     case "Alle":
                         pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2), 0, 1));
                         break;
                     case "Bundesländer":
                         new StatesGui(clickHandler.getPlayer(), pluginMessenger, registriesProvider).open();
-                        break;
-                    case "Server":
-                        new ServersGui(clickHandler.getPlayer(), pluginMessenger, registriesProvider).open();
                         break;
                 }
             }
@@ -57,11 +57,11 @@ public class CategoriesGui extends SinglePageWarpGuiAbstract {
                 .addRow(new BlueprintRange(0, 8, placeholderDefault))
                 .addRow(new BlueprintRange(0, placeholderDefault),
                         new BlueprintRange(1, new BlueprintItem()),
-                        new BlueprintRange(2, placeholderDefault),
-                        new BlueprintRange(3, new BlueprintItem()),
-                        new BlueprintRange(4, placeholderDefault),
+                        new BlueprintRange(2, new BlueprintItem()),
+                        new BlueprintRange(3, placeholderDefault),
+                        new BlueprintRange(4, new BlueprintItem()),
                         new BlueprintRange(5, new BlueprintItem()),
-                        new BlueprintRange(6, placeholderDefault),
+                        new BlueprintRange(6, new BlueprintItem()),
                         new BlueprintRange(7, new BlueprintItem()),
                         new BlueprintRange(8, placeholderDefault)
                 )
@@ -71,24 +71,31 @@ public class CategoriesGui extends SinglePageWarpGuiAbstract {
     @Nonnull
     @Override
     public List<ItemStack> getContent() {
-
-        ItemStack itemCities = new ItemStack(Material.STAINED_GLASS, 1, (short) 14);
+        ItemStack itemCities = new ItemStack(Material.STAINED_GLASS, 1, (short) 11);
         ItemMeta metaCities = itemCities.getItemMeta();
         metaCities.setDisplayName("Städte");
         itemCities.setItemMeta(metaCities);
-        ItemStack itemStates = new ItemStack(Material.STAINED_GLASS, 1, (short) 13);
+        ItemStack itemStates = new ItemStack(Material.STAINED_GLASS, 1, (short) 4);
         ItemMeta metaStates = itemStates.getItemMeta();
         metaStates.setDisplayName("Bundesländer");
         itemStates.setItemMeta(metaStates);
-        ItemStack itemServers = new ItemStack(Material.STAINED_GLASS, 1, (short) 11);
-        ItemMeta metaServers = itemCities.getItemMeta();
-        metaServers.setDisplayName("Server");
-        itemServers.setItemMeta(metaServers);
+        ItemStack itemEvents = new ItemStack(Material.STAINED_GLASS, 1, (short) 14);
+        ItemMeta metaEvents = itemCities.getItemMeta();
+        metaEvents.setDisplayName("Events");
+        itemEvents.setItemMeta(metaEvents);
+        ItemStack itemPlots = new ItemStack(Material.STAINED_GLASS, 1, (short) 13);
+        ItemMeta metaPlots = itemPlots.getItemMeta();
+        metaPlots.setDisplayName("Plotregionen");
+        itemPlots.setItemMeta(metaPlots);
+        ItemStack itemNormen = new ItemStack(Material.STAINED_GLASS, 1, (short) 15);
+        ItemMeta metaNormen = itemNormen.getItemMeta();
+        metaNormen.setDisplayName("Normen Hubs");
+        itemNormen.setItemMeta(metaNormen);
         ItemStack itemAll = new ItemStack(Material.STAINED_GLASS, 1, (short) 0);
         ItemMeta metaAll = itemCities.getItemMeta();
         metaAll.setDisplayName("Alle");
         itemAll.setItemMeta(metaAll);
 
-        return Arrays.asList(itemCities, itemStates, itemServers, itemAll);
+        return Arrays.asList(itemCities, itemStates, itemEvents, itemPlots, itemNormen, itemAll);
     }
 }
