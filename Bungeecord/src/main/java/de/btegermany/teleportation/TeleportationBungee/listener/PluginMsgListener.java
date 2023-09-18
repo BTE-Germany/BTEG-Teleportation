@@ -28,7 +28,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static de.btegermany.teleportation.TeleportationBungee.TeleportationBungee.getFormattedMessage;
@@ -105,6 +104,7 @@ public class PluginMsgListener implements Listener {
                         sendGuiData(player, metaTitle, pages, "SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height FROM warps WHERE " + stringBuilder);
                         break;
                     case "city":
+                    case "lobbywarp":
                         sendGuiData(player, metaTitle, pages, "SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height FROM warps WHERE city = '" + title + "' ORDER BY name");
                         break;
                     case "bl":
@@ -142,6 +142,35 @@ public class PluginMsgListener implements Listener {
                             }
                         });
                         sendGuiData(player, metaTitle, pages, "SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height FROM warps WHERE" + new String(builder) + " ORDER BY name");
+                        break;
+                    case "lobbywarp-around":
+                        String[] args = metaTitle.split("_");
+                        String city = args[1];
+                        double latitude = Double.parseDouble(args[2]);
+                        double longitude = Double.parseDouble(args[3]);
+                        int radius = Integer.parseInt(args[4]);
+
+                        Set<Warp> warpsAround = new HashSet<>();
+                        for(Warp warp : TeleportationBungee.warps) {
+                            if(warp.getCity().equals(city)) {
+                                continue;
+                            }
+                            double[] cA = new double[]{latitude, longitude};
+                            double[] cB = new double[]{warp.getLatitude(), warp.getLongitude()};
+
+                            double dLat = Math.toRadians(cB[0] - cA[0]);
+                            double dLon = Math.toRadians(cB[1] - cA[1]);
+                            double lat1 = Math.toRadians(cA[0]);
+                            double lat2 = Math.toRadians(cB[0]);
+                            double distance = 2 * 6371 * Math.asin(Math.sqrt(
+                                    Math.pow(Math.sin(dLat / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dLon / 2), 2)
+                            ));
+                            if(distance <= radius) {
+                                warpsAround.add(warp);
+                            }
+                        }
+
+                        pluginMessenger.sendGuiData(player, String.format("lobbywarp-around_%s", city), this.getJSONFromWarps(warpsAround));
                         break;
                 }
                 break;
@@ -205,6 +234,7 @@ public class PluginMsgListener implements Listener {
                     PreparedStatement preparedStatement = database.getConnection().prepareStatement("DELETE FROM warps WHERE id = ?");
                     preparedStatement.setInt(1, id);
                     database.executeUpdateAsync(preparedStatement).thenRun(() -> {
+                        TeleportationBungee.warps.stream().filter(warp -> warp.getId() == id).collect(Collectors.toList()).forEach(TeleportationBungee.warps::remove);
                         player.sendMessage(TeleportationBungee.getFormattedMessage("Der Warp mit der Id " + id + " wurde gelöscht!"));
                         try {
                             preparedStatement.close();
@@ -239,6 +269,10 @@ public class PluginMsgListener implements Listener {
                 double height = Double.parseDouble(dataInput.readUTF());
                 if(headId.equals("null")) headId = null;
 
+                final String headIdFinal = headId;
+                final float yawCreateFinal = yaw;
+                final float pitchCreateFinal = pitch;
+
                 try {
                     PreparedStatement preparedStatement = database.getConnection().prepareStatement("INSERT INTO warps (name, city, state, latitude, longitude, head_id, yaw, pitch, height) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
                     preparedStatement.setString(1, name);
@@ -254,7 +288,21 @@ public class PluginMsgListener implements Listener {
                         try {
                             ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
                             if(generatedKeys.next()) {
-                                player.sendMessage(TeleportationBungee.getFormattedMessage(String.format("Der Warp wurde mit der Id §9\"%d\" §6erstellt!", generatedKeys.getInt(1))));
+                                int idNew = generatedKeys.getInt(1);
+                                TeleportationBungee.warps.add(new Warp(
+                                        idNew,
+                                        name,
+                                        city,
+                                        state,
+                                        coordinates[1],
+                                        coordinates[0],
+                                        headIdFinal,
+                                        yawCreateFinal,
+                                        pitchCreateFinal,
+                                        height,
+                                        null
+                                ));
+                                player.sendMessage(TeleportationBungee.getFormattedMessage(String.format("Der Warp wurde mit der Id §9\"%d\" §6erstellt!", idNew)));
                             }
                             preparedStatement.close();
                         } catch (SQLException e) {
@@ -267,6 +315,7 @@ public class PluginMsgListener implements Listener {
                 break;
 
             case "warp_change":
+                //TODO: change in cached data
                 playerUUID = UUID.fromString(dataInput.readUTF());
                 id = Integer.parseInt(dataInput.readUTF());
                 String column = dataInput.readUTF();
@@ -395,45 +444,9 @@ public class PluginMsgListener implements Listener {
                                         return;
                                     }
 
-                                    final Map<Integer, List<JSONObject>> pagesMap = new HashMap<>();
-                                    final List<JSONObject> currentPage = new ArrayList<>();
-                                    Consumer<Warp> warpConsumer = warp -> {
-                                        JSONObject object = new JSONObject();
-                                        object.put("name", warp.getName());
-                                        object.put("state", warp.getState());
-                                        object.put("id", warp.getId());
-                                        object.put("latitude", warp.getLatitude());
-                                        object.put("longitude", warp.getLongitude());
-                                        object.put("city", warp.getCity());
-                                        object.put("yaw", warp.getYaw());
-                                        object.put("pitch", warp.getPitch());
-                                        object.put("height", warp.getHeight());
-                                        if(warp.getHeadId() != null) {
-                                            object.put("head_id", warp.getHeadId());
-                                        }
-                                        currentPage.add(object);
-                                        if(currentPage.size() == 36) {
-                                            pagesMap.put(pagesMap.size(), new ArrayList<>(currentPage));
-                                            currentPage.clear();
-                                        }
-                                    };
-                                    warpsSearch1.forEach(warpConsumer);
-                                    warpsSearch2.forEach(warpConsumer);
-                                    if(currentPage.size() > 0) {
-                                        pagesMap.put(pagesMap.size(), currentPage);
-                                    }
+                                    warpsSearch1.addAll(warpsSearch2);
 
-                                    JSONArray pagesData = new JSONArray();
-                                    pagesMap.forEach((page, content) -> {
-                                        JSONObject object = new JSONObject();
-                                        object.put("page", page);
-                                        JSONArray objectContent = new JSONArray();
-                                        content.forEach(objectContent::put);
-                                        object.put("content", objectContent);
-                                        pagesData.put(object);
-                                    });
-
-                                    pluginMessenger.sendGuiData(player, String.format("search_%s", search), pagesData);
+                                    pluginMessenger.sendGuiData(player, String.format("search_%s", search), this.getJSONFromWarps(warpsSearch1));
 
                                     /*if(warpsSearch1.size() > 0) {
                                         player.sendMessage(TeleportationBungee.getFormattedMessage("Es wurden Warps mit diesem Namen gefunden:"));
@@ -509,6 +522,45 @@ public class PluginMsgListener implements Listener {
                 break;
 
         }
+    }
+
+    private JSONArray getJSONFromWarps(Collection<Warp> warps) {
+        final Map<Integer, List<JSONObject>> pagesMap = new HashMap<>();
+        final List<JSONObject> currentPage = new ArrayList<>();
+        for(Warp warp : warps) {
+            JSONObject object = new JSONObject();
+            object.put("name", warp.getName());
+            object.put("state", warp.getState());
+            object.put("id", warp.getId());
+            object.put("latitude", warp.getLatitude());
+            object.put("longitude", warp.getLongitude());
+            object.put("city", warp.getCity());
+            object.put("yaw", warp.getYaw());
+            object.put("pitch", warp.getPitch());
+            object.put("height", warp.getHeight());
+            if(warp.getHeadId() != null) {
+                object.put("head_id", warp.getHeadId());
+            }
+            currentPage.add(object);
+            if(currentPage.size() == 36) {
+                pagesMap.put(pagesMap.size(), new ArrayList<>(currentPage));
+                currentPage.clear();
+            }
+        }
+        if(currentPage.size() > 0) {
+            pagesMap.put(pagesMap.size(), currentPage);
+        }
+
+        JSONArray pagesData = new JSONArray();
+        pagesMap.forEach((page, content) -> {
+            JSONObject object = new JSONObject();
+            object.put("page", page);
+            JSONArray objectContent = new JSONArray();
+            content.forEach(objectContent::put);
+            object.put("content", objectContent);
+            pagesData.put(object);
+        });
+        return pagesData;
     }
 
     private void loadGuiData(ProxiedPlayer player, String query, boolean loadFromDb, Runnable runnable) {

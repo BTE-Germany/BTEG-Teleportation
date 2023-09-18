@@ -19,9 +19,9 @@ import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.List;
 
-public class CategoriesGui extends SinglePageWarpGuiAbstract {
+public class WarpGui extends SinglePageWarpGuiAbstract {
 
-    public CategoriesGui(Player player, PluginMessenger pluginMessenger, RegistriesProvider registriesProvider) {
+    public WarpGui(Player player, PluginMessenger pluginMessenger, RegistriesProvider registriesProvider) {
         super(player, "Warp Kategorien", pluginMessenger, registriesProvider);
 
         inventory.addHandler(new PagedInventoryClickHandler() {

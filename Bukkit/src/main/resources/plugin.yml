@@ -30,3 +30,7 @@ commands:
     usage: /nwarp
     aliases:
       - warp
+  lobbywarp:
+    usage: |
+      /lobbywarp [city]
+      /lobbywarp add [city] [center-latitude] [center-longitude] [radius]

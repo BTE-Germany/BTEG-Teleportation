@@ -121,6 +121,12 @@ public class PluginMsgListener implements PluginMessageListener {
 								case "server":
 									new ServersDetailGui(targetPlayer, pluginMessenger, pagesData, title, registriesProvider).open();
 									break;
+								case "lobbywarp":
+									new LobbyWarpGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
+									break;
+								case "lobbywarp-around":
+									new LobbyWarpAroundGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
+									break;
 							}
 							break;
 						}

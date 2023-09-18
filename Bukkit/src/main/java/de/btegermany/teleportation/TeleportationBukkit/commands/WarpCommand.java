@@ -1,6 +1,6 @@
 package de.btegermany.teleportation.TeleportationBukkit.commands;
 
-import de.btegermany.teleportation.TeleportationBukkit.gui.CategoriesGui;
+import de.btegermany.teleportation.TeleportationBukkit.gui.WarpGui;
 import de.btegermany.teleportation.TeleportationBukkit.util.WarpGettingChanged;
 import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
 import de.btegermany.teleportation.TeleportationBukkit.message.ChangeWarpMessage;
@@ -47,7 +47,7 @@ public class WarpCommand implements CommandExecutor, TabExecutor {
 
         switch (args.length) {
             case 0:
-                new CategoriesGui(player, pluginMessenger, registriesProvider).open();
+                new WarpGui(player, pluginMessenger, registriesProvider).open();
                 break;
             case 1:
                 if(!player.hasPermission("bteg.warps.manage") || !args[0].equals("create")) {
