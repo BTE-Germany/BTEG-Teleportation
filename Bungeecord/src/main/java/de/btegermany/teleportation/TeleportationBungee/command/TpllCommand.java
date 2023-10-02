@@ -34,13 +34,12 @@ public class TpllCommand extends Command {
     @Override
     public void execute(CommandSender sender, String[] args) {
 
-        if(!(sender instanceof ProxiedPlayer)) {
+        if(!(sender instanceof ProxiedPlayer player)) {
             return;
         }
 
         args = Stream.of(args).filter(arg -> !arg.isEmpty()).toArray(String[]::new);
 
-        ProxiedPlayer player = (ProxiedPlayer) sender;
         Optional<GeoServer> optional = geoData.getGeoServers().stream().filter(geoServer -> player.getServer().getInfo().equals(geoServer.getServerInfo())).findFirst();
         if(optional.isPresent() && optional.get().isTpllPassthrough()) {
             StringBuilder builder = new StringBuilder();

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class TpasRegistry implements Registry {
+public class TpasRegistry implements PlayerRegistry {
 
     Map<UUID, UUID> tpas;
 

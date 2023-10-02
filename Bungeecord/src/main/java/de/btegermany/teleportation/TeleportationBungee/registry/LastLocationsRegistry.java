@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class LastLocationsRegistry implements Registry {
+public class LastLocationsRegistry implements PlayerRegistry {
 
     Map<UUID, LastLocation> lastLocations;
 

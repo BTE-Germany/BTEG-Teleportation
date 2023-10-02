@@ -18,8 +18,7 @@ public class TpaCancelCommand extends Command {
     @Override
     public void execute(CommandSender sender, String[] args) {
 
-        if(sender instanceof ProxiedPlayer) {
-            ProxiedPlayer player = (ProxiedPlayer) sender;
+        if(sender instanceof ProxiedPlayer player) {
             if(!player.hasPermission("teleportation.tpa")) {
                 player.sendMessage(new ComponentBuilder("§b§lBTEG §7» §cDu §cbist §cnicht §cberechtigt, §cdiesen §cCommand §causzuführen!").create());
                 return;

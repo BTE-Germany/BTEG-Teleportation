@@ -1,6 +1,6 @@
 package de.btegermany.teleportation.TeleportationBukkit.listener;
 
-import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
+import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBukkit.util.LobbyCity;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,9 +16,11 @@ import java.util.Map;
 
 public class PlayerInteractListener implements Listener {
 
+    private final RegistriesProvider registriesProvider;
     private final Map<Player, PressurePlateActivation> lastActivations;
 
-    public PlayerInteractListener() {
+    public PlayerInteractListener(RegistriesProvider registriesProvider) {
+        this.registriesProvider = registriesProvider;
         this.lastActivations = new HashMap<>();
     }
 
@@ -26,12 +28,12 @@ public class PlayerInteractListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Block block = event.getClickedBlock();
         Player player = event.getPlayer();
-        if(!event.getAction().equals(Action.PHYSICAL) || block.getType() != Material.GOLD_PLATE) {
+        if(!event.getAction().equals(Action.PHYSICAL) || block == null|| block.getType() != Material.LIGHT_WEIGHTED_PRESSURE_PLATE) {
             return;
         }
 
         event.setCancelled(true);
-        for(LobbyCity lobbyCity : TeleportationBukkit.lobbyCities) {
+        for(LobbyCity lobbyCity : this.registriesProvider.getLobbyCitiesRegistry().getLobbyCities()) {
             if(!block.getLocation().equals(lobbyCity.getBlock().getLocation())) {
                 continue;
             }

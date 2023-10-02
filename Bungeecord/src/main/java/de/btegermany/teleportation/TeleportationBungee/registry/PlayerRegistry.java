@@ -4,7 +4,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.UUID;
 
-public interface Registry {
+public interface PlayerRegistry {
 
     default boolean isRegistered(ProxiedPlayer player) {
         return isRegistered(player.getUniqueId());

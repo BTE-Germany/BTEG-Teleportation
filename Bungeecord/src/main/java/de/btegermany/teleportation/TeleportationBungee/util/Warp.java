@@ -3,18 +3,17 @@ package de.btegermany.teleportation.TeleportationBungee.util;
 public class Warp {
 
     private final int id;
-    private final String name;
-    private final String city;
-    private final String state;
-    private final double latitude;
-    private final double longitude;
-    private final String headId;
-    private final float yaw;
-    private final float pitch;
-    private final double height;
-    private final String stayServer;
+    private String name;
+    private String city;
+    private String state;
+    private double latitude;
+    private double longitude;
+    private String headId;
+    private float yaw;
+    private float pitch;
+    private double height;
 
-    public Warp(int id, String name, String city, String state, double latitude, double longitude, String headId, float yaw, float pitch, double height, String stayServer) {
+    public Warp(int id, String name, String city, String state, double latitude, double longitude, String headId, float yaw, float pitch, double height) {
         this.id = id;
         this.name = name;
         this.city = city;
@@ -25,14 +24,50 @@ public class Warp {
         this.yaw = yaw;
         this.pitch = pitch;
         this.height = height;
-        this.stayServer = stayServer;
     }
 
     public String getTpllCommand() {
-        return "tpll " + latitude + " " + longitude + " " + height + " yaw=" + yaw + " pitch=" + pitch + (stayServer != null ? " stay=" + stayServer : "");
+        return "tpll " + latitude + " " + longitude + " " + height + " yaw=" + yaw + " pitch=" + pitch;
     }
 
-    // Getters
+    // Setters, Getters
+
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
+    }
+
+    public void setHeadId(String headId) {
+        this.headId = headId;
+    }
+
+    public void setYaw(float yaw) {
+        this.yaw = yaw;
+    }
+
+    public void setPitch(float pitch) {
+        this.pitch = pitch;
+    }
 
     public int getId() {
         return id;

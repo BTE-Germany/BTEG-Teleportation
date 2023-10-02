@@ -72,7 +72,7 @@ public abstract class WarpGuiAbstract {
             openLobbySortGui();
         }
     };
-    public CustomNavigationItem NAV_LOBBY_AROUND = new CustomNavigationItem(new ItemStack(Material.SMOOTH_BRICK, 1, (short) 3), 1) {
+    public CustomNavigationItem NAV_LOBBY_AROUND = new CustomNavigationItem(new ItemStack(Material.CHISELED_STONE_BRICKS, 1), 1) {
         @Override
         public void handleClick(PagedInventoryCustomNavigationHandler handler) {}
     };
@@ -85,7 +85,7 @@ public abstract class WarpGuiAbstract {
         this.pluginMessenger = pluginMessenger;
         this.registriesProvider = registriesProvider;
 
-        ItemStack placeholderDefaultItem = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 7);
+        ItemStack placeholderDefaultItem = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta placeholderDefaultMeta = placeholderDefaultItem.getItemMeta();
         placeholderDefaultMeta.setDisplayName(" ");
         placeholderDefaultItem.setItemMeta(placeholderDefaultMeta);

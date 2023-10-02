@@ -22,7 +22,6 @@ public class PlayerJoinListener implements Listener {
 
 	@EventHandler
 	public void onPlayerJoin(PlayerLoginEvent event) {
-		
 		Player player = event.getPlayer();
 
 		if(teleportationHandler.getPendingTps().containsKey(player.getUniqueId())) {

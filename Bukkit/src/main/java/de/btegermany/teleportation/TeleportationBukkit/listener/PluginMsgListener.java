@@ -4,7 +4,6 @@ import de.btegermany.teleportation.TeleportationBukkit.gui.*;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.tp.PendingTpPlayer;
 import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.MultiplePagesDetailWarpGuiAbstract;
 import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBukkit.tp.PendingTpLocation;
 import de.btegermany.teleportation.TeleportationBukkit.tp.TeleportationHandler;
@@ -21,6 +20,7 @@ import org.bukkit.util.NumberConversions;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.annotation.Nonnull;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -39,100 +39,84 @@ public class PluginMsgListener implements PluginMessageListener {
 	}
 
 	@Override
-	public void onPluginMessageReceived(String channel, Player player, byte[] message) {
+	public void onPluginMessageReceived(String channel, @Nonnull Player player, @Nonnull byte[] message) {
 
 		if(channel.equals(TeleportationBukkit.PLUGIN_CHANNEL)) {
 
 			DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
-			UUID playerUUID;
-			Player targetPlayer;
-			float yaw;
-			float pitch;
 
 			try {
 				switch (in.readUTF()) {
 
-					case "teleport_player":
-						playerUUID = UUID.fromString(in.readUTF());
-						UUID tUUID = UUID.fromString(in.readUTF());
+					case "teleport_player" -> {
+						UUID playerUUID = UUID.fromString(in.readUTF());
+						UUID targetUUID = UUID.fromString(in.readUTF());
 
-						teleportationHandler.handle(new PendingTpPlayer(playerUUID, tUUID));
-						break;
+						teleportationHandler.handle(new PendingTpPlayer(playerUUID, targetUUID));
+					}
 
-					case "teleport_coords":
-						playerUUID = UUID.fromString(in.readUTF());
+					case "teleport_coords" -> {
+						UUID playerUUID = UUID.fromString(in.readUTF());
 						String[] coords = in.readUTF().split(",");
 						double x = Double.parseDouble(coords[0]);
 						double y = Double.parseDouble(coords[1]);
 						double z = Double.parseDouble(coords[2]);
-						yaw = Float.parseFloat(in.readUTF());
-						pitch = Float.parseFloat(in.readUTF());
+						float yaw = Float.parseFloat(in.readUTF());
+						float pitch = Float.parseFloat(in.readUTF());
 						World world = Bukkit.getWorld("world");
-						if(world == null) {
+						if (world == null) {
 							world = Bukkit.getWorlds().get(0);
 						}
 						if (Double.isNaN(y) || !NumberConversions.isFinite(y)) {
 							y = world.getHighestBlockYAt((int) x, (int) z);
 						}
 
-						teleportationHandler.handle(new PendingTpLocation(playerUUID, world, x, y, z, yaw, pitch));
-						break;
+						teleportationHandler.handle(new PendingTpLocation(playerUUID, world, x, y + 1, z, yaw, pitch));
+					}
 
-					case "gui_data":
+					case "gui_data" -> {
 						JSONObject object = new JSONObject(in.readUTF());
 						String metaTitle = object.getString("title");
-						playerUUID = UUID.fromString(object.getString("player_uuid"));
+						UUID playerUUID = UUID.fromString(object.getString("player_uuid"));
 						JSONArray pagesData = object.getJSONArray("pagesData");
 
 						String group = metaTitle.split("_").length > 0 ? metaTitle.split("_")[0] : metaTitle;
 						String title = metaTitle.equals(group) ? group : metaTitle.substring(group.length() + 1);
-						targetPlayer = Bukkit.getPlayer(playerUUID);
-						if (!targetPlayer.isOnline()) return;
+						Player targetPlayer = Bukkit.getPlayer(playerUUID);
+						if (targetPlayer == null || !targetPlayer.isOnline()) return;
 
 						if (registriesProvider.getMultiplePagesGuisRegistry().isRegistered(targetPlayer)) {
 							registriesProvider.getMultiplePagesGuisRegistry().getGui(targetPlayer).addPages(pagesData);
 						} else {
 							switch (group) {
-								case "Alle":
-									MultiplePagesDetailWarpGuiAbstract gui = new AllGui(targetPlayer, pluginMessenger, pagesData, registriesProvider);
-									gui.open();
-									break;
-								case "Städte":
-									new CitiesGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
-									break;
-								case "Events":
-									new EventsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
-									break;
-								case "Plotregionen":
-									new PlotsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
-									break;
-								case "Normen Hubs":
-									new NormenHubsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
-									break;
-								case "city":
-									new CitiesDetailGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
-									break;
-								case "bl":
-									new StatesDetailGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
-									break;
-								case "search":
-									new SearchResultsGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
-									break;
-								case "server":
-									new ServersDetailGui(targetPlayer, pluginMessenger, pagesData, title, registriesProvider).open();
-									break;
-								case "lobbywarp":
-									new LobbyWarpGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
-									break;
-								case "lobbywarp-around":
-									new LobbyWarpAroundGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
-									break;
+								case "Alle" ->
+										new AllGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
+								case "Städte" ->
+										new CitiesGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
+								case "Events" ->
+										new EventsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
+								case "Plotregionen" ->
+										new PlotsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
+								case "Normen Hubs" ->
+										new NormenHubsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
+								case "city" ->
+										new CitiesDetailGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
+								case "bl" ->
+										new StatesDetailGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
+								case "search" ->
+										new SearchResultsGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
+								case "server" ->
+										new ServersDetailGui(targetPlayer, pluginMessenger, pagesData, title, registriesProvider).open();
+								case "lobbywarp" ->
+										new LobbyWarpGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
+								case "lobbywarp-around" ->
+										new LobbyWarpAroundGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
 							}
-							break;
 						}
+					}
 
-					case "warp_info":
-						playerUUID = UUID.fromString(in.readUTF());
+					case "warp_info" -> {
+						UUID playerUUID = UUID.fromString(in.readUTF());
 						int responseNumber = Integer.parseInt(in.readUTF());
 						int id = Integer.parseInt(in.readUTF());
 						String name = in.readUTF();
@@ -144,14 +128,14 @@ public class PluginMsgListener implements PluginMessageListener {
 						if (headId.equals("null")) {
 							headId = null;
 						}
-						yaw = Float.parseFloat(in.readUTF());
-						pitch = Float.parseFloat(in.readUTF());
+						float yaw = Float.parseFloat(in.readUTF());
+						float pitch = Float.parseFloat(in.readUTF());
 						double height = Double.parseDouble(in.readUTF());
-						targetPlayer = Bukkit.getPlayer(playerUUID);
-						if (!targetPlayer.isOnline()) return;
+						Player targetPlayer = Bukkit.getPlayer(playerUUID);
+						if (targetPlayer == null || !targetPlayer.isOnline()) return;
 
 						switch (responseNumber) {
-							case 0:
+							case 0 -> {
 								targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Bist du sicher, dass du folgenden Warp löschen willst?"));
 								targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Id: " + id));
 								targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Name: " + name));
@@ -164,8 +148,8 @@ public class PluginMsgListener implements PluginMessageListener {
 								yes.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nwarp delete " + id));
 								targetPlayer.spigot().sendMessage(new TextComponent(TeleportationBukkit.getFormattedMessage("")), yes);
 								registriesProvider.getPlayersEnteringDeleteWarpIdRegistry().unregister(targetPlayer);
-								break;
-							case 1:
+							}
+							case 1 -> {
 								targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Um den folgenden Warp zu ändern, klicke unter dem jeweiligen Wert."));
 								TextComponent changeName = new TextComponent(TeleportationBukkit.getFormattedMessage("§r§cName §cändern"));
 								changeName.setColor(ChatColor.RED);
@@ -209,19 +193,18 @@ public class PluginMsgListener implements PluginMessageListener {
 								targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Höhe: " + height));
 								targetPlayer.spigot().sendMessage(changeHeight);
 								registriesProvider.getPlayersEnteringChangeWarpIdRegistry().unregister(targetPlayer);
-								break;
+							}
 						}
-						break;
+					}
 
-					case "command_perform":
-						playerUUID = UUID.fromString(in.readUTF());
+					case "command_perform" -> {
+						UUID playerUUID = UUID.fromString(in.readUTF());
 						String command = in.readUTF();
-						targetPlayer = Bukkit.getPlayer(playerUUID);
-						if (!targetPlayer.isOnline()) return;
+						Player targetPlayer = Bukkit.getPlayer(playerUUID);
+						if (targetPlayer == null || !targetPlayer.isOnline()) return;
 
 						targetPlayer.performCommand(command);
-						break;
-
+					}
 				}
 
 			} catch (IOException ignore) {}

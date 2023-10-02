@@ -4,7 +4,6 @@ import com.tchristofferson.pagedinventories.IPagedInventory;
 import com.tchristofferson.pagedinventories.NavigationRow;
 import com.tchristofferson.pagedinventories.handlers.PagedInventoryCustomNavigationHandler;
 import com.tchristofferson.pagedinventories.navigationitems.CustomNavigationItem;
-import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintItem;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintRange;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.GuiBlueprint;
@@ -33,8 +32,8 @@ public class LobbyWarpGui extends MultiplePagesDetailWarpGuiAbstract {
                 new CustomNavigationItem(NAV_LOBBY_AROUND.getItemStack(), NAV_LOBBY_AROUND.getSlot()) {
                     @Override
                     public void handleClick(PagedInventoryCustomNavigationHandler handler) {
-                        Optional<LobbyCity> lobbyCityOptional = TeleportationBukkit.lobbyCities.stream().filter(lobbyCity1 -> lobbyCity1.getCity().equalsIgnoreCase(title)).findFirst();
-                        if(!lobbyCityOptional.isPresent()) {
+                        Optional<LobbyCity> lobbyCityOptional = registriesProvider.getLobbyCitiesRegistry().getLobbyCities().stream().filter(lobbyCity1 -> lobbyCity1.getCity().equalsIgnoreCase(title)).findFirst();
+                        if(lobbyCityOptional.isEmpty()) {
                             return;
                         }
                         LobbyCity lobbyCity = lobbyCityOptional.get();

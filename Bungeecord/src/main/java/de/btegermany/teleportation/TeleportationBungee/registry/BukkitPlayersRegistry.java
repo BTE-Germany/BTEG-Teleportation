@@ -1,13 +1,13 @@
 package de.btegermany.teleportation.TeleportationBungee.registry;
 
-import de.btegermany.teleportation.TeleportationBungee.BukkitPlayer;
+import de.btegermany.teleportation.TeleportationBungee.util.BukkitPlayer;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class BukkitPlayersRegistry implements Registry {
+public class BukkitPlayersRegistry implements PlayerRegistry {
 
     ConcurrentMap<UUID, BukkitPlayer> bukkitPlayers = new ConcurrentHashMap<>();
 

@@ -32,9 +32,8 @@ public class TpaCommand extends Command implements TabExecutor {
     @Override
     public void execute(CommandSender sender, String[] args) {
 
-        if(sender instanceof ProxiedPlayer) {
+        if(sender instanceof ProxiedPlayer player) {
 
-            ProxiedPlayer player = (ProxiedPlayer) sender;
             if(!player.hasPermission("teleportation.tpa")) {
                 player.sendMessage(new ComponentBuilder("§b§lBTEG §7> §cDu §cbist §cnicht §cberechtigt, §cdiesen §cCommand §causzuführen!").create());
                 return;

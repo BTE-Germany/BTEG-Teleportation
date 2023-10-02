@@ -28,17 +28,11 @@ public class WarpGui extends SinglePageWarpGuiAbstract {
             @Override
             public void handle(ClickHandler clickHandler) {
                 if(clickHandler.getCurrentItem().getItemMeta() == null || clickHandler.getCurrentItem().getItemMeta().getDisplayName() == null || clickHandler.getCurrentItem().getItemMeta().getDisplayName().length() < 3) return;
-                switch(clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2)) {
-                    case "Städte":
-                    case "Events":
-                    case "Plotregionen":
-                    case "Normen Hubs":
-                    case "Alle":
-                        pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2), 0, 1));
-                        break;
-                    case "Bundesländer":
-                        new StatesGui(clickHandler.getPlayer(), pluginMessenger, registriesProvider).open();
-                        break;
+                switch (clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2)) {
+                    case "Städte", "Events", "Plotregionen", "Normen Hubs", "Alle" ->
+                            pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2), 0, 1));
+                    case "Bundesländer" ->
+                            new StatesGui(clickHandler.getPlayer(), pluginMessenger, registriesProvider).open();
                 }
             }
         });
@@ -71,27 +65,27 @@ public class WarpGui extends SinglePageWarpGuiAbstract {
     @Nonnull
     @Override
     public List<ItemStack> getContent() {
-        ItemStack itemCities = new ItemStack(Material.STAINED_GLASS, 1, (short) 11);
+        ItemStack itemCities = new ItemStack(Material.BLUE_STAINED_GLASS);
         ItemMeta metaCities = itemCities.getItemMeta();
         metaCities.setDisplayName("Städte");
         itemCities.setItemMeta(metaCities);
-        ItemStack itemStates = new ItemStack(Material.STAINED_GLASS, 1, (short) 4);
+        ItemStack itemStates = new ItemStack(Material.YELLOW_STAINED_GLASS);
         ItemMeta metaStates = itemStates.getItemMeta();
         metaStates.setDisplayName("Bundesländer");
         itemStates.setItemMeta(metaStates);
-        ItemStack itemEvents = new ItemStack(Material.STAINED_GLASS, 1, (short) 14);
+        ItemStack itemEvents = new ItemStack(Material.RED_STAINED_GLASS);
         ItemMeta metaEvents = itemCities.getItemMeta();
         metaEvents.setDisplayName("Events");
         itemEvents.setItemMeta(metaEvents);
-        ItemStack itemPlots = new ItemStack(Material.STAINED_GLASS, 1, (short) 13);
+        ItemStack itemPlots = new ItemStack(Material.GREEN_STAINED_GLASS);
         ItemMeta metaPlots = itemPlots.getItemMeta();
         metaPlots.setDisplayName("Plotregionen");
         itemPlots.setItemMeta(metaPlots);
-        ItemStack itemNormen = new ItemStack(Material.STAINED_GLASS, 1, (short) 15);
+        ItemStack itemNormen = new ItemStack(Material.BLACK_STAINED_GLASS);
         ItemMeta metaNormen = itemNormen.getItemMeta();
         metaNormen.setDisplayName("Normen Hubs");
         itemNormen.setItemMeta(metaNormen);
-        ItemStack itemAll = new ItemStack(Material.STAINED_GLASS, 1, (short) 0);
+        ItemStack itemAll = new ItemStack(Material.WHITE_STAINED_GLASS);
         ItemMeta metaAll = itemCities.getItemMeta();
         metaAll.setDisplayName("Alle");
         itemAll.setItemMeta(metaAll);

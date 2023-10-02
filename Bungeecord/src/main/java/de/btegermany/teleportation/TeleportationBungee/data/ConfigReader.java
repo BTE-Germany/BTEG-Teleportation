@@ -3,6 +3,8 @@ package de.btegermany.teleportation.TeleportationBungee.data;
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
 import de.btegermany.teleportation.TeleportationBungee.geo.GeoData;
 import de.btegermany.teleportation.TeleportationBungee.geo.GeoServer;
+import de.btegermany.teleportation.TeleportationBungee.registry.WarpsRegistry;
+import de.btegermany.teleportation.TeleportationBungee.util.Warp;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.config.Configuration;
@@ -26,7 +28,7 @@ public class ConfigReader {
         this.geoData = geoData;
     }
 
-    public void readServers() {
+    public void readServers(WarpsRegistry warpsRegistry) {
         ConfigurationProvider provider = YamlConfiguration.getProvider(YamlConfiguration.class);
         File dir = plugin.getDataFolder();
         if(!dir.getParentFile().exists()) dir.getParentFile().mkdir();
@@ -64,7 +66,8 @@ public class ConfigReader {
                 if(showPlayersOnTerramapRaw != null) {
                     showPlayersOnTerramap = (boolean) showPlayersOnTerramapRaw;
                 }
-                String normenWarp = config.getString(serverName + ".normen-warp");
+                String normenWarpName = config.getString(serverName + ".normen-warp");
+                Warp normenWarp = warpsRegistry.getWarps().stream().filter(warp -> warp.getName().equals(normenWarpName)).findFirst().orElse(null);
 
                 geoServers.add(new GeoServer(serverInfo, states, cities, tpllPassthrough, isEarthServer, showPlayersOnTerramap, normenWarp));
             }

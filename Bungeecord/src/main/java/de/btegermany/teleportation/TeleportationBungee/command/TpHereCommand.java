@@ -24,9 +24,8 @@ public class TpHereCommand extends Command implements TabExecutor {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if(sender instanceof ProxiedPlayer) {
+        if(sender instanceof ProxiedPlayer player) {
 
-            ProxiedPlayer player = (ProxiedPlayer) sender;
             if(!player.hasPermission("teleportation.tphere")) {
                 player.sendMessage(new ComponentBuilder("§b§lBTEG §7» §cDu §cbist §cnicht §cberechtigt, §cdiesen §cCommand §causzuführen!").create());
                 return;

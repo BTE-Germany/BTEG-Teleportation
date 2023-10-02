@@ -1,5 +1,7 @@
 package de.btegermany.teleportation.TeleportationBukkit.registry;
 
+import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
+
 public class RegistriesProvider {
 
     private final MultiplePagesGuisRegistry multiplePagesGuisRegistry;
@@ -7,13 +9,15 @@ public class RegistriesProvider {
     private final WarpsInCreationRegistry warpsInCreationRegistry;
     private final PlayersEnteringChangeWarpIdRegistry playersEnteringChangeWarpIdRegistry;
     private final WarpsGettingChangedRegistry warpsGettingChangedRegistry;
+    private final LobbyCitiesRegistry lobbyCitiesRegistry;
 
-    public RegistriesProvider() {
+    public RegistriesProvider(TeleportationBukkit plugin) {
         this.multiplePagesGuisRegistry = new MultiplePagesGuisRegistry();
         this.playersEnteringDeleteWarpIdRegistry = new PlayersEnteringDeleteWarpIdRegistry();
         this.warpsInCreationRegistry = new WarpsInCreationRegistry();
         this.playersEnteringChangeWarpIdRegistry = new PlayersEnteringChangeWarpIdRegistry();
         this.warpsGettingChangedRegistry = new WarpsGettingChangedRegistry();
+        this.lobbyCitiesRegistry = new LobbyCitiesRegistry(plugin, "lobbycities.yml");
     }
 
     // Getters
@@ -36,6 +40,10 @@ public class RegistriesProvider {
 
     public WarpsGettingChangedRegistry getWarpsGettingChangedRegistry() {
         return warpsGettingChangedRegistry;
+    }
+
+    public LobbyCitiesRegistry getLobbyCitiesRegistry() {
+        return lobbyCitiesRegistry;
     }
 
 }

@@ -27,7 +27,7 @@ public abstract class MultiplePagesDetailWarpGuiAbstract extends MultiplePagesWa
                 Optional<String> optionalCommand = lore.stream().filter(s -> s.startsWith("/tpll")).findFirst();
                 Optional<String> optionalRotation = lore.stream().filter(s -> s.startsWith("Drehung:")).findFirst();
                 Optional<String> optionalHeight = lore.stream().filter(s -> s.startsWith("Höhe:")).findFirst();
-                if(!optionalCommand.isPresent() || !optionalRotation.isPresent() || !optionalHeight.isPresent()) return;
+                if(optionalCommand.isEmpty() || optionalRotation.isEmpty() || optionalHeight.isEmpty()) return;
 
                 String command = optionalCommand.get();
                 String[] rotation = optionalRotation.get().substring("Drehung: ".length()).replace(",", "").split(" ");

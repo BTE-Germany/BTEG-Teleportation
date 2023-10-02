@@ -20,7 +20,7 @@
 
 package de.btegermany.teleportation.TeleportationBungee.terramap;
 
-import de.btegermany.teleportation.TeleportationBungee.BukkitPlayer;
+import de.btegermany.teleportation.TeleportationBungee.util.BukkitPlayer;
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
 import de.btegermany.teleportation.TeleportationBungee.geo.GeoData;
 import fr.thesmyler.bungee2forge.api.ForgePacket;

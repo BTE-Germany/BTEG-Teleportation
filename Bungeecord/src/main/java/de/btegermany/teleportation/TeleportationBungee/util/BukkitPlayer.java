@@ -1,4 +1,4 @@
-package de.btegermany.teleportation.TeleportationBungee;
+package de.btegermany.teleportation.TeleportationBungee.util;
 
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;

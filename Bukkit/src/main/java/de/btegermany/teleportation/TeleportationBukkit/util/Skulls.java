@@ -14,7 +14,7 @@ public class Skulls {
 
     public static ItemStack getSkull(Skin skin) {
 
-        ItemStack head = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
 
         try {
             String urlBase64 = new String(Base64.getEncoder().encode(("{\"textures\":{\"SKIN\":{\"url\":\"https://textures.minecraft.net/texture/" + skin.id + "\"}}}").getBytes()));
@@ -37,7 +37,7 @@ public class Skulls {
 
     public static ItemStack getSkullFromId(String id) {
 
-        ItemStack head = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
 
         try {
             String urlBase64 = new String(Base64.getEncoder().encode(("{\"textures\":{\"SKIN\":{\"url\":\"https://textures.minecraft.net/texture/" + id + "\"}}}").getBytes()));

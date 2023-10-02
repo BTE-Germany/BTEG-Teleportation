@@ -1,45 +1,40 @@
 package de.btegermany.teleportation.TeleportationBukkit.commands;
 
-import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
 import de.btegermany.teleportation.TeleportationBukkit.message.GetGuiDataMessage;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
+import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBukkit.util.LobbyCity;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import java.io.File;
-import java.io.IOException;
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit.getFormattedErrorMessage;
 import static de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit.getFormattedMessage;
 
-public class LobbyWarpCommand implements CommandExecutor {
+public class LobbyWarpCommand implements CommandExecutor, TabExecutor {
 
     private final PluginMessenger pluginMessenger;
-    private final File lobbyCitiesConfigFile;
-    private final FileConfiguration lobbyCitiesConfig;
+    private final RegistriesProvider registriesProvider;
 
-    public LobbyWarpCommand(PluginMessenger pluginMessenger, File lobbyCitiesConfigFile, FileConfiguration lobbyCitiesConfig) {
+    public LobbyWarpCommand(PluginMessenger pluginMessenger, RegistriesProvider registriesProvider) {
         this.pluginMessenger = pluginMessenger;
-        this.lobbyCitiesConfigFile = lobbyCitiesConfigFile;
-        this.lobbyCitiesConfig = lobbyCitiesConfig;
+        this.registriesProvider = registriesProvider;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, @Nonnull String[] args) {
 
-        if(!(sender instanceof Player)) {
+        if(!(sender instanceof Player player)) {
             sender.sendMessage(getFormattedErrorMessage("Diesen Command können nur Spieler ausführen!"));
             return true;
         }
-        Player player = (Player) sender;
 
         if(args.length < 1) {
             sender.sendMessage(getFormattedErrorMessage("Bitte gib eine Stadt an!"));
@@ -56,7 +51,7 @@ public class LobbyWarpCommand implements CommandExecutor {
 
             String city = args[1].substring(0, 1).toUpperCase() + args[1].substring(1).toLowerCase();
 
-            if(this.lobbyCitiesConfig.getKeys(false).contains(city)) {
+            if(this.registriesProvider.getLobbyCitiesRegistry().doesExist(city)) {
                 player.sendMessage(getFormattedErrorMessage("Diese Stadt existiert schon!"));
                 return true;
             }
@@ -76,30 +71,26 @@ public class LobbyWarpCommand implements CommandExecutor {
                     .setZ(player.getLocation().getBlockZ())
                     .build();
 
-            this.lobbyCitiesConfig.set(city + ".center-latitude", lobbyCity.getCenterLat());
-            this.lobbyCitiesConfig.set(city + ".center-longitude", lobbyCity.getCenterLon());
-            this.lobbyCitiesConfig.set(city + ".radius-km", lobbyCity.getRadius());
-            this.lobbyCitiesConfig.set(city + ".x", lobbyCity.getBlock().getX());
-            this.lobbyCitiesConfig.set(city + ".y", lobbyCity.getBlock().getY());
-            this.lobbyCitiesConfig.set(city + ".z", lobbyCity.getBlock().getZ());
-            this.lobbyCitiesConfig.set(city + ".world", lobbyCity.getBlock().getWorld().getUID().toString());
-            try {
-                this.lobbyCitiesConfig.save(this.lobbyCitiesConfigFile);
-                TeleportationBukkit.lobbyCities.add(lobbyCity);
-                player.sendMessage(getFormattedMessage(String.format("%s wurde hinzugefügt!", city)));
-                Location armorStandLocation = player.getLocation().getBlock().getLocation();
-                armorStandLocation.setX(armorStandLocation.getX() + 0.5);
-                armorStandLocation.setZ(armorStandLocation.getZ() + 0.5);
-                ArmorStand armorStand = (ArmorStand) armorStandLocation.getWorld().spawnEntity(armorStandLocation, EntityType.ARMOR_STAND);
-                armorStand.setGravity(false);
-                armorStand.setCanPickupItems(false);
-                armorStand.setCustomNameVisible(true);
-                armorStand.setVisible(false);
-                armorStand.setCustomName(ChatColor.GOLD + city);
-            } catch (IOException e) {
-                player.sendMessage(getFormattedErrorMessage("Ein Fehler ist aufgetreten!"));
-                e.printStackTrace();
+            this.registriesProvider.getLobbyCitiesRegistry().register(lobbyCity);
+            player.sendMessage(getFormattedMessage(String.format("%s wurde hinzugefügt!", city)));
+            return true;
+        }
+
+        if(args[0].equalsIgnoreCase("remove")) {
+            if(!player.hasPermission("bteg.warps.manage")) {
+                return true;
             }
+            if(args.length < 2) {
+                return false;
+            }
+
+            Optional<LobbyCity> lobbyCityOptional = this.registriesProvider.getLobbyCitiesRegistry().getLobbyCities().stream().filter(lobbyCity -> lobbyCity.getCity().equalsIgnoreCase(args[1])).findFirst();
+            if(lobbyCityOptional.isEmpty()) {
+                player.sendMessage(getFormattedErrorMessage("Für diese Stadt wurde keine Druckplatte festgelegt!"));
+                return true;
+            }
+            this.registriesProvider.getLobbyCitiesRegistry().unregister(lobbyCityOptional.get());
+            player.sendMessage(getFormattedMessage("Die Stadt wurde gelöscht."));
             return true;
         }
 
@@ -110,4 +101,23 @@ public class LobbyWarpCommand implements CommandExecutor {
         return true;
     }
 
+    @Override
+    public List<String> onTabComplete(@Nonnull CommandSender commandSender, @Nonnull Command command, @Nonnull String s, @Nonnull String[] args) {
+        if(!commandSender.hasPermission("bteg.warps.manage")) {
+            return null;
+        }
+
+        List<String> result = new ArrayList<>();
+        switch (args.length) {
+            case 1 -> {
+                if("add".startsWith(args[0].toLowerCase())) {
+                    result.add("add");
+                }
+                if("remove".startsWith(args[0].toLowerCase())) {
+                    result.add("remove");
+                }
+            }
+        }
+        return result;
+    }
 }

@@ -12,8 +12,8 @@ import de.btegermany.teleportation.TeleportationBungee.terramap.TerramapListener
 import de.btegermany.teleportation.TeleportationBungee.data.ConfigReader;
 import de.btegermany.teleportation.TeleportationBungee.data.Database;
 import de.btegermany.teleportation.TeleportationBungee.message.PluginMessenger;
+import de.btegermany.teleportation.TeleportationBungee.util.BukkitPlayer;
 import de.btegermany.teleportation.TeleportationBungee.util.Utils;
-import de.btegermany.teleportation.TeleportationBungee.util.Warp;
 import fr.thesmyler.bungee2forge.BungeeToForgePlugin;
 import fr.thesmyler.bungee2forge.api.ForgeChannel;
 import fr.thesmyler.bungee2forge.api.ForgeChannelRegistry;
@@ -26,11 +26,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -46,8 +42,6 @@ public class TeleportationBungee extends Plugin {
     private GeoData geoData;
     private ScheduledExecutorService scheduledExecutorServiceCheckStateBorders;
     private final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
-    //TODO: temp + für alles cachen
-    public static Set<Warp> warps = new HashSet<>();
 
     @Override
     public void onEnable() {
@@ -58,14 +52,15 @@ public class TeleportationBungee extends Plugin {
         terramapMapSyncChannel.registerPacket(1, PlayerSyncPacket.class);
         terramapPluginChannel.registerPacket(0, PluginHelloPacket.class);
 
-        this.registriesProvider = new RegistriesProvider();
         this.geoData = new GeoData(this);
         PluginMessenger pluginMessenger = new PluginMessenger();
-        Utils utils = new Utils(pluginMessenger, this.registriesProvider);
         ConfigReader configReader = new ConfigReader(this, this.geoData);
-        configReader.readServers();
         this.database = new Database(configReader);
         this.database.connect();
+        this.registriesProvider = new RegistriesProvider(this.database, this);
+        this.registriesProvider.getWarpsRegistry().loadWarps();
+        configReader.readServers(this.registriesProvider.getWarpsRegistry());
+        Utils utils = new Utils(pluginMessenger, this.registriesProvider);
 
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TeleportCommand(utils));
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpaCommand(utils, this.registriesProvider));
@@ -95,27 +90,6 @@ public class TeleportationBungee extends Plugin {
 
         //DatabaseConverter databaseConverter = new DatabaseConverter(this, database, new File(this.getDataFolder(), "BTEGTeleportationBungee.db"));
         //databaseConverter.convertDbFileToDatabase();
-
-        try {
-            ResultSet resultSet = this.database.executeQuerySync(this.database.getConnection().prepareStatement("SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height FROM warps ORDER BY name"));
-            while (resultSet.next()) {
-                warps.add(new Warp(
-                        resultSet.getInt("id"),
-                        resultSet.getString("name"),
-                        resultSet.getString("city"),
-                        resultSet.getString("state"),
-                        Double.parseDouble(resultSet.getString("latitude")),
-                        Double.parseDouble(resultSet.getString("longitude")),
-                        resultSet.getString("head_id"),
-                        resultSet.getFloat("yaw"),
-                        resultSet.getFloat("pitch"),
-                        resultSet.getInt("height"),
-                        null
-                ));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
