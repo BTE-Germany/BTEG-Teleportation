@@ -57,12 +57,12 @@ public class CoordinateFormatConverter {
         return degrees;
     }
 
-    public static double toDegrees(int degree, int minutes, double seconds) {
-        return (((seconds / 60) + minutes) / 60) + degree;
+    public static double toDegrees(int degrees, int minutes, double seconds) {
+        return ((double) degrees) + (minutes / 60.0) + (seconds / 3600.0);
     }
 
-    public static double toDegrees(int degree, double minutes) {
-        return (minutes / 60) + degree;
+    public static double toDegrees(int degrees, double minutes) {
+        return ((double) degrees) + (minutes / 60.0);
     }
 
 }

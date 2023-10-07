@@ -37,11 +37,13 @@ public abstract class MultiplePagesWarpGuiAbstract extends WarpGuiAbstract {
     }
 
     public void addPages(JSONArray pagesData) {
-
         for(int i = 0; i < pagesData.length(); i++) {
             JSONObject pageData = pagesData.getJSONObject(i);
             int page = pageData.getInt("page");
             JSONArray pageContent = pageData.getJSONArray("content");
+            if(page < inventory.getSize()) {
+                continue;
+            }
 
             currentInventory = Bukkit.createInventory(player, blueprint.getRowsCount() * 9, title + " - Seite " + (page + 1));
             for(int j = 0; j < pageContent.length(); j++) {

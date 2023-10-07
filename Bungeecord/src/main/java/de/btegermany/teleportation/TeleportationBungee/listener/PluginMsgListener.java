@@ -38,12 +38,14 @@ public class PluginMsgListener implements Listener {
     private final Database database;
     private final GeoData geoData;
     private final RegistriesProvider registriesProvider;
+    private final Map<UUID, Map<Integer, List<JSONObject>>> cachedGuiData;
 
     public PluginMsgListener(PluginMessenger pluginMessenger, Database database, GeoData geoData, RegistriesProvider registriesProvider) {
         this.pluginMessenger = pluginMessenger;
         this.database = database;
         this.geoData = geoData;
         this.registriesProvider = registriesProvider;
+        this.cachedGuiData = new HashMap<>();
     }
     
     @EventHandler
@@ -70,8 +72,11 @@ public class PluginMsgListener implements Listener {
 
                 switch (group) {
                     case "Alle" -> {
-                        Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps();
-                        this.pluginMessenger.sendGuiData(player, metaTitle, this.getJSONFromWarps(warps));
+                        if(pages[0] == 0) {
+                            Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps();
+                            this.cachedGuiData.put(playerUUID, this.getJSONObjectsFromWarps(warps));
+                        }
+                        this.pluginMessenger.sendGuiData(player, metaTitle, this.getJSONArrayFromCache(playerUUID, pages));
                     }
                     case "Städte" -> {
                         final Map<Integer, List<JSONObject>> pagesMap = new HashMap<>();
@@ -108,24 +113,68 @@ public class PluginMsgListener implements Listener {
                         this.pluginMessenger.sendGuiData(player, metaTitle, pagesData);
                     }
                     case "Events" -> {
-                        Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getName().endsWith("[Event]")).collect(Collectors.toSet());
-                        this.pluginMessenger.sendGuiData(player, metaTitle, this.getJSONFromWarps(warps));
+                        if(pages[0] == 0) {
+                            Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getName().endsWith("[Event]")).collect(Collectors.toSet());
+                            this.cachedGuiData.put(playerUUID, this.getJSONObjectsFromWarps(warps));
+                        }
+                        this.pluginMessenger.sendGuiData(player, metaTitle, this.getJSONArrayFromCache(playerUUID, pages));
                     }
                     case "Plotregionen" -> {
-                        Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getName().endsWith("[Plotgebiet]")).collect(Collectors.toSet());
-                        this.pluginMessenger.sendGuiData(player, metaTitle, this.getJSONFromWarps(warps));
+                        if(pages[0] == 0) {
+                            Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getName().endsWith("[Plotgebiet]")).collect(Collectors.toSet());
+                            this.cachedGuiData.put(playerUUID, this.getJSONObjectsFromWarps(warps));
+                        }
+                        this.pluginMessenger.sendGuiData(player, metaTitle, this.getJSONArrayFromCache(playerUUID, pages));
                     }
                     case "Normen Hubs" -> {
-                        Set<Warp> warps = this.geoData.getGeoServers().stream().map(GeoServer::getNormenWarp).filter(Objects::nonNull).collect(Collectors.toSet());
-                        this.pluginMessenger.sendGuiData(player, metaTitle, this.getJSONFromWarps(warps));
+                        if(pages[0] == 0) {
+                            Set<Warp> warps = this.geoData.getGeoServers().stream().map(GeoServer::getNormenWarp).filter(Objects::nonNull).collect(Collectors.toSet());
+                            this.cachedGuiData.put(playerUUID, this.getJSONObjectsFromWarps(warps));
+                        }
+                        this.pluginMessenger.sendGuiData(player, metaTitle, this.getJSONArrayFromCache(playerUUID, pages));
                     }
                     case "city", "lobbywarp" -> {
-                        Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getCity().equalsIgnoreCase(title)).collect(Collectors.toSet());
-                        this.pluginMessenger.sendGuiData(player, metaTitle, this.getJSONFromWarps(warps));
+                        if(pages[0] == 0) {
+                            Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getCity().equalsIgnoreCase(title)).collect(Collectors.toSet());
+                            this.cachedGuiData.put(playerUUID, this.getJSONObjectsFromWarps(warps));
+                        }
+                        this.pluginMessenger.sendGuiData(player, metaTitle, this.getJSONArrayFromCache(playerUUID, pages));
                     }
                     case "bl" -> {
-                        Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getState().equals(title)).collect(Collectors.toSet());
-                        this.pluginMessenger.sendGuiData(player, metaTitle, this.getJSONFromWarps(warps));
+                        if(pages[0] == 0) {
+                            Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getState().equals(title)).collect(Collectors.toSet());
+                            this.cachedGuiData.put(playerUUID, this.getJSONObjectsFromWarps(warps));
+                        }
+                        this.pluginMessenger.sendGuiData(player, metaTitle, this.getJSONArrayFromCache(playerUUID, pages));
+                    }
+                    case "search" -> {
+                        List<Warp> warpsSearch1 = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getName().equalsIgnoreCase(title)).collect(Collectors.toList());
+                        if (warpsSearch1.size() == 1) {
+                            Warp warp = warpsSearch1.get(0);
+                            String stayServer = null;
+                            for (GeoServer geoServer : this.geoData.getGeoServers()) {
+                                if (warp.equals(geoServer.getNormenWarp())) {
+                                    stayServer = geoServer.getServerInfo().getName();
+                                    break;
+                                }
+                            }
+                            ProxyServer.getInstance().getPluginManager().dispatchCommand(player, warp.getTpllCommand() + (stayServer != null ? " stay=" + stayServer : ""));
+                            return;
+                        }
+
+                        List<Warp> warpsSearch2 = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getCity().equalsIgnoreCase(title)).toList();
+
+                        if (warpsSearch1.size() == 0 && warpsSearch2.size() == 0) {
+                            player.sendMessage(TeleportationBungee.getFormattedMessage("Leider wurden keine Warps gefunden!"));
+                            return;
+                        }
+
+                        warpsSearch1.addAll(warpsSearch2);
+
+                        if(pages[0] == 0) {
+                            this.cachedGuiData.put(playerUUID, this.getJSONObjectsFromWarps(warpsSearch1));
+                        }
+                        this.pluginMessenger.sendGuiData(player, metaTitle, this.getJSONArrayFromCache(playerUUID, pages));
                     }
                     case "lobbywarp-around" -> {
                         String[] args = metaTitle.split("_");
@@ -152,7 +201,11 @@ public class PluginMsgListener implements Listener {
                                 warpsAround.add(warp);
                             }
                         }
-                        pluginMessenger.sendGuiData(player, String.format("lobbywarp-around_%s", city), this.getJSONFromWarps(warpsAround));
+
+                        if(pages[0] == 0) {
+                            this.cachedGuiData.put(playerUUID, this.getJSONObjectsFromWarps(warpsAround));
+                        }
+                        pluginMessenger.sendGuiData(player, String.format("lobbywarp-around_%s", city), this.getJSONArrayFromCache(playerUUID, pages));
                     }
                 }
             }
@@ -358,7 +411,7 @@ public class PluginMsgListener implements Listener {
                 registriesProvider.getLastLocationsRegistry().register(playerUUID, new LastLocation(x, y, z, yaw, pitch, player.getServer().getInfo()));
             }
 
-            case "warps_search" -> {
+            /*case "warps_search" -> {
                 UUID playerUUID = UUID.fromString(dataInput.readUTF());
                 String search = dataInput.readUTF();
                 ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerUUID);
@@ -387,8 +440,8 @@ public class PluginMsgListener implements Listener {
 
                 warpsSearch1.addAll(warpsSearch2);
 
-                pluginMessenger.sendGuiData(player, String.format("search_%s", search), this.getJSONFromWarps(warpsSearch1));
-            }
+                pluginMessenger.sendGuiData(player, String.format("search_%s", search), this.get(warpsSearch1));
+            }*/
 
             case "players_online" -> {
                 String serverAddress = dataInput.readUTF();
@@ -430,7 +483,7 @@ public class PluginMsgListener implements Listener {
         }
     }
 
-    private JSONArray getJSONFromWarps(Collection<Warp> warps) {
+    private Map<Integer, List<JSONObject>> getJSONObjectsFromWarps(Collection<Warp> warps) {
         final Map<Integer, List<JSONObject>> pagesMap = new HashMap<>();
         final List<JSONObject> currentPage = new ArrayList<>();
         for(Warp warp : warps) {
@@ -456,16 +509,22 @@ public class PluginMsgListener implements Listener {
         if(currentPage.size() > 0) {
             pagesMap.put(pagesMap.size(), currentPage);
         }
+        return pagesMap;
+    }
 
+    private JSONArray getJSONArrayFromCache(UUID playerUUID, int... pages) {
         JSONArray pagesData = new JSONArray();
-        pagesMap.forEach((page, content) -> {
+        for(int pageIndex : pages) {
+            if(!this.cachedGuiData.get(playerUUID).containsKey(pageIndex)) {
+                continue;
+            }
             JSONObject object = new JSONObject();
-            object.put("page", page);
+            object.put("page", pageIndex);
             JSONArray objectContent = new JSONArray();
-            content.forEach(objectContent::put);
+            this.cachedGuiData.get(playerUUID).get(pageIndex).forEach(objectContent::put);
             object.put("content", objectContent);
             pagesData.put(object);
-        });
+        }
         return pagesData;
     }
 

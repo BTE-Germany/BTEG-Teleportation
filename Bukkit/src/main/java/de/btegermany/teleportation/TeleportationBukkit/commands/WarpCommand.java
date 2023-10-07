@@ -112,7 +112,7 @@ public class WarpCommand implements CommandExecutor, TabExecutor {
             searchBuilder.append(args[i]);
         }
         String search = new String(searchBuilder);
-        pluginMessenger.send(new WarpsSearchMessage(player, search));
+        pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), String.format("search_%s", search), 0, 1));
     }
 
     @Override
