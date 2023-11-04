@@ -18,21 +18,23 @@ public class Utils {
         this.registriesProvider = registriesProvider;
     }
 
-    public void teleport(ProxiedPlayer p, ProxiedPlayer t) {
-        p.sendMessage(TeleportationBungee.getFormattedMessage("Du wirst zu " + t.getName() + " teleportiert..."));
-        pluginMessenger.teleportToPlayer(p, t);
+    // teleports the player to the target player
+    public void teleport(ProxiedPlayer player, ProxiedPlayer target) {
+        player.sendMessage(TeleportationBungee.getFormattedMessage("Du wirst zu " + target.getName() + " teleportiert..."));
+        pluginMessenger.teleportToPlayer(player, target);
     }
 
+    // cancels the tpa the player sent
     public void cancelTpa(ProxiedPlayer player) {
-        if(registriesProvider.getTpasRegistry().isRegistered(player)) {
-            ProxiedPlayer target = ProxyServer.getInstance().getPlayer(registriesProvider.getTpasRegistry().getTpa(player));
-            registriesProvider.getTpasRegistry().unregister(player);
-            player.sendMessage(getFormattedMessage("Die Anfrage wurde abgebrochen."));
-            if(target != null) {
-                target.sendMessage(getFormattedMessage(player.getDisplayName() + " hat die Anfrage abgebrochen!"));
-            }
-        } else {
+        if(!registriesProvider.getTpasRegistry().isRegistered(player)) {
             player.sendMessage(getFormattedMessage("Du hast keine Anfrage gestellt!"));
+            return;
+        }
+        ProxiedPlayer target = ProxyServer.getInstance().getPlayer(registriesProvider.getTpasRegistry().getTpa(player));
+        registriesProvider.getTpasRegistry().unregister(player);
+        player.sendMessage(getFormattedMessage("Die Anfrage wurde abgebrochen."));
+        if(target != null) {
+            target.sendMessage(getFormattedMessage(player.getDisplayName() + " hat die Anfrage abgebrochen!"));
         }
     }
 

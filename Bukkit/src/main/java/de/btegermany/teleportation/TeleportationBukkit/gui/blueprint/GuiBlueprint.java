@@ -12,7 +12,6 @@ public class GuiBlueprint {
 
     private final ItemStack defaultPlaceholder;
     private final List<BlueprintItem[]> rows = new ArrayList<>();
-    private int currentRow = 0;
 
     public GuiBlueprint(@Nonnull ItemStack defaultPlaceholder) {
         this.defaultPlaceholder = defaultPlaceholder;
@@ -37,22 +36,10 @@ public class GuiBlueprint {
         return this;
     }
 
-    public BlueprintItem[] getCurrentRow() {
-        return rows.get(currentRow);
-    }
-
     public List<BlueprintItem> getAllItems() {
         List<BlueprintItem> items = new ArrayList<>();
         rows.forEach(blueprintItems -> items.addAll(Arrays.asList(blueprintItems)));
         return items;
-    }
-
-    public boolean nextRow() {
-        if(currentRow < getRowsCount() - 1) {
-            currentRow++;
-            return true;
-        }
-        return false;
     }
 
     public int getRowsCount() {
@@ -62,5 +49,4 @@ public class GuiBlueprint {
     public ItemStack getDefaultPlaceholder() {
         return defaultPlaceholder;
     }
-
 }

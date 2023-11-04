@@ -29,7 +29,7 @@ import javax.annotation.Nonnull;
 public abstract class WarpGuiAbstract {
 
     protected final Player player;
-    protected final PagedInventoryAPI pagedInventoryAPI = TeleportationBukkit.getPagedInventoryAPI();
+    protected static final PagedInventoryAPI pagedInventoryAPI = TeleportationBukkit.getPagedInventoryAPI();
     protected final IPagedInventory inventory;
     protected final PluginMessenger pluginMessenger;
     protected final RegistriesProvider registriesProvider;
@@ -38,22 +38,22 @@ public abstract class WarpGuiAbstract {
     protected final String title;
     protected final BlueprintItem placeholderDefault;
     private final boolean showNextPrevious;
-    public final NextNavigationItem NAV_NEXT = new NextNavigationItem(Skulls.getSkull(Skulls.Skin.ARROW_RIGHT), 8);
-    public final PreviousNavigationItem NAV_PREVIOUS = new PreviousNavigationItem(Skulls.getSkull(Skulls.Skin.ARROW_LEFT), 7);
-    public final CloseNavigationItem NAV_CLOSE = new CloseNavigationItem(new ItemStack(Material.BARRIER), 4);
+    public static final NextNavigationItem NAV_NEXT = new NextNavigationItem(Skulls.getSkull(Skulls.Skin.ARROW_RIGHT), 8);
+    public static final PreviousNavigationItem NAV_PREVIOUS = new PreviousNavigationItem(Skulls.getSkull(Skulls.Skin.ARROW_LEFT), 7);
+    public static final CloseNavigationItem NAV_CLOSE = new CloseNavigationItem(new ItemStack(Material.BARRIER), 4);
     public final CustomNavigationItem NAV_SORT = new CustomNavigationItem(new ItemStack(Material.HOPPER), 0) {
         @Override
         public void handleClick(PagedInventoryCustomNavigationHandler pagedInventoryCustomNavigationHandler) {
             openSortGui();
         }
     };
-    public final CustomNavigationItem NAV_MANAGE = new CustomNavigationItem(new ItemStack(Material.ANVIL), 2) {
+    public final CustomNavigationItem NAV_MANAGE = new CustomNavigationItem(new ItemStack(Material.ANVIL), 6) {
         @Override
         public void handleClick(PagedInventoryCustomNavigationHandler pagedInventoryCustomNavigationHandler) {
             openManageGui();
         }
     };
-    public final CustomNavigationItem NAV_SEARCH = new CustomNavigationItem(new ItemStack(Material.COMPASS), 1) {
+    public static final CustomNavigationItem NAV_SEARCH = new CustomNavigationItem(new ItemStack(Material.COMPASS), 1) {
         @Override
         public void handleClick(PagedInventoryCustomNavigationHandler pagedInventoryCustomNavigationHandler) {
             TextComponent button = new TextComponent(" /nwarp ");
@@ -61,7 +61,7 @@ public abstract class WarpGuiAbstract {
             button.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Command in der Chatzeile einfügen").create()));
             button.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/nwarp "));
             TextComponent text1 = new TextComponent(TeleportationBukkit.getFormattedMessage("Nutze den Command"));
-            TextComponent text2 = new TextComponent(TeleportationBukkit.getFormattedMessage("und gib dahinter den Namen eines Warps oder der Stadt, die du suchst, ein!").substring(13));
+            TextComponent text2 = new TextComponent(TeleportationBukkit.getFormattedMessage("und gib dahinter den Namen eines Warps oder der Stadt, die du suchst, ein!").substring(2));
             pagedInventoryCustomNavigationHandler.getPlayer().closeInventory();
             pagedInventoryCustomNavigationHandler.getPlayer().spigot().sendMessage(text1, button, text2);
         }
@@ -72,9 +72,15 @@ public abstract class WarpGuiAbstract {
             openLobbySortGui();
         }
     };
-    public CustomNavigationItem NAV_LOBBY_AROUND = new CustomNavigationItem(new ItemStack(Material.CHISELED_STONE_BRICKS, 1), 1) {
+    public static CustomNavigationItem NAV_LOBBY_AROUND = new CustomNavigationItem(new ItemStack(Material.CHISELED_STONE_BRICKS, 1), 1) {
         @Override
         public void handleClick(PagedInventoryCustomNavigationHandler handler) {}
+    };
+    public final CustomNavigationItem NAV_TP_RANDOM = new CustomNavigationItem(new ItemStack(Material.CHERRY_SAPLING, 1), 2) {
+        @Override
+        public void handleClick(PagedInventoryCustomNavigationHandler handler) {
+            tpToRandomWarp();
+        }
     };
     public final CustomNavigationItem NAV_PLACEHOLDER_DEFAULT;
 
@@ -85,13 +91,15 @@ public abstract class WarpGuiAbstract {
         this.pluginMessenger = pluginMessenger;
         this.registriesProvider = registriesProvider;
 
+        // default placeholder
         ItemStack placeholderDefaultItem = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta placeholderDefaultMeta = placeholderDefaultItem.getItemMeta();
         placeholderDefaultMeta.setDisplayName(" ");
         placeholderDefaultItem.setItemMeta(placeholderDefaultMeta);
         placeholderDefault = new BlueprintItem(placeholderDefaultItem);
-        NAV_PLACEHOLDER_DEFAULT = new CustomNavigationItem(placeholderDefaultItem, 6) {@Override public void handleClick(PagedInventoryCustomNavigationHandler pagedInventoryCustomNavigationHandler) {}};
+        NAV_PLACEHOLDER_DEFAULT = new CustomNavigationItem(placeholderDefaultItem, 5) {@Override public void handleClick(PagedInventoryCustomNavigationHandler pagedInventoryCustomNavigationHandler) {}};
 
+        // change navigation item names
         ItemMeta metaNext = NAV_NEXT.getItemStack().getItemMeta();
         metaNext.setDisplayName(ChatColor.GOLD + "Nächste Seite");
         ItemMeta metaPrevious = NAV_PREVIOUS.getItemStack().getItemMeta();
@@ -108,6 +116,8 @@ public abstract class WarpGuiAbstract {
         metaLobbySort.setDisplayName(ChatColor.GOLD + "Zurück");
         ItemMeta metaLobbyAround = NAV_LOBBY_AROUND.getItemStack().getItemMeta();
         metaLobbyAround.setDisplayName(ChatColor.GOLD + "Warps im Umkreis");
+        ItemMeta metaTpRandom = NAV_TP_RANDOM.getItemStack().getItemMeta();
+        metaTpRandom.setDisplayName(ChatColor.GOLD + "Zufälliger Warp");
         NAV_NEXT.getItemStack().setItemMeta(metaNext);
         NAV_PREVIOUS.getItemStack().setItemMeta(metaPrevious);
         NAV_CLOSE.getItemStack().setItemMeta(metaClose);
@@ -116,10 +126,12 @@ public abstract class WarpGuiAbstract {
         NAV_SEARCH.getItemStack().setItemMeta(metaSearch);
         NAV_LOBBY_SORT.getItemStack().setItemMeta(metaLobbySort);
         NAV_LOBBY_AROUND.getItemStack().setItemMeta(metaLobbyAround);
+        NAV_TP_RANDOM.getItemStack().setItemMeta(metaTpRandom);
 
+        // creates a new inventory, adds manage item and fills empty slots with placeholder
         inventory = createInventory();
         if(player.hasPermission("bteg.warps.manage")) {
-            inventory.getNavigationRow().set(2, NAV_MANAGE);
+            inventory.getNavigationRow().set(6, NAV_MANAGE);
         }
         for(int i = 0; i < 9; i++) {
             if(inventory.getNavigationItem(i) != null) {
@@ -157,8 +169,13 @@ public abstract class WarpGuiAbstract {
     }
 
     public void openLobbySortGui() {
-        player.closeInventory();
-        player.performCommand("lobbywarp " + title);
+        this.player.closeInventory();
+        this.player.performCommand("lobbywarp " + title);
+    }
+
+    public void tpToRandomWarp() {
+        this.player.closeInventory();
+        this.player.performCommand("nwarp random");
     }
 
 }

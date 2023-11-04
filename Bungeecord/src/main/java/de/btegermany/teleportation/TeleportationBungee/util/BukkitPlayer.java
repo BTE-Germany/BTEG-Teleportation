@@ -14,6 +14,7 @@ public class BukkitPlayer {
     private float pitch;
     private String gameMode;
 
+    // a player with location data and game mode
     public BukkitPlayer(ProxiedPlayer proxiedPlayer, ServerInfo serverInfo, double x, double y, double z, float yaw, float pitch, String gameMode) {
         this.proxiedPlayer = proxiedPlayer;
         this.serverInfo = serverInfo;

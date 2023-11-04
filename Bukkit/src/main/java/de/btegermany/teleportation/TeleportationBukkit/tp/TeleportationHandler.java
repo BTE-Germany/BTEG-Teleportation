@@ -16,6 +16,7 @@ public class TeleportationHandler {
         this.pluginMessenger = pluginMessenger;
     }
 
+    // teleport if possible, otherwise store teleportation until it's possible
     public void handle(PendingTeleportationAbstract teleportation) {
         if(teleportation.canTeleport()) {
             pluginMessenger.send(new LastLocationMessage(teleportation.getPlayerUUID()));

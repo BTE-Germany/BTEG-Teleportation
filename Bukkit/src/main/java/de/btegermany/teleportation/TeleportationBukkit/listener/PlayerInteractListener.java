@@ -28,6 +28,7 @@ public class PlayerInteractListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Block block = event.getClickedBlock();
         Player player = event.getPlayer();
+        // check if pressure plate
         if(!event.getAction().equals(Action.PHYSICAL) || block == null|| block.getType() != Material.LIGHT_WEIGHTED_PRESSURE_PLATE) {
             return;
         }
@@ -37,11 +38,13 @@ public class PlayerInteractListener implements Listener {
             if(!block.getLocation().equals(lobbyCity.getBlock().getLocation())) {
                 continue;
             }
+            // check if there has been an activation by the player just before
             boolean isSpam = this.lastActivations.containsKey(player) && this.lastActivations.get(player).isSpam();
             this.lastActivations.put(player, new PressurePlateActivation(lobbyCity.getBlock()));
             if(isSpam) {
                 return;
             }
+            // otherwise open gui with city warps
             player.performCommand(String.format("lobbywarp %s", lobbyCity.getCity()));
         }
     }

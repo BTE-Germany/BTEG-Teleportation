@@ -15,6 +15,7 @@ public class GeoServer {
     private final boolean showPlayersOnTerramap;
     private final Warp normenWarp;
 
+    // a server inside the network specified by the servers config
     public GeoServer(ServerInfo serverInfo, List<String> states, List<String> cities, boolean tpllPassthrough, boolean isEarthServer, boolean showPlayersOnTerramap, Warp normenWarp) {
         this.serverInfo = serverInfo;
         this.states = states;

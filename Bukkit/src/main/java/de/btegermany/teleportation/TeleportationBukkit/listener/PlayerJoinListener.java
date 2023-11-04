@@ -7,7 +7,7 @@ import de.btegermany.teleportation.TeleportationBukkit.tp.TeleportationHandler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 
 public class PlayerJoinListener implements Listener {
@@ -21,17 +21,23 @@ public class PlayerJoinListener implements Listener {
 	}
 
 	@EventHandler
-	public void onPlayerJoin(PlayerLoginEvent event) {
+	public void onPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 
-		if(teleportationHandler.getPendingTps().containsKey(player.getUniqueId())) {
-			PendingTeleportationAbstract teleportation = teleportationHandler.getPendingTps().get(player.getUniqueId());
-			if(teleportation.canTeleport() && teleportation.isValid()) {
-				pluginMessenger.send(new LastLocationMessage(teleportation.getPlayerUUID()));
-				teleportation.teleport();
-			}
-			teleportationHandler.getPendingTps().remove(teleportation.getPlayerUUID());
+		// check if there is a teleportation for this player still pending
+		if(!this.teleportationHandler.getPendingTps().containsKey(player.getUniqueId())) {
+			return;
 		}
+		PendingTeleportationAbstract teleportation = this.teleportationHandler.getPendingTps().get(player.getUniqueId());
+		// teleport if possible
+		if(!teleportation.canTeleport()) {
+			return;
+		}
+		if(teleportation.isValid()) {
+			this.pluginMessenger.send(new LastLocationMessage(teleportation.getPlayerUUID()));
+			teleportation.teleport();
+		}
+		this.teleportationHandler.getPendingTps().remove(teleportation.getPlayerUUID());
 	}
 	
 }

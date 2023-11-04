@@ -24,25 +24,28 @@ public class TeleportCommand extends Command implements TabExecutor {
     @Override
     public void execute(CommandSender sender, String[] args) {
 
-        if (sender instanceof ProxiedPlayer player) {
+        if (!(sender instanceof ProxiedPlayer player)) {
+            return;
+        }
 
-            if(!player.hasPermission("teleportation.tp")) {
-                player.sendMessage(new ComponentBuilder("§b§lBTEG §7» §cDu §cbist §cnicht §cberechtigt, §cdiesen §cCommand §causzuführen!").create());
-                return;
-            }
-            if(args.length != 1) {
-                player.sendMessage(TeleportationBungee.getFormattedMessage("Bitte gib einen Spieler an!"));
-                return;
-            }
-            ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
+        // check permissions
+        if(!player.hasPermission("teleportation.tp")) {
+            player.sendMessage(new ComponentBuilder("ᾠ §cDu §cbist §cnicht §cberechtigt, §cdiesen §cCommand §causzuführen!").create());
+            return;
+        }
+        // check args length
+        if(args.length != 1) {
+            player.sendMessage(TeleportationBungee.getFormattedMessage("Bitte gib einen Spieler an!"));
+            return;
+        }
+        ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
 
 
-            if(target != null) {
-
-                utils.teleport(player, target);
-            } else {
-                player.sendMessage(TeleportationBungee.getFormattedMessage("Der Spieler wurde nicht gefunden!"));
-            }
+        // will teleport player to target player if target player exists
+        if(target != null) {
+            utils.teleport(player, target);
+        } else {
+            player.sendMessage(TeleportationBungee.getFormattedMessage("Der Spieler wurde nicht gefunden!"));
         }
     }
 

@@ -1,6 +1,5 @@
 package de.btegermany.teleportation.TeleportationBukkit.util;
 
-import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
 import org.bukkit.entity.Player;
 
 public class WarpInCreation {
@@ -10,45 +9,9 @@ public class WarpInCreation {
     private State state;
     private String headId;
     private final Player player;
-    private int currentQuestionIndex;
-    private final String[] questions = new String[] {"Name eingeben:", "Stadt eingeben:", "Bundesland eingeben:", "HeadId eingeben (optional, zum Überspringen \"skip\" eingeben):"};
 
     public WarpInCreation(Player player) {
         this.player = player;
-        this.currentQuestionIndex = 0;
-    }
-
-    public void sendCurrentQuestion() {
-        player.sendMessage(TeleportationBukkit.getFormattedMessage(questions[currentQuestionIndex]));
-    }
-
-    public void processInput(String input) {
-        switch (currentQuestionIndex) {
-            case 0:
-                setName(input);
-                break;
-            case 1:
-                setCity(input);
-                break;
-            case 2:
-                for(State state : State.values()) {
-                    if(state.displayName.equalsIgnoreCase(input) || state.abbreviation.equalsIgnoreCase(input)) {
-                        setState(state);
-                        currentQuestionIndex++;
-                        return;
-                    }
-                }
-                player.sendMessage(TeleportationBukkit.getFormattedMessage(String.format("§9\"%s\" §6ist weder Name noch eine gültige Abkürzung eines Bundeslandes. Bitte überprüfe deine Eingabe.", input)));
-                return;
-            case 3:
-                setHeadId(input.equals("skip") ? null : input);
-                break;
-        }
-        currentQuestionIndex++;
-    }
-
-    public boolean isComplete() {
-        return currentQuestionIndex == questions.length;
     }
 
     // Setters, Getters

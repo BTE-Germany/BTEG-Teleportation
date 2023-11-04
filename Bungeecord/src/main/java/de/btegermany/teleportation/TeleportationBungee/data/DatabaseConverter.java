@@ -17,6 +17,7 @@ public class DatabaseConverter {
         this.dbFile = dbFile;
     }
 
+    // converts the warps table from sqlite to mysql
     public void convertDbFileToDatabase() {
         try {
             Class.forName("org.sqlite.JDBC");

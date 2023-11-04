@@ -18,6 +18,7 @@ public abstract class MultiplePagesDetailWarpGuiAbstract extends MultiplePagesWa
 
     @Override
     public void onStartup() {
+        // teleport to warp on click
         inventory.addHandler(new PagedInventoryClickHandler() {
             @Override
             public void handle(ClickHandler clickHandler) {
@@ -29,6 +30,7 @@ public abstract class MultiplePagesDetailWarpGuiAbstract extends MultiplePagesWa
                 Optional<String> optionalHeight = lore.stream().filter(s -> s.startsWith("Höhe:")).findFirst();
                 if(optionalCommand.isEmpty() || optionalRotation.isEmpty() || optionalHeight.isEmpty()) return;
 
+                // execute tpll command for warp
                 String command = optionalCommand.get();
                 String[] rotation = optionalRotation.get().substring("Drehung: ".length()).replace(",", "").split(" ");
                 double height = Double.parseDouble(optionalHeight.get().substring("Höhe: ".length()));

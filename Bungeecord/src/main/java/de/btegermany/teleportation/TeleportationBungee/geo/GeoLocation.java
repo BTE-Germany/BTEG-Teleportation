@@ -8,6 +8,7 @@ public class GeoLocation {
     String state;
     String city;
 
+    // represents a real life location and holds its data
     public GeoLocation(double lat, double lon) {
         this.lat = lat;
         this.lon = lon;

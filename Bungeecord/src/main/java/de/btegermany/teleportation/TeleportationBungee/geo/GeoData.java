@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class GeoData {
 
-    public static final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
+    public static final EarthGeneratorSettings BTE_GENERATOR_SETTINGS = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
     private final TeleportationBungee plugin;
     private List<GeoServer> geoServers;
     private final Map<Double, Map<Double, JSONObject>> cachedLocationResults;
@@ -30,6 +30,7 @@ public class GeoData {
         this.plugin = plugin;
         this.cachedLocationResults = new HashMap<>();
 
+        // initialize core objects for location data
         File osmLocationData = new File(plugin.getDataFolder(), "osm-location-data.bin");
         if(osmLocationData.exists()) {
             try {
@@ -44,6 +45,7 @@ public class GeoData {
         }
     }
 
+    // returns the server the location with the given coordinates is stored on
     public ServerInfo getServerFromLocation(double lat, double lon) {
         GeoLocation location = getLocation(lat, lon);
         if (location == null) {
@@ -75,6 +77,7 @@ public class GeoData {
         return null;
     }
 
+    // returns the GeoLocation that belongs to the given coordinates
     public GeoLocation getLocation(double lat, double lon) {
         try {
             GeoLocation location = getOfflineLocation(lat, lon);

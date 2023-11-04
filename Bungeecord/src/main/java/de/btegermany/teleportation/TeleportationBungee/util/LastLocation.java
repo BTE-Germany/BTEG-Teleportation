@@ -11,6 +11,7 @@ public class LastLocation {
     private final float pitch;
     private final ServerInfo serverInfo;
 
+    // a location a player teleported from to another location
     public LastLocation(double x, double y, double z, float yaw, float pitch, ServerInfo serverInfo) {
         this.x = x;
         this.y = y;

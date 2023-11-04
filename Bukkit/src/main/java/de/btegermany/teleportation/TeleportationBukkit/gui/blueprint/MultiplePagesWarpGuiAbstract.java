@@ -36,6 +36,7 @@ public abstract class MultiplePagesWarpGuiAbstract extends WarpGuiAbstract {
         });
     }
 
+    // adds the pages specified by the JSONArray to the guis data
     public void addPages(JSONArray pagesData) {
         for(int i = 0; i < pagesData.length(); i++) {
             JSONObject pageData = pagesData.getJSONObject(i);
@@ -71,6 +72,7 @@ public abstract class MultiplePagesWarpGuiAbstract extends WarpGuiAbstract {
         registriesProvider.getMultiplePagesGuisRegistry().register(player, this);
     }
 
+    // creates an item from a JSONObject with item data
     private ItemStack getItem(JSONObject object) {
         String name = object.getString("name");
         String headId = object.has("head_id") ? object.getString("head_id") : this.headId;

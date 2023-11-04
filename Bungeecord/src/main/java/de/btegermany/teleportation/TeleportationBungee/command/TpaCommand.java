@@ -32,37 +32,44 @@ public class TpaCommand extends Command implements TabExecutor {
     @Override
     public void execute(CommandSender sender, String[] args) {
 
-        if(sender instanceof ProxiedPlayer player) {
-
-            if(!player.hasPermission("teleportation.tpa")) {
-                player.sendMessage(new ComponentBuilder("§b§lBTEG §7> §cDu §cbist §cnicht §cberechtigt, §cdiesen §cCommand §causzuführen!").create());
-                return;
-            }
-
-            if(args.length != 1) {
-                player.sendMessage(getFormattedMessage("Bitte gib einen Spieler an!"));
-                return;
-            }
-            ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
-
-            if(target != null) {
-                if(registriesProvider.getTpasRegistry().isRegistered(player)) {
-                    utils.cancelTpa(player);
-                }
-                TextComponent compAccept = new TextComponent("/tpaccept " + player.getName());
-                compAccept.setColor(ChatColor.GREEN);
-                compAccept.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/tpaccept " + player.getName()));
-                TextComponent compDeny = new TextComponent("/tpadeny " + player.getName());
-                compDeny.setColor(ChatColor.RED);
-                compDeny.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/tpadeny " + player.getName()));
-
-                registriesProvider.getTpasRegistry().register(player, target);
-                target.sendMessage(new ComponentBuilder("§b§lBTEG §7> §6Du §6hast §6eine §6Teleport-Anfrage §6von §6" + player.getDisplayName() + " §6erhalten. §6Nutze ").append(compAccept).append(" §6zum §6Akzeptieren §6und ").append(compDeny).append(" §6zum §6Ablehnen §6der §6Anfrage.").create());
-                player.sendMessage(getFormattedMessage("Die Anfrage wurde gesendet! Um sie abzubrechen, nutze /tpacancel."));
-            } else {
-                player.sendMessage(getFormattedMessage("Der Spieler wurde nicht gefunden!"));
-            }
+        if(!(sender instanceof ProxiedPlayer player)) {
+            return;
         }
+
+        // check permissions
+        if(!player.hasPermission("teleportation.tpa")) {
+            player.sendMessage(new ComponentBuilder("ᾠ §cDu §cbist §cnicht §cberechtigt, §cdiesen §cCommand §causzuführen!").create());
+            return;
+        }
+
+        // check args length
+        if(args.length != 1) {
+            player.sendMessage(getFormattedMessage("Bitte gib einen Spieler an!"));
+            return;
+        }
+        ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
+
+        if(target == null) {
+            player.sendMessage(getFormattedMessage("Der Spieler wurde nicht gefunden!"));
+            return;
+        }
+
+        // if the player sent another tpa it gets cancelled
+        if(registriesProvider.getTpasRegistry().isRegistered(player)) {
+            utils.cancelTpa(player);
+        }
+        // create text components
+        TextComponent compAccept = new TextComponent("/tpaccept " + player.getName());
+        compAccept.setColor(ChatColor.GREEN);
+        compAccept.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/tpaccept " + player.getName()));
+        TextComponent compDeny = new TextComponent("/tpadeny " + player.getName());
+        compDeny.setColor(ChatColor.RED);
+        compDeny.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/tpadeny " + player.getName()));
+
+        // store tpa
+        registriesProvider.getTpasRegistry().register(player, target);
+        target.sendMessage(new ComponentBuilder("ᾠ §6Du §6hast §6eine §6Teleport-Anfrage §6von §6" + player.getDisplayName() + " §6erhalten. §6Nutze ").append(compAccept).append(" §6zum §6Akzeptieren §6und ").append(compDeny).append(" §6zum §6Ablehnen §6der §6Anfrage.").create());
+        player.sendMessage(getFormattedMessage("Die Anfrage wurde gesendet! Um sie abzubrechen, nutze /tpacancel."));
     }
 
     @Override

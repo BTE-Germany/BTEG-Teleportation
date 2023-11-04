@@ -8,14 +8,17 @@ import java.util.regex.Pattern;
 public class CoordinateFormatConverter {
 
     /**
-     * Possible formats:
-     * 52.513949 13.378661
-     * 52.513949, 13.378661
-     * 52°30'50.2"N 13°22'43.2"E
-     * 52°30'50.2" 13°22'43.2" (will still be N and E)
+     * Converts an input String to a double array consisting of the coordinates in degrees.
+     * <br>Possible formats:
+     * <br>52.513949 13.378661
+     * <br>52.513949, 13.378661
+     * <br>52°30'50.2"N 13°22'43.2"E
+     * <br>52°30'50.2" 13°22'43.2" (will still be N and E)
      */
     public static double[] toDegrees(String inputLatLon) {
         String[] args = inputLatLon.split(" ");
+        args[0] = args[0].replace("N", "").replace("E", "");
+        args[1] = args[1].replace("N", "").replace("E", "");
         String regexDouble = "\\d+((\\.\\d+)*°*,*)$";
         if (args.length == 2 && args[0].matches(regexDouble) && args[1].matches(regexDouble)) {
             args[0] = args[0].replace("°", "").replace(",", "");
@@ -23,7 +26,7 @@ public class CoordinateFormatConverter {
             return new double[] {Double.parseDouble(args[0]), Double.parseDouble(args[1])};
         }
 
-        inputLatLon = inputLatLon.replace("N", "").replace("E", "").replace(" ", "").replace(",", ".");
+        inputLatLon = inputLatLon.replace(" ", "").replace(",", ".");
         double[] degrees = new double[2];
         String regexEndDegrees = "°";
         String regexEndMinutes = "['|′]";
@@ -58,11 +61,11 @@ public class CoordinateFormatConverter {
     }
 
     public static double toDegrees(int degrees, int minutes, double seconds) {
-        return ((double) degrees) + (minutes / 60.0) + (seconds / 3600.0);
+        return ((double) degrees) + (minutes / 60.00000) + (seconds / 3600.00000);
     }
 
     public static double toDegrees(int degrees, double minutes) {
-        return ((double) degrees) + (minutes / 60.0);
+        return ((double) degrees) + (minutes / 60.00000);
     }
 
 }

@@ -30,40 +30,46 @@ public class TpaDenyCommand extends Command implements TabExecutor {
     public void execute(CommandSender sender, String[] args) {
         TpasRegistry tpasRegistry = registriesProvider.getTpasRegistry();
 
-        if(sender instanceof ProxiedPlayer player) {
+        if(!(sender instanceof ProxiedPlayer player)) {
+            return;
+        }
 
-            if(!player.hasPermission("teleportation.tpa")) {
-                player.sendMessage(new ComponentBuilder("§b§lBTEG §7» §cDu §cbist §cnicht §cberechtigt, §cdiesen §cCommand §causzuführen!").create());
+        // check permissions
+        if(!player.hasPermission("teleportation.tpa")) {
+            player.sendMessage(new ComponentBuilder("ᾠ §cDu §cbist §cnicht §cberechtigt, §cdiesen §cCommand §causzuführen!").create());
+            return;
+        }
+
+        // get amount of tpas the player received
+        long requests = tpasRegistry.getTpas().values().stream().filter(uuid -> uuid.equals(player.getUniqueId())).count();
+        if(args.length == 1) {
+            // will deny the tpa the target player sent
+            ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
+            if(target == null) {
+                player.sendMessage(getFormattedMessage("Der Spieler wurde nicht gefunden!"));
                 return;
             }
-
-            long requests = tpasRegistry.getTpas().values().stream().filter(uuid -> uuid.equals(player.getUniqueId())).count();
-            if(args.length == 1) {
-                ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
-                if(target != null) {
-                    if(tpasRegistry.isRegistered(target) & tpasRegistry.getTpa(target).equals(player.getUniqueId())) {
-                        target.sendMessage(getFormattedMessage("Deine Anfrage wurde abgelehnt!"));
-                        player.sendMessage(getFormattedMessage("Du hast die Anfrage von " + target.getName() + " abgelehnt."));
-                        tpasRegistry.unregister(target);
-                    } else {
-                        player.sendMessage(getFormattedMessage("Du hast keine Anfrage von diesem Spieler erhalten!"));
-                    }
-                } else {
-                    player.sendMessage(getFormattedMessage("Der Spieler wurde nicht gefunden!"));
-                }
-            } else if(args.length == 0 && requests == 1) {
-                for(Map.Entry<UUID, UUID> entry : tpasRegistry.getTpas().entrySet()) {
-                    if(entry.getValue().equals(player.getUniqueId())) {
-                        ProxiedPlayer target = ProxyServer.getInstance().getPlayer(entry.getKey());
-                        target.sendMessage(getFormattedMessage("Deine Anfrage wurde abgelehnt!"));
-                        player.sendMessage(getFormattedMessage("Du hast die Anfrage von " + target.getName() + " abgelehnt."));
-                        tpasRegistry.unregister(target);
-                        return;
-                    }
-                }
+            if(tpasRegistry.isRegistered(target) && tpasRegistry.getTpa(target).equals(player.getUniqueId())) {
+                target.sendMessage(getFormattedMessage("Deine Anfrage wurde abgelehnt!"));
+                player.sendMessage(getFormattedMessage("Du hast die Anfrage von " + target.getName() + " abgelehnt."));
+                tpasRegistry.unregister(target);
             } else {
-                player.sendMessage(getFormattedMessage("Bitte gib den Spieler an, der die Anfrage gesendet hat!"));
+                player.sendMessage(getFormattedMessage("Du hast keine Anfrage von diesem Spieler erhalten!"));
             }
+        } else if(args.length == 0 && requests == 1) {
+            // will deny the only tpa the player received
+            for(Map.Entry<UUID, UUID> entry : tpasRegistry.getTpas().entrySet()) {
+                if(!entry.getValue().equals(player.getUniqueId())) {
+                    continue;
+                }
+                ProxiedPlayer target = ProxyServer.getInstance().getPlayer(entry.getKey());
+                target.sendMessage(getFormattedMessage("Deine Anfrage wurde abgelehnt!"));
+                player.sendMessage(getFormattedMessage("Du hast die Anfrage von " + target.getName() + " abgelehnt."));
+                tpasRegistry.unregister(target);
+                return;
+            }
+        } else {
+            player.sendMessage(getFormattedMessage("Bitte gib den Spieler an, der die Anfrage gesendet hat!"));
         }
     }
 

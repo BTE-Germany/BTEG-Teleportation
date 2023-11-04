@@ -4,6 +4,7 @@ import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
 import de.btegermany.teleportation.TeleportationBungee.data.Database;
 import de.btegermany.teleportation.TeleportationBungee.util.Warp;
 
+import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -67,6 +68,7 @@ public class WarpsRegistry {
         return this.warps.stream().anyMatch(warp -> warp.getId() == id);
     }
 
+    @Nullable
     public Warp getWarp(int id) {
         return this.warps.stream().filter(warp -> warp.getId() == id).findFirst().orElse(null);
     }

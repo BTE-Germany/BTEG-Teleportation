@@ -28,6 +28,7 @@ public class ConfigReader {
         this.geoData = geoData;
     }
 
+    // read the servers config and add them as GeoServers to GeoData
     public void readServers(WarpsRegistry warpsRegistry) {
         ConfigurationProvider provider = YamlConfiguration.getProvider(YamlConfiguration.class);
         File dir = plugin.getDataFolder();
@@ -67,7 +68,7 @@ public class ConfigReader {
                     showPlayersOnTerramap = (boolean) showPlayersOnTerramapRaw;
                 }
                 String normenWarpName = config.getString(serverName + ".normen-warp");
-                Warp normenWarp = warpsRegistry.getWarps().stream().filter(warp -> warp.getName().equals(normenWarpName)).findFirst().orElse(null);
+                Warp normenWarp = normenWarpName.isEmpty() ? null : warpsRegistry.getWarps().stream().filter(warp -> warp.getName().equals(normenWarpName)).findFirst().orElse(null);
 
                 geoServers.add(new GeoServer(serverInfo, states, cities, tpllPassthrough, isEarthServer, showPlayersOnTerramap, normenWarp));
             }
@@ -79,6 +80,7 @@ public class ConfigReader {
         }
     }
 
+    // read the database config and return the data (url, user, password)
     public List<String> readDatabaseConfig() {
         List<String> data = new ArrayList<>();
 

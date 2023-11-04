@@ -10,6 +10,7 @@ public class RegistriesProvider {
     private final PlayersEnteringChangeWarpIdRegistry playersEnteringChangeWarpIdRegistry;
     private final WarpsGettingChangedRegistry warpsGettingChangedRegistry;
     private final LobbyCitiesRegistry lobbyCitiesRegistry;
+    private final CitiesRegistry citiesRegistry;
 
     public RegistriesProvider(TeleportationBukkit plugin) {
         this.multiplePagesGuisRegistry = new MultiplePagesGuisRegistry();
@@ -18,6 +19,7 @@ public class RegistriesProvider {
         this.playersEnteringChangeWarpIdRegistry = new PlayersEnteringChangeWarpIdRegistry();
         this.warpsGettingChangedRegistry = new WarpsGettingChangedRegistry();
         this.lobbyCitiesRegistry = new LobbyCitiesRegistry(plugin, "lobbycities.yml");
+        this.citiesRegistry = new CitiesRegistry();
     }
 
     // Getters
@@ -46,4 +48,7 @@ public class RegistriesProvider {
         return lobbyCitiesRegistry;
     }
 
+    public CitiesRegistry getCitiesRegistry() {
+        return citiesRegistry;
+    }
 }

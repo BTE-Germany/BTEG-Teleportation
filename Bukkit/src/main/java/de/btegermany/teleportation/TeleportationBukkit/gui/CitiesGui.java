@@ -25,7 +25,7 @@ public class CitiesGui extends MultiplePagesWarpGuiAbstract {
         inventory.addHandler(new PagedInventoryClickHandler() {
             @Override
             public void handle(ClickHandler clickHandler) {
-                if(clickHandler.getCurrentItem().getItemMeta() == null || clickHandler.getCurrentItem().getItemMeta().getDisplayName().length() < 3) return;
+                if(clickHandler.getCurrentItem() == null || clickHandler.getCurrentItem().getItemMeta() == null || clickHandler.getCurrentItem().getItemMeta().getDisplayName().length() < 3) return;
                 pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), "city_" + clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2), 0, 1));
                 registriesProvider.getMultiplePagesGuisRegistry().unregister(player);
             }
@@ -42,7 +42,7 @@ public class CitiesGui extends MultiplePagesWarpGuiAbstract {
     @Nonnull
     @Override
     public IPagedInventory createInventory() {
-        return pagedInventoryAPI.createPagedInventory(new NavigationRow(NAV_NEXT, NAV_PREVIOUS, NAV_CLOSE, NAV_SORT, NAV_SEARCH));
+        return pagedInventoryAPI.createPagedInventory(new NavigationRow(NAV_NEXT, NAV_PREVIOUS, NAV_CLOSE, NAV_SORT, NAV_SEARCH, NAV_TP_RANDOM));
     }
 
     @Nonnull

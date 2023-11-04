@@ -17,7 +17,6 @@ import de.btegermany.teleportation.TeleportationBungee.util.Utils;
 import fr.thesmyler.bungee2forge.BungeeToForgePlugin;
 import fr.thesmyler.bungee2forge.api.ForgeChannel;
 import fr.thesmyler.bungee2forge.api.ForgeChannelRegistry;
-import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -35,33 +34,37 @@ public class TeleportationBungee extends Plugin {
 
     private static TeleportationBungee instance;
     public static final String PLUGIN_CHANNEL = "bungeecord:btegtp";
-    public static final ForgeChannel terramapMapSyncChannel = ForgeChannelRegistry.instance().get("terramap:mapsync");
-    public static final ForgeChannel terramapPluginChannel = ForgeChannelRegistry.instance().get("terramap:sh");
+    public static final ForgeChannel TERRAMAP_MAP_SYNC_CHANNEL = ForgeChannelRegistry.instance().get("terramap:mapsync");
+    public static final ForgeChannel TERRAMAP_PLUGIN_CHANNEL = ForgeChannelRegistry.instance().get("terramap:sh");
     private Database database;
     private RegistriesProvider registriesProvider;
     private GeoData geoData;
+    private PluginMessenger pluginMessenger;
     private ScheduledExecutorService scheduledExecutorServiceCheckStateBorders;
-    private final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
+    private ScheduledExecutorService scheduledExecutorServiceSendWarpCities;
 
     @Override
     public void onEnable() {
         instance = this;
 
+        // enable support for Terramap
         BungeeToForgePlugin.onEnable(this);
-        terramapMapSyncChannel.registerPacket(0, RegisterForUpdatePacket.class);
-        terramapMapSyncChannel.registerPacket(1, PlayerSyncPacket.class);
-        terramapPluginChannel.registerPacket(0, PluginHelloPacket.class);
+        TERRAMAP_MAP_SYNC_CHANNEL.registerPacket(0, RegisterForUpdatePacket.class);
+        TERRAMAP_MAP_SYNC_CHANNEL.registerPacket(1, PlayerSyncPacket.class);
+        TERRAMAP_PLUGIN_CHANNEL.registerPacket(0, PluginHelloPacket.class);
 
+        // initialize objects
         this.geoData = new GeoData(this);
-        PluginMessenger pluginMessenger = new PluginMessenger();
+        this.pluginMessenger = new PluginMessenger();
         ConfigReader configReader = new ConfigReader(this, this.geoData);
         this.database = new Database(configReader);
         this.database.connect();
         this.registriesProvider = new RegistriesProvider(this.database, this);
         this.registriesProvider.getWarpsRegistry().loadWarps();
         configReader.readServers(this.registriesProvider.getWarpsRegistry());
-        Utils utils = new Utils(pluginMessenger, this.registriesProvider);
+        Utils utils = new Utils(this.pluginMessenger, this.registriesProvider);
 
+        // register commands
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TeleportCommand(utils));
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpaCommand(utils, this.registriesProvider));
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpacceptCommand(utils, this.registriesProvider));
@@ -71,11 +74,15 @@ public class TeleportationBungee extends Plugin {
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpBackCommand(this.registriesProvider));
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpllCommand(this.geoData, pluginMessenger));
 
+        // register plugin channel
         ProxyServer.getInstance().registerChannel(PLUGIN_CHANNEL);
+
+        // register listeners
         ProxyServer.getInstance().getPluginManager().registerListener(this, new PluginMsgListener(pluginMessenger, this.database, this.geoData, this.registriesProvider));
         ProxyServer.getInstance().getPluginManager().registerListener(this, new TerramapListener());
         ProxyServer.getInstance().getPluginManager().registerListener(this, new ServerLeaveListener(this.registriesProvider));
 
+        // schedule task to send Terramap data
         ProxyServer.getInstance().getScheduler().schedule(this, () -> {
             Collection<BukkitPlayer> players = this.registriesProvider.getBukkitPlayersRegistry().getBukkitPlayers().values();
             if(players.isEmpty()) {
@@ -83,10 +90,14 @@ public class TeleportationBungee extends Plugin {
             }
             BukkitPlayer[] playersArray = players.toArray(new BukkitPlayer[0]);
             PlayerSyncPacket playerSyncPacket = new PlayerSyncPacket(playersArray, this.geoData);
-            terramapMapSyncChannel.send(playerSyncPacket, ProxyServer.getInstance().getPlayers().toArray(new ProxiedPlayer[0]));
+            TERRAMAP_MAP_SYNC_CHANNEL.send(playerSyncPacket, ProxyServer.getInstance().getPlayers().toArray(new ProxiedPlayer[0]));
         }, 0, 500, TimeUnit.MILLISECONDS);
 
-        //startStateBorderCheck();
+        // schedule task to check if the players are on the right server. If not they will be teleported to the right server
+        startStateBorderCheck();
+
+        // schedule task to send cities warps are located in to all servers
+        scheduleSendWarpCities();
 
         //DatabaseConverter databaseConverter = new DatabaseConverter(this, database, new File(this.getDataFolder(), "BTEGTeleportationBungee.db"));
         //databaseConverter.convertDbFileToDatabase();
@@ -96,29 +107,38 @@ public class TeleportationBungee extends Plugin {
     public void onDisable() {
         this.database.disconnect();
 
-        terramapMapSyncChannel.deregisterAllPackets();
-        terramapPluginChannel.deregisterAllPackets();
+        // disable Terramap
+        TERRAMAP_MAP_SYNC_CHANNEL.deregisterAllPackets();
+        TERRAMAP_PLUGIN_CHANNEL.deregisterAllPackets();
         BungeeToForgePlugin.onDisable(this);
 
-        //this.scheduledExecutorServiceCheckStateBorders.shutdownNow();
+        this.scheduledExecutorServiceCheckStateBorders.shutdownNow();
+        this.scheduledExecutorServiceSendWarpCities.shutdownNow();
     }
 
-    public void startStateBorderCheck() {
+    private void startStateBorderCheck() {
         this.scheduledExecutorServiceCheckStateBorders = Executors.newSingleThreadScheduledExecutor();
         this.scheduledExecutorServiceCheckStateBorders.scheduleAtFixedRate(() -> {
             this.registriesProvider.getBukkitPlayersRegistry().getBukkitPlayers().forEach((uuid, bukkitPlayer) -> {
                 try {
-                    double[] coords = this.bteGeneratorSettings.projection().toGeo(bukkitPlayer.getX(), bukkitPlayer.getZ());
+                    double[] coords = GeoData.BTE_GENERATOR_SETTINGS.projection().toGeo(bukkitPlayer.getX(), bukkitPlayer.getZ());
                     ServerInfo serverInfo = this.geoData.getServerFromLocation(coords[1], coords[0]);
                     if(!bukkitPlayer.getServerInfo().equals(serverInfo) && this.geoData.getGeoServers().stream().anyMatch(geoServer -> geoServer.getServerInfo().equals(serverInfo) && geoServer.isEarthServer()) && this.geoData.getGeoServers().stream().anyMatch(geoServer -> geoServer.getServerInfo().equals(bukkitPlayer.getServerInfo()) && geoServer.isEarthServer())) {
                         bukkitPlayer.getProxiedPlayer().sendMessage(TeleportationBungee.getFormattedMessage("Dieses Bundesland liegt auf einem anderen Server, du wirst daher auf den richtigen Server gesendet!"));
                         ProxyServer.getInstance().getPluginManager().dispatchCommand(bukkitPlayer.getProxiedPlayer(), "tpll " + coords[1] + " " + coords[0] + " yaw=" + bukkitPlayer.getYaw() + " pitch=" + bukkitPlayer.getPitch());
                     }
                 } catch (OutOfProjectionBoundsException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
             });
-        }, 0, 2, TimeUnit.SECONDS);
+        }, 0, 3, TimeUnit.SECONDS);
+    }
+
+    private void scheduleSendWarpCities() {
+        this.scheduledExecutorServiceSendWarpCities = Executors.newSingleThreadScheduledExecutor();
+        this.scheduledExecutorServiceSendWarpCities.scheduleAtFixedRate(() -> {
+            this.pluginMessenger.sendCitiesToServers(this.registriesProvider.getWarpsRegistry().getWarps());
+        }, 0, 5, TimeUnit.SECONDS);
     }
 
     public static BaseComponent[] getFormattedMessage(String text) {

@@ -13,6 +13,7 @@ public class Database {
         this.configReader = configReader;
     }
 
+    // connect to the database and create the warps table if it doesn't exist yet
     public void connect() {
         List<String> configData = this.configReader.readDatabaseConfig();
         try {
@@ -26,6 +27,7 @@ public class Database {
         }
     }
 
+    // disconnect from the database
     public void disconnect() {
         try {
             connection.close();

@@ -12,7 +12,7 @@ public class TerramapListener implements Listener {
     @EventHandler
     public void onPostLoginEvent(PostLoginEvent event) {
         PluginHelloPacket helloPacket = new PluginHelloPacket("1.0", PlayerSyncStatus.ENABLED, PlayerSyncStatus.ENABLED, true, true, false, new UUID(0, 0));
-        TeleportationBungee.terramapPluginChannel.send(helloPacket, event.getPlayer());
+        TeleportationBungee.TERRAMAP_PLUGIN_CHANNEL.send(helloPacket, event.getPlayer());
     }
 
 }

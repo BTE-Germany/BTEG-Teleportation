@@ -13,7 +13,10 @@ import de.btegermany.teleportation.TeleportationBungee.util.LastLocation;
 import de.btegermany.teleportation.TeleportationBungee.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBungee.util.Warp;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
@@ -268,7 +271,7 @@ public class PluginMsgListener implements Listener {
                 ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerUUID);
                 if (player == null || !player.isConnected()) return;
                 try {
-                    coordinates = GeoData.bteGeneratorSettings.projection().toGeo(x, z);
+                    coordinates = GeoData.BTE_GENERATOR_SETTINGS.projection().toGeo(x, z);
                 } catch (OutOfProjectionBoundsException e) {
                     player.sendMessage(getFormattedMessage("§cError: §cOutOfProjectionBoundsException"));
                     return;
@@ -334,6 +337,10 @@ public class PluginMsgListener implements Listener {
                 if (player == null || !player.isConnected()) return;
 
                 Warp warp = this.registriesProvider.getWarpsRegistry().getWarp(id);
+                if(warp == null) {
+                    player.sendMessage(TeleportationBungee.getFormattedMessage("Es wurde kein Warp mit der Id " + id + " gefunden!"));
+                    return;
+                }
 
                 if (column.equals("coordinates")) {
                     if (valueInput == null) return;
@@ -381,7 +388,7 @@ public class PluginMsgListener implements Listener {
                         preparedStatement.setString(1, valueInput);
                         value = valueInput;
                     }
-                    Field field = Warp.class.getDeclaredField(column);
+                    Field field = Warp.class.getDeclaredField(column.equals("head_id") ? "headId" : column);
                     field.setAccessible(true);
                     field.set(warp, value);
                     preparedStatement.setInt(2, id);
@@ -410,38 +417,6 @@ public class PluginMsgListener implements Listener {
 
                 registriesProvider.getLastLocationsRegistry().register(playerUUID, new LastLocation(x, y, z, yaw, pitch, player.getServer().getInfo()));
             }
-
-            /*case "warps_search" -> {
-                UUID playerUUID = UUID.fromString(dataInput.readUTF());
-                String search = dataInput.readUTF();
-                ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerUUID);
-                if (player == null || !player.isConnected()) return;
-
-                List<Warp> warpsSearch1 = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getName().equalsIgnoreCase(search)).collect(Collectors.toList());
-                if (warpsSearch1.size() == 1) {
-                    Warp warp = warpsSearch1.get(0);
-                    String stayServer = null;
-                    for (GeoServer geoServer : this.geoData.getGeoServers()) {
-                        if (warp.equals(geoServer.getNormenWarp())) {
-                            stayServer = geoServer.getServerInfo().getName();
-                            break;
-                        }
-                    }
-                    ProxyServer.getInstance().getPluginManager().dispatchCommand(player, warp.getTpllCommand() + (stayServer != null ? " stay=" + stayServer : ""));
-                    return;
-                }
-
-                List<Warp> warpsSearch2 = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getCity().equalsIgnoreCase(search)).toList();
-
-                if (warpsSearch1.size() == 0 && warpsSearch2.size() == 0) {
-                    player.sendMessage(TeleportationBungee.getFormattedMessage("Leider wurden keine Warps gefunden!"));
-                    return;
-                }
-
-                warpsSearch1.addAll(warpsSearch2);
-
-                pluginMessenger.sendGuiData(player, String.format("search_%s", search), this.get(warpsSearch1));
-            }*/
 
             case "players_online" -> {
                 String serverAddress = dataInput.readUTF();
@@ -479,6 +454,38 @@ public class PluginMsgListener implements Listener {
                     }
                     registriesProvider.getBukkitPlayersRegistry().register(bukkitPlayer);
                 }
+            }
+
+            case "tp_random_warp" -> {
+                UUID playerUUID = UUID.fromString(dataInput.readUTF());
+                ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerUUID);
+                if (player == null || !player.isConnected()) return;
+
+                Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps();
+                Warp warp = null;
+
+                do {
+                    int i = 0;
+                    int searchedIndex = new Random().nextInt(warps.size());
+
+                    for (Warp randomWarp : warps) {
+                        if (i < searchedIndex) {
+                            i++;
+                            continue;
+                        }
+                        if(randomWarp.getCity().isEmpty()) {
+                            break;
+                        }
+                        warp = randomWarp;
+                        ProxyServer.getInstance().getPluginManager().dispatchCommand(player, warp.getTpllCommand());
+                        TextComponent textComponent = new TextComponent(String.format("ᾠ %sDies ist %s in %s, %s.", ChatColor.GOLD, ChatColor.GREEN + warp.getName() + ChatColor.GOLD, ChatColor.GREEN + warp.getCity(), warp.getState() + ChatColor.GOLD));
+                        TextComponent button = new TextComponent(String.format("ᾠ %sKlicke hier, um dich zum nächsten Warp zu teleportieren.", ChatColor.BLUE));
+                        button.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nwarp random"));
+                        player.sendMessage(textComponent);
+                        player.sendMessage(button);
+                        break;
+                    }
+                } while (warp == null);
             }
         }
     }

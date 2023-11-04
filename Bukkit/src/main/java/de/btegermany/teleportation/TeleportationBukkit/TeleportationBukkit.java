@@ -18,27 +18,34 @@ import java.util.concurrent.TimeUnit;
 
 public class TeleportationBukkit extends JavaPlugin {
 
-	public static String PLUGIN_CHANNEL = "bungeecord:btegtp";
+	public static final String PLUGIN_CHANNEL = "bungeecord:btegtp";
 	private static PagedInventoryAPI pagedInventoryAPI;
 	private PluginMessenger pluginMessenger;
 	private ScheduledExecutorService scheduledExecutorServiceProxyPlayerSynchronization;
 
 	@Override
 	public void onEnable() {
+		//initialize objects
 		pagedInventoryAPI = new PagedInventoryAPI(this);
 		this.pluginMessenger = new PluginMessenger(this);
 		RegistriesProvider registriesProvider = new RegistriesProvider(this);
 		registriesProvider.getLobbyCitiesRegistry().loadLobbyCities();
-
 		TeleportationHandler teleportationHandler = new TeleportationHandler(this.pluginMessenger);
+
+		//register plugin channel
 		this.getServer().getMessenger().registerIncomingPluginChannel(this, PLUGIN_CHANNEL, new PluginMsgListener(teleportationHandler, this.pluginMessenger, registriesProvider));
 		this.getServer().getMessenger().registerOutgoingPluginChannel(this, PLUGIN_CHANNEL);
+
+		// register listeners
 		this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(teleportationHandler, this.pluginMessenger), this);
 		this.getServer().getPluginManager().registerEvents(new PlayerInteractListener(registriesProvider), this);
+
+		// register commands
 		this.getCommand("nwarp").setExecutor(new WarpCommand(this.pluginMessenger, registriesProvider));
 		this.getCommand("lobbywarp").setExecutor(new LobbyWarpCommand(this.pluginMessenger, registriesProvider));
 
-		startProxyPlayerSynchronization();
+		// still needed (1.20+)?
+		//startProxyPlayerSynchronization();
 	}
 
 	@Override
