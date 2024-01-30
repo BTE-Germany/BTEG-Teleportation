@@ -29,7 +29,7 @@ public class WarpGui extends SinglePageWarpGuiAbstract {
             public void handle(ClickHandler clickHandler) {
                 if(clickHandler.getCurrentItem() == null || clickHandler.getCurrentItem().getItemMeta() == null || clickHandler.getCurrentItem().getItemMeta().getDisplayName().length() < 3) return;
                 switch (clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2)) {
-                    case "Städte", "Events", "Plotregionen", "Normen Hubs", "Alle" ->
+                    case "Tags", "Städte", "Events", "Plotregionen", "Normen Hubs", "Alle" ->
                             pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2), 0, 1));
                     case "Bundesländer" ->
                             new StatesGui(clickHandler.getPlayer(), pluginMessenger, registriesProvider).open();
@@ -50,13 +50,9 @@ public class WarpGui extends SinglePageWarpGuiAbstract {
         return new GuiBlueprint()
                 .addRow(new BlueprintRange(0, 8, placeholderDefault))
                 .addRow(new BlueprintRange(0, placeholderDefault),
-                        new BlueprintRange(1, new BlueprintItem()),
-                        new BlueprintRange(2, new BlueprintItem()),
+                        new BlueprintRange(1, 2, new BlueprintItem()),
                         new BlueprintRange(3, placeholderDefault),
-                        new BlueprintRange(4, new BlueprintItem()),
-                        new BlueprintRange(5, new BlueprintItem()),
-                        new BlueprintRange(6, new BlueprintItem()),
-                        new BlueprintRange(7, new BlueprintItem()),
+                        new BlueprintRange(4, 7, new BlueprintItem()),
                         new BlueprintRange(8, placeholderDefault)
                 )
                 .addRow(new BlueprintRange(0, 8, placeholderDefault));
@@ -69,27 +65,27 @@ public class WarpGui extends SinglePageWarpGuiAbstract {
         ItemMeta metaCities = itemCities.getItemMeta();
         metaCities.setDisplayName("Städte");
         itemCities.setItemMeta(metaCities);
-        ItemStack itemStates = new ItemStack(Material.YELLOW_STAINED_GLASS);
+        ItemStack itemStates = new ItemStack(Material.GREEN_STAINED_GLASS);
         ItemMeta metaStates = itemStates.getItemMeta();
         metaStates.setDisplayName("Bundesländer");
         itemStates.setItemMeta(metaStates);
-        ItemStack itemEvents = new ItemStack(Material.RED_STAINED_GLASS);
+        ItemStack itemTags = new ItemStack(Material.YELLOW_STAINED_GLASS);
+        ItemMeta metaTags = itemCities.getItemMeta();
+        metaTags.setDisplayName("Tags");
+        itemTags.setItemMeta(metaTags);
+        ItemStack itemEvents = new ItemStack(Material.ORANGE_STAINED_GLASS);
         ItemMeta metaEvents = itemCities.getItemMeta();
         metaEvents.setDisplayName("Events");
         itemEvents.setItemMeta(metaEvents);
-        ItemStack itemPlots = new ItemStack(Material.GREEN_STAINED_GLASS);
+        ItemStack itemPlots = new ItemStack(Material.RED_STAINED_GLASS);
         ItemMeta metaPlots = itemPlots.getItemMeta();
         metaPlots.setDisplayName("Plotregionen");
         itemPlots.setItemMeta(metaPlots);
-        ItemStack itemNormen = new ItemStack(Material.BLACK_STAINED_GLASS);
-        ItemMeta metaNormen = itemNormen.getItemMeta();
-        metaNormen.setDisplayName("Normen Hubs");
-        itemNormen.setItemMeta(metaNormen);
         ItemStack itemAll = new ItemStack(Material.WHITE_STAINED_GLASS);
         ItemMeta metaAll = itemCities.getItemMeta();
         metaAll.setDisplayName("Alle");
         itemAll.setItemMeta(metaAll);
 
-        return Arrays.asList(itemCities, itemStates, itemEvents, itemPlots, itemNormen, itemAll);
+        return Arrays.asList(itemCities, itemStates, itemTags, itemEvents, itemPlots, itemAll);
     }
 }

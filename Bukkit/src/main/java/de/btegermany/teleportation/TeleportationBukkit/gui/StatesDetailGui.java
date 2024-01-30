@@ -33,7 +33,7 @@ public class StatesDetailGui extends MultiplePagesDetailWarpGuiAbstract {
     @Nonnull
     @Override
     public IPagedInventory createInventory() {
-        return pagedInventoryAPI.createPagedInventory(new NavigationRow(NAV_NEXT, NAV_PREVIOUS, NAV_CLOSE, NAV_SORT, NAV_SEARCH, NAV_TP_RANDOM));
+        return pagedInventoryAPI.createPagedInventory(new NavigationRow(NAV_NEXT, NAV_PREVIOUS, NAV_CLOSE, NAV_SORT, NAV_SEARCH));
     }
 
     @Nonnull

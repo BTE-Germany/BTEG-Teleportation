@@ -1,15 +1,18 @@
 package de.btegermany.teleportation.TeleportationBungee.command;
 
 import de.btegermany.teleportation.TeleportationBungee.geo.CoordinateFormatConverter;
+import de.btegermany.teleportation.TeleportationBungee.geo.CoordinateFormats;
 import de.btegermany.teleportation.TeleportationBungee.geo.GeoData;
 import de.btegermany.teleportation.TeleportationBungee.geo.GeoServer;
 import de.btegermany.teleportation.TeleportationBungee.message.PluginMessenger;
+import de.btegermany.teleportation.TeleportationBungee.registry.RegistriesProvider;
 import net.buildtheearth.terraminusminus.dataset.IScalarDataset;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorPipelines;
 import net.buildtheearth.terraminusminus.generator.GeneratorDatasets;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
@@ -24,11 +27,13 @@ public class TpllCommand extends Command {
 
     private final GeoData geoData;
     private final PluginMessenger pluginMessenger;
+    private final RegistriesProvider registriesProvider;
 
-    public TpllCommand(GeoData geoData, PluginMessenger pluginMessenger) {
+    public TpllCommand(GeoData geoData, PluginMessenger pluginMessenger, RegistriesProvider registriesProvider) {
         super("tpll", null, "tpl");
         this.geoData = geoData;
         this.pluginMessenger = pluginMessenger;
+        this.registriesProvider = registriesProvider;
     }
 
     @Override
@@ -71,6 +76,12 @@ public class TpllCommand extends Command {
         // if copied from google earth web
         args[0] = args[0].replace("\u2066", "").replace("\u2069", "");
         args[1] = args[1].replace("\u2066", "").replace("\u2069", "");
+
+        // check format of coordinates because of inaccuracy
+        if(!this.registriesProvider.getSentCoordinatesFormatWarningRegistry().isRegistered(player) && (CoordinateFormats.isDegreesMinutes(args[0] + " " + args[1]) || CoordinateFormats.isDegreesMinutesSeconds(args[0] + " " + args[1]))) {
+            player.sendMessage(new TextComponent("ᾠ §cAchtung: §6Du verwendest ein ungenaues Koordinatenformat. §cFalls du gerade etwas baust, nutze bitte ausschließlich Dezimalkoordinaten §6(z.B. 12.3456(°)). Kopiere sie einfach über Rechtsklick auf Google Maps oder Google Earth (bei letzterem muss das Format unter 'Tools -> Einstellungen -> Formate und Einheiten' zu 'Dezimal' geändert werden)."));
+            this.registriesProvider.getSentCoordinatesFormatWarningRegistry().register(player);
+        }
 
         // convert input coordinates to degrees format
         double[] coordinates = CoordinateFormatConverter.toDegrees(args[0] + " " + args[1]);

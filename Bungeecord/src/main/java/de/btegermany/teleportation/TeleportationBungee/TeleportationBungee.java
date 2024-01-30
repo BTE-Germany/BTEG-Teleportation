@@ -42,6 +42,7 @@ public class TeleportationBungee extends Plugin {
     private PluginMessenger pluginMessenger;
     private ScheduledExecutorService scheduledExecutorServiceCheckStateBorders;
     private ScheduledExecutorService scheduledExecutorServiceSendWarpCities;
+    private ScheduledExecutorService scheduledExecutorServiceSendWarpTags;
 
     @Override
     public void onEnable() {
@@ -72,13 +73,14 @@ public class TeleportationBungee extends Plugin {
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpaCancelCommand(utils));
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpHereCommand(utils));
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpBackCommand(this.registriesProvider));
-        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpllCommand(this.geoData, pluginMessenger));
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpllCommand(this.geoData, this.pluginMessenger, this.registriesProvider));
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, new EventCommand(this.registriesProvider, this.pluginMessenger));
 
         // register plugin channel
         ProxyServer.getInstance().registerChannel(PLUGIN_CHANNEL);
 
         // register listeners
-        ProxyServer.getInstance().getPluginManager().registerListener(this, new PluginMsgListener(pluginMessenger, this.database, this.geoData, this.registriesProvider));
+        ProxyServer.getInstance().getPluginManager().registerListener(this, new PluginMsgListener(this.pluginMessenger, this.database, this.geoData, this.registriesProvider));
         ProxyServer.getInstance().getPluginManager().registerListener(this, new TerramapListener());
         ProxyServer.getInstance().getPluginManager().registerListener(this, new ServerLeaveListener(this.registriesProvider));
 
@@ -96,8 +98,9 @@ public class TeleportationBungee extends Plugin {
         // schedule task to check if the players are on the right server. If not they will be teleported to the right server
         startStateBorderCheck();
 
-        // schedule task to send cities warps are located in to all servers
+        // schedule task to send cities warps are located in and warp tags to all servers
         scheduleSendWarpCities();
+        scheduleSendWarpTags();
 
         //DatabaseConverter databaseConverter = new DatabaseConverter(this, database, new File(this.getDataFolder(), "BTEGTeleportationBungee.db"));
         //databaseConverter.convertDbFileToDatabase();
@@ -114,6 +117,7 @@ public class TeleportationBungee extends Plugin {
 
         this.scheduledExecutorServiceCheckStateBorders.shutdownNow();
         this.scheduledExecutorServiceSendWarpCities.shutdownNow();
+        this.scheduledExecutorServiceSendWarpTags.shutdownNow();
     }
 
     private void startStateBorderCheck() {
@@ -137,8 +141,15 @@ public class TeleportationBungee extends Plugin {
     private void scheduleSendWarpCities() {
         this.scheduledExecutorServiceSendWarpCities = Executors.newSingleThreadScheduledExecutor();
         this.scheduledExecutorServiceSendWarpCities.scheduleAtFixedRate(() -> {
-            this.pluginMessenger.sendCitiesToServers(this.registriesProvider.getWarpsRegistry().getWarps());
-        }, 0, 5, TimeUnit.SECONDS);
+            this.pluginMessenger.sendWarpCitiesToServers(this.registriesProvider.getWarpsRegistry().getWarps());
+        }, 0, 10, TimeUnit.SECONDS);
+    }
+
+    private void scheduleSendWarpTags() {
+        this.scheduledExecutorServiceSendWarpTags = Executors.newSingleThreadScheduledExecutor();
+        this.scheduledExecutorServiceSendWarpTags.scheduleAtFixedRate(() -> {
+            this.pluginMessenger.sendWarpTagsToServers(this.registriesProvider.getWarpTagsRegistry().getTags());
+        }, 5, 10, TimeUnit.SECONDS);
     }
 
     public static BaseComponent[] getFormattedMessage(String text) {

@@ -44,12 +44,12 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
             return true;
         }
 
-        if(!args[0].equals("create") && !args[0].equals("delete") && !args[0].equals("change")) {
+        if(!args[0].equals("create") && !args[0].equals("delete") && !args[0].equals("change") && !args[0].equals("tag")) {
             if(args[0].equals("random")) {
                 this.pluginMessenger.send(new TpToRandomWarpMessage(player));
                 return true;
             }
-            findWarps(player, args);
+            this.findWarps(player, args);
             return true;
         }
 
@@ -104,6 +104,18 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
                 }
                 this.pluginMessenger.send(new ChangeWarpMessage(player, warpGettingChanged));
             }
+            case "tag" -> {
+                if (args.length < 4) {
+                    return false;
+                }
+                String tag = args[1];
+                int warpId = Integer.parseInt(args[3]);
+
+                switch (args[2].toLowerCase()) {
+                    case "add" -> this.pluginMessenger.send(new WarpAddTagMessage(player, tag, warpId));
+                    case "remove" -> this.pluginMessenger.send(new WarpRemoveTagMessage(player, tag, warpId));
+                }
+            }
         }
         return true;
     }
@@ -126,17 +138,30 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
 
         switch (args.length) {
             case 1 -> {
-                result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[0], this.registriesProvider.getCitiesRegistry().getCities().toArray(new String[0])));
+                result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[0], this.registriesProvider.getCitiesRegistry().getCities().toArray(String[]::new)));
                 if(!sender.hasPermission("bteg.warps.manage")) {
                     break;
                 }
-                result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[0], "create", "delete", "change"));
+                result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[0], "create", "delete", "change", "tag"));
             }
-            case 3 -> {
-                if(!sender.hasPermission("bteg.warps.manage") || !args[0].equalsIgnoreCase("change")) {
+            case 2 -> {
+                if(!sender.hasPermission("bteg.warps.manage") || !args[0].equalsIgnoreCase("tag")) {
                     break;
                 }
-                result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[2], "name", "city", "state", "coordinates", "headId", "yaw", "pitch", "height"));
+                result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[1], this.registriesProvider.getWarpTagsRegistry().getTags().toArray(String[]::new)));
+            }
+            case 3 -> {
+                if(!sender.hasPermission("bteg.warps.manage")) {
+                    break;
+                }
+
+                if(args[0].equalsIgnoreCase("change")) {
+                    result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[2], "name", "city", "state", "coordinates", "headId", "yaw", "pitch", "height"));
+                    break;
+                }
+                if(args[0].equalsIgnoreCase("tag")) {
+                    result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[2], "add", "remove"));
+                }
             }
         }
 

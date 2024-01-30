@@ -75,11 +75,21 @@ public class PluginMessenger {
         player.getServer().sendData(TeleportationBungee.PLUGIN_CHANNEL, out.toByteArray());
     }
 
-    // sends a list of all cities warps are located in to all server (for tab completion)
-    public void sendCitiesToServers(Set<Warp> warps) {
+    // sends a list of all cities warps are located in to all servers (for tab completion)
+    public void sendWarpCitiesToServers(Set<Warp> warps) {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("list_cities");
         warps.stream().map(Warp::getCity).collect(Collectors.toSet()).forEach(out::writeUTF);
+        for(ServerInfo serverInfo : ProxyServer.getInstance().getServers().values()) {
+            serverInfo.sendData(TeleportationBungee.PLUGIN_CHANNEL, out.toByteArray());
+        }
+    }
+
+    // sends a list of all warp tags to all servers (for tab completion)
+    public void sendWarpTagsToServers(Set<String> tags) {
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("list_tags");
+        tags.forEach(out::writeUTF);
         for(ServerInfo serverInfo : ProxyServer.getInstance().getServers().values()) {
             serverInfo.sendData(TeleportationBungee.PLUGIN_CHANNEL, out.toByteArray());
         }

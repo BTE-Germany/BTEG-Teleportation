@@ -16,15 +16,17 @@ public class ServerLeaveListener implements Listener {
 
     @EventHandler
     public void onServerDisconnect(ServerDisconnectEvent event) {
+        this.registriesProvider.getSentCoordinatesFormatWarningRegistry().unregister(event.getPlayer());
+
         // unregister Bukkit Player from registry
-        registriesProvider.getBukkitPlayersRegistry().unregister(event.getPlayer());
+        this.registriesProvider.getBukkitPlayersRegistry().unregister(event.getPlayer());
     }
 
     @EventHandler
     public void onServerSwitch(ServerConnectedEvent event) {
         // update Bukkit Player data (server)
-        if(registriesProvider.getBukkitPlayersRegistry().isRegistered(event.getPlayer().getUniqueId())) {
-            registriesProvider.getBukkitPlayersRegistry().getBukkitPlayer(event.getPlayer().getUniqueId()).setServerInfo(event.getPlayer().getServer().getInfo());
+        if(this.registriesProvider.getBukkitPlayersRegistry().isRegistered(event.getPlayer().getUniqueId())) {
+            this.registriesProvider.getBukkitPlayersRegistry().getBukkitPlayer(event.getPlayer().getUniqueId()).setServerInfo(event.getPlayer().getServer().getInfo());
         }
     }
 

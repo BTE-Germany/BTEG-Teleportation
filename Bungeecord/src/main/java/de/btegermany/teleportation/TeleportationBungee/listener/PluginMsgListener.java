@@ -115,6 +115,35 @@ public class PluginMsgListener implements Listener {
                         });
                         this.pluginMessenger.sendGuiData(player, metaTitle, pagesData);
                     }
+                    case "Tags" -> {
+                        final Map<Integer, List<JSONObject>> pagesMap = new HashMap<>();
+                        final List<JSONObject> currentPage = new ArrayList<>();
+
+                        List<String> tags = this.registriesProvider.getWarpTagsRegistry().getTags().stream().sorted(String::compareToIgnoreCase).toList();
+                        for(String tag : tags) {
+                            JSONObject object = new JSONObject();
+                            object.put("name", tag);
+                            currentPage.add(object);
+                            if(currentPage.size() == 36) {
+                                pagesMap.put(pagesMap.size(), new ArrayList<>(currentPage));
+                                currentPage.clear();
+                            }
+                        }
+                        if(currentPage.size() > 0) {
+                            pagesMap.put(pagesMap.size(), currentPage);
+                        }
+
+                        JSONArray pagesData = new JSONArray();
+                        pagesMap.forEach((page, content) -> {
+                            JSONObject object = new JSONObject();
+                            object.put("page", page);
+                            JSONArray objectContent = new JSONArray();
+                            content.forEach(objectContent::put);
+                            object.put("content", objectContent);
+                            pagesData.put(object);
+                        });
+                        this.pluginMessenger.sendGuiData(player, metaTitle, pagesData);
+                    }
                     case "Events" -> {
                         if(pages[0] == 0) {
                             Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getName().endsWith("[Event]")).collect(Collectors.toSet());
@@ -139,6 +168,13 @@ public class PluginMsgListener implements Listener {
                     case "city", "lobbywarp" -> {
                         if(pages[0] == 0) {
                             Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getCity().equalsIgnoreCase(title)).collect(Collectors.toSet());
+                            this.cachedGuiData.put(playerUUID, this.getJSONObjectsFromWarps(warps));
+                        }
+                        this.pluginMessenger.sendGuiData(player, metaTitle, this.getJSONArrayFromCache(playerUUID, pages));
+                    }
+                    case "tag" -> {
+                        if(pages[0] == 0) {
+                            Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getTags().stream().anyMatch(tag -> tag.equalsIgnoreCase(title))).collect(Collectors.toSet());
                             this.cachedGuiData.put(playerUUID, this.getJSONObjectsFromWarps(warps));
                         }
                         this.pluginMessenger.sendGuiData(player, metaTitle, this.getJSONArrayFromCache(playerUUID, pages));
@@ -392,6 +428,7 @@ public class PluginMsgListener implements Listener {
                     field.setAccessible(true);
                     field.set(warp, value);
                     preparedStatement.setInt(2, id);
+                    field.setAccessible(false);
                     database.executeUpdateAsync(preparedStatement).thenRun(() -> {
                         player.sendMessage(TeleportationBungee.getFormattedMessage("Der Warp wurde geändert!"));
                         try {
@@ -486,6 +523,26 @@ public class PluginMsgListener implements Listener {
                         break;
                     }
                 } while (warp == null);
+            }
+
+            case "tag_add" -> {
+                UUID playerUUID = UUID.fromString(dataInput.readUTF());
+                ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerUUID);
+                if (player == null || !player.isConnected()) return;
+                String tag = dataInput.readUTF();
+                int warpId = Integer.parseInt(dataInput.readUTF());
+
+                this.registriesProvider.getWarpsRegistry().addTagsToWarp(player, warpId, tag);
+            }
+
+            case "tag_remove" -> {
+                UUID playerUUID = UUID.fromString(dataInput.readUTF());
+                ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerUUID);
+                if (player == null || !player.isConnected()) return;
+                String tag = dataInput.readUTF();
+                int warpId = Integer.parseInt(dataInput.readUTF());
+
+                this.registriesProvider.getWarpsRegistry().removeTagsFromWarp(player, warpId, tag);
             }
         }
     }

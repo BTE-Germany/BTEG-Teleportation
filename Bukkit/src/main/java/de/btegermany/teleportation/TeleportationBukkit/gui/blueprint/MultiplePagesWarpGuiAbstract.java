@@ -83,7 +83,9 @@ public abstract class MultiplePagesWarpGuiAbstract extends WarpGuiAbstract {
         if(object.has("city")) {
             lore.add("Stadt: " + object.getString("city"));
         }
-        lore.add("Bundesland: " + object.getString("state"));
+        if(object.has("state")) {
+            lore.add("Bundesland: " + object.getString("state"));
+        }
         if(object.has("latitude") && object.has("longitude")) {
             lore.add("/tpll " + object.getDouble("latitude") + ", " + object.getDouble("longitude"));
         }

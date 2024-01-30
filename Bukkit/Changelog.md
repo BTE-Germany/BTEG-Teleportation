@@ -10,3 +10,6 @@
   - changed PlayerLoginEvent to PlayerJoinEvent
   - added feature: teleport to random warp
   - added tab completion with cities for /nwarp
+- 1.1.4
+  - removed normen hubs from nwarp gui
+  - added warp tags

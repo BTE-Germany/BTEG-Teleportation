@@ -1,5 +1,8 @@
 package de.btegermany.teleportation.TeleportationBungee.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Warp {
 
     private final int id;
@@ -12,8 +15,9 @@ public class Warp {
     private float yaw;
     private float pitch;
     private double height;
+    private final List<String> tags;
 
-    public Warp(int id, String name, String city, String state, double latitude, double longitude, String headId, float yaw, float pitch, double height) {
+    public Warp(int id, String name, String city, String state, double latitude, double longitude, String headId, float yaw, float pitch, double height, List<String> tags) {
         this.id = id;
         this.name = name;
         this.city = city;
@@ -24,6 +28,11 @@ public class Warp {
         this.yaw = yaw;
         this.pitch = pitch;
         this.height = height;
+        this.tags = tags;
+    }
+
+    public Warp(int id, String name, String city, String state, double latitude, double longitude, String headId, float yaw, float pitch, double height) {
+        this(id, name, city, state, latitude, longitude, headId, yaw, pitch, height, new ArrayList<>());
     }
 
     public String getTpllCommand() {
@@ -107,5 +116,9 @@ public class Warp {
 
     public double getHeight() {
         return height;
+    }
+
+    public List<String> getTags() {
+        return tags;
     }
 }

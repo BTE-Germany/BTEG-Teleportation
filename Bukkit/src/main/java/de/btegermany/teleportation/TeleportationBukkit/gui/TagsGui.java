@@ -2,11 +2,11 @@ package de.btegermany.teleportation.TeleportationBukkit.gui;
 
 import com.tchristofferson.pagedinventories.IPagedInventory;
 import com.tchristofferson.pagedinventories.NavigationRow;
-import com.tchristofferson.pagedinventories.handlers.PagedInventorySwitchPageHandler;
+import com.tchristofferson.pagedinventories.handlers.PagedInventoryClickHandler;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintItem;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintRange;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.GuiBlueprint;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.MultiplePagesDetailWarpGuiAbstract;
+import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.MultiplePagesWarpGuiAbstract;
 import de.btegermany.teleportation.TeleportationBukkit.message.GetGuiDataMessage;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
@@ -16,16 +16,17 @@ import org.json.JSONArray;
 
 import javax.annotation.Nonnull;
 
-public class SearchResultsGui extends MultiplePagesDetailWarpGuiAbstract {
+public class TagsGui extends MultiplePagesWarpGuiAbstract {
 
-    public SearchResultsGui(Player player, String city, PluginMessenger pluginMessenger, JSONArray contentJSON, RegistriesProvider registriesProvider) {
-        super(player, String.format("Suche: %s", city), pluginMessenger, contentJSON, Skulls.Skin.WARP_HOUSE.getId(), registriesProvider);
+    public TagsGui(Player player, PluginMessenger pluginMessenger, JSONArray pagesData, RegistriesProvider registriesProvider) {
+        super(player, "Tags", pluginMessenger, pagesData, Skulls.Skin.EDIT.getId(), registriesProvider);
 
-        inventory.addHandler(new PagedInventorySwitchPageHandler() {
+        inventory.addHandler(new PagedInventoryClickHandler() {
             @Override
-            public void handle(SwitchHandler switchHandler) {
-                if(!switchHandler.getPageAction().equals(PageAction.NEXT)) return;
-                pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), String.format("search_%s", city), inventory.getSize()));
+            public void handle(ClickHandler clickHandler) {
+                if(clickHandler.getCurrentItem().getItemMeta() == null || clickHandler.getCurrentItem().getItemMeta().getDisplayName().length() < 3) return;
+                pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), "tag_" + clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2), 0, 1));
+                registriesProvider.getMultiplePagesGuisRegistry().unregister(player);
             }
         });
     }
@@ -33,7 +34,7 @@ public class SearchResultsGui extends MultiplePagesDetailWarpGuiAbstract {
     @Nonnull
     @Override
     public IPagedInventory createInventory() {
-        return pagedInventoryAPI.createPagedInventory(new NavigationRow(NAV_NEXT, NAV_PREVIOUS, NAV_CLOSE));
+        return pagedInventoryAPI.createPagedInventory(new NavigationRow(NAV_NEXT, NAV_PREVIOUS, NAV_CLOSE, NAV_SORT, NAV_SEARCH, NAV_TP_RANDOM));
     }
 
     @Nonnull
@@ -46,5 +47,4 @@ public class SearchResultsGui extends MultiplePagesDetailWarpGuiAbstract {
                 .addRow(new BlueprintRange(0, 8, new BlueprintItem()))
                 .addRow(new BlueprintRange(0, 8, new BlueprintItem()));
     }
-
 }

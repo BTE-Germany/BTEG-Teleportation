@@ -19,8 +19,7 @@ public class CoordinateFormatConverter {
         String[] args = inputLatLon.split(" ");
         args[0] = args[0].replace("N", "").replace("E", "");
         args[1] = args[1].replace("N", "").replace("E", "");
-        String regexDouble = "\\d+((\\.\\d+)*°*,*)$";
-        if (args.length == 2 && args[0].matches(regexDouble) && args[1].matches(regexDouble)) {
+        if (args.length == 2 && CoordinateFormats.isDegrees(args[0]) && CoordinateFormats.isDegrees(args[1])) {
             args[0] = args[0].replace("°", "").replace(",", "");
             args[1] = args[1].replace("°", "").replace(",", "");
             return new double[] {Double.parseDouble(args[0]), Double.parseDouble(args[1])};
@@ -32,8 +31,8 @@ public class CoordinateFormatConverter {
         String regexEndMinutes = "['|′]";
         String regexEndSeconds = "(''|′′|″|\")";
         Matcher matcherDegrees = Pattern.compile("(\\d+)" + regexEndDegrees).matcher(inputLatLon);
-        Matcher matcherMinutes = Pattern.compile("\\d+(,\\d+)*" + regexEndMinutes).matcher(inputLatLon);
-        Matcher matcherSeconds = Pattern.compile("\\d+(,\\d+)*" + regexEndSeconds).matcher(inputLatLon);
+        Matcher matcherMinutes = Pattern.compile("\\d+(\\.\\d+)?" + regexEndMinutes).matcher(inputLatLon);
+        Matcher matcherSeconds = Pattern.compile("\\d+(\\.\\d+)?" + regexEndSeconds).matcher(inputLatLon);
         List<Integer> degreesFound = new ArrayList<>();
         List<Double> minutesFound = new ArrayList<>();
         List<Double> secondsFound = new ArrayList<>();

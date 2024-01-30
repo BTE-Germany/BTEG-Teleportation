@@ -35,6 +35,7 @@ commands:
       /nwarp change [id] [name/city/state/coordinates/headId] [value]
       /nwarp change [id] [yaw/pitch/height]
       /nwarp delete [id]
+      /nwarp tag [tag] add/remove [warpId]
     aliases:
       - warp
   lobbywarp:

@@ -16,16 +16,16 @@ import org.json.JSONArray;
 
 import javax.annotation.Nonnull;
 
-public class SearchResultsGui extends MultiplePagesDetailWarpGuiAbstract {
+public class TagsDetailGui extends MultiplePagesDetailWarpGuiAbstract {
 
-    public SearchResultsGui(Player player, String city, PluginMessenger pluginMessenger, JSONArray contentJSON, RegistriesProvider registriesProvider) {
-        super(player, String.format("Suche: %s", city), pluginMessenger, contentJSON, Skulls.Skin.WARP_HOUSE.getId(), registriesProvider);
+    public TagsDetailGui(Player player, String tag, PluginMessenger pluginMessenger, JSONArray contentJSON, RegistriesProvider registriesProvider) {
+        super(player, tag, pluginMessenger, contentJSON, Skulls.Skin.WARP_HOUSE.getId(), registriesProvider);
 
         inventory.addHandler(new PagedInventorySwitchPageHandler() {
             @Override
             public void handle(SwitchHandler switchHandler) {
                 if(!switchHandler.getPageAction().equals(PageAction.NEXT)) return;
-                pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), String.format("search_%s", city), inventory.getSize()));
+                pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), "tag_" + tag, inventory.getSize()));
             }
         });
     }
@@ -33,7 +33,7 @@ public class SearchResultsGui extends MultiplePagesDetailWarpGuiAbstract {
     @Nonnull
     @Override
     public IPagedInventory createInventory() {
-        return pagedInventoryAPI.createPagedInventory(new NavigationRow(NAV_NEXT, NAV_PREVIOUS, NAV_CLOSE));
+        return pagedInventoryAPI.createPagedInventory(new NavigationRow(NAV_NEXT, NAV_PREVIOUS, NAV_CLOSE, NAV_SORT, NAV_SEARCH));
     }
 
     @Nonnull

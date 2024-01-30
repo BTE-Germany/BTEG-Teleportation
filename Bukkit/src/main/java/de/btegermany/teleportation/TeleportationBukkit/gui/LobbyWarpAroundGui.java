@@ -23,7 +23,7 @@ public class LobbyWarpAroundGui extends MultiplePagesDetailWarpGuiAbstract {
     @Nonnull
     @Override
     public IPagedInventory createInventory() {
-        return pagedInventoryAPI.createPagedInventory(new NavigationRow(NAV_NEXT, NAV_PREVIOUS, NAV_CLOSE, NAV_LOBBY_SORT));
+        return pagedInventoryAPI.createPagedInventory(new NavigationRow(NAV_NEXT, NAV_PREVIOUS, NAV_CLOSE));
     }
 
     @Nonnull

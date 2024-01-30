@@ -10,3 +10,8 @@
   - fixed problems with /nwarp create and /nwarp change
 - 1.1.3:
   - activated StatesBordersCheck (if state on other server send to this server)
+- 1.1.4:
+  - added warning for inaccurate coordinate formats
+  - added /event
+  - removed normen hubs from nwarp gui
+  - added warp tags

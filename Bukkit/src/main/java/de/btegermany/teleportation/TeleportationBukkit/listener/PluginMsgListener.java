@@ -3,6 +3,7 @@ package de.btegermany.teleportation.TeleportationBukkit.listener;
 import de.btegermany.teleportation.TeleportationBukkit.gui.*;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.registry.CitiesRegistry;
+import de.btegermany.teleportation.TeleportationBukkit.registry.WarpTagsRegistry;
 import de.btegermany.teleportation.TeleportationBukkit.tp.PendingTpPlayer;
 import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
 import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
@@ -88,6 +89,7 @@ public class PluginMsgListener implements PluginMessageListener {
 					Player targetPlayer = Bukkit.getPlayer(playerUUID);
 					if (targetPlayer == null || !targetPlayer.isOnline()) return;
 
+
 					if (registriesProvider.getMultiplePagesGuisRegistry().isRegistered(targetPlayer)) {
 						registriesProvider.getMultiplePagesGuisRegistry().getGui(targetPlayer).addPages(pagesData);
 					} else {
@@ -96,6 +98,8 @@ public class PluginMsgListener implements PluginMessageListener {
 									new AllGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
 							case "Städte" ->
 									new CitiesGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
+							case "Tags" ->
+									new TagsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
 							case "Events" ->
 									new EventsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
 							case "Plotregionen" ->
@@ -104,6 +108,8 @@ public class PluginMsgListener implements PluginMessageListener {
 									new NormenHubsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
 							case "city" ->
 									new CitiesDetailGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
+							case "tag" ->
+								new TagsDetailGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
 							case "bl" ->
 									new StatesDetailGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
 							case "search" ->
@@ -216,6 +222,19 @@ public class PluginMsgListener implements PluginMessageListener {
 						try {
 							String city = in.readUTF();
 							citiesRegistry.register(city);
+						} catch (EOFException e) {
+							break;
+						}
+					}
+				}
+
+				case "list_tags" -> {
+					WarpTagsRegistry warpTagsRegistry = this.registriesProvider.getWarpTagsRegistry();
+					warpTagsRegistry.unregisterAll();
+					while (true) {
+						try {
+							String warpTag = in.readUTF();
+							warpTagsRegistry.register(warpTag);
 						} catch (EOFException e) {
 							break;
 						}
