@@ -7,7 +7,7 @@ import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintIt
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintRange;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.GuiBlueprint;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.MultiplePagesWarpGuiAbstract;
-import de.btegermany.teleportation.TeleportationBukkit.message.GetGuiDataMessage;
+import de.btegermany.teleportation.TeleportationBukkit.message.withresponse.GetGuiDataMessage;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBukkit.util.Skulls;
@@ -25,7 +25,7 @@ public class TagsGui extends MultiplePagesWarpGuiAbstract {
             @Override
             public void handle(ClickHandler clickHandler) {
                 if(clickHandler.getCurrentItem().getItemMeta() == null || clickHandler.getCurrentItem().getItemMeta().getDisplayName().length() < 3) return;
-                pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), "tag_" + clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2), 0, 1));
+                pluginMessenger.send(new GetGuiDataMessage(registriesProvider, pluginMessenger, player.getUniqueId().toString(), "tag_" + clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2), 0, 1));
                 registriesProvider.getMultiplePagesGuisRegistry().unregister(player);
             }
         });

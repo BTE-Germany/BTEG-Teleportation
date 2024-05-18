@@ -6,7 +6,7 @@
 
     <groupId>de.btegermany</groupId>
     <artifactId>teleportation-bungeecord</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.6</version>
     <packaging>jar</packaging>
 
     <name>Teleportation.bungee</name>
@@ -73,6 +73,11 @@
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>de.btegermany</groupId>
+            <artifactId>teleportation-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>

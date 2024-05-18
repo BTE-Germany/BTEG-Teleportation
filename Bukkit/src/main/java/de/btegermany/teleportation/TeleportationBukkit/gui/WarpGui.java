@@ -7,7 +7,7 @@ import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintIt
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintRange;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.GuiBlueprint;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.SinglePageWarpGuiAbstract;
-import de.btegermany.teleportation.TeleportationBukkit.message.GetGuiDataMessage;
+import de.btegermany.teleportation.TeleportationBukkit.message.withresponse.GetGuiDataMessage;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import org.bukkit.Material;
@@ -30,7 +30,7 @@ public class WarpGui extends SinglePageWarpGuiAbstract {
                 if(clickHandler.getCurrentItem() == null || clickHandler.getCurrentItem().getItemMeta() == null || clickHandler.getCurrentItem().getItemMeta().getDisplayName().length() < 3) return;
                 switch (clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2)) {
                     case "Tags", "Städte", "Events", "Plotregionen", "Normen Hubs", "Alle" ->
-                            pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2), 0, 1));
+                            pluginMessenger.send(new GetGuiDataMessage(registriesProvider, pluginMessenger, player.getUniqueId().toString(), clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2), 0, 1));
                     case "Bundesländer" ->
                             new StatesGui(clickHandler.getPlayer(), pluginMessenger, registriesProvider).open();
                 }
@@ -61,29 +61,34 @@ public class WarpGui extends SinglePageWarpGuiAbstract {
     @Nonnull
     @Override
     public List<ItemStack> getContent() {
-        ItemStack itemCities = new ItemStack(Material.BLUE_STAINED_GLASS);
+        ItemStack itemCities = new ItemStack(Material.PAPER);
         ItemMeta metaCities = itemCities.getItemMeta();
         metaCities.setDisplayName("Städte");
+        metaCities.setCustomModelData(7);
         itemCities.setItemMeta(metaCities);
-        ItemStack itemStates = new ItemStack(Material.GREEN_STAINED_GLASS);
+        ItemStack itemStates = new ItemStack(Material.PAPER);
         ItemMeta metaStates = itemStates.getItemMeta();
         metaStates.setDisplayName("Bundesländer");
+        metaStates.setCustomModelData(3);
         itemStates.setItemMeta(metaStates);
-        ItemStack itemTags = new ItemStack(Material.YELLOW_STAINED_GLASS);
+        ItemStack itemTags = new ItemStack(Material.NAME_TAG);
         ItemMeta metaTags = itemCities.getItemMeta();
         metaTags.setDisplayName("Tags");
         itemTags.setItemMeta(metaTags);
-        ItemStack itemEvents = new ItemStack(Material.ORANGE_STAINED_GLASS);
+        ItemStack itemEvents = new ItemStack(Material.PAPER);
         ItemMeta metaEvents = itemCities.getItemMeta();
         metaEvents.setDisplayName("Events");
+        metaEvents.setCustomModelData(12);
         itemEvents.setItemMeta(metaEvents);
-        ItemStack itemPlots = new ItemStack(Material.RED_STAINED_GLASS);
+        ItemStack itemPlots = new ItemStack(Material.PAPER);
         ItemMeta metaPlots = itemPlots.getItemMeta();
         metaPlots.setDisplayName("Plotregionen");
+        metaPlots.setCustomModelData(2);
         itemPlots.setItemMeta(metaPlots);
-        ItemStack itemAll = new ItemStack(Material.WHITE_STAINED_GLASS);
+        ItemStack itemAll = new ItemStack(Material.PAPER);
         ItemMeta metaAll = itemCities.getItemMeta();
         metaAll.setDisplayName("Alle");
+        metaAll.setCustomModelData(4);
         itemAll.setItemMeta(metaAll);
 
         return Arrays.asList(itemCities, itemStates, itemTags, itemEvents, itemPlots, itemAll);

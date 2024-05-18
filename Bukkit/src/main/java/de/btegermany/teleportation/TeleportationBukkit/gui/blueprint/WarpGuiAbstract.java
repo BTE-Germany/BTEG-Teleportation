@@ -47,13 +47,13 @@ public abstract class WarpGuiAbstract {
             openSortGui();
         }
     };
-    public final CustomNavigationItem NAV_MANAGE = new CustomNavigationItem(new ItemStack(Material.ANVIL), 6) {
+    public final CustomNavigationItem NAV_MANAGE = new CustomNavigationItem(new ItemStack(Material.PAPER), 6) {
         @Override
         public void handleClick(PagedInventoryCustomNavigationHandler pagedInventoryCustomNavigationHandler) {
             openManageGui();
         }
     };
-    public static final CustomNavigationItem NAV_SEARCH = new CustomNavigationItem(new ItemStack(Material.COMPASS), 1) {
+    public static final CustomNavigationItem NAV_SEARCH = new CustomNavigationItem(new ItemStack(Material.PAPER), 1) {
         @Override
         public void handleClick(PagedInventoryCustomNavigationHandler pagedInventoryCustomNavigationHandler) {
             TextComponent button = new TextComponent(" /nwarp ");
@@ -76,7 +76,7 @@ public abstract class WarpGuiAbstract {
         @Override
         public void handleClick(PagedInventoryCustomNavigationHandler handler) {}
     };
-    public final CustomNavigationItem NAV_TP_RANDOM = new CustomNavigationItem(new ItemStack(Material.CHERRY_SAPLING, 1), 2) {
+    public final CustomNavigationItem NAV_TP_RANDOM = new CustomNavigationItem(Skulls.getSkull(Skulls.Skin.DICE), 2) {
         @Override
         public void handleClick(PagedInventoryCustomNavigationHandler handler) {
             tpToRandomWarp();
@@ -110,8 +110,10 @@ public abstract class WarpGuiAbstract {
         metaSort.setDisplayName(ChatColor.GOLD + "ZUR ÜBERSICHT");
         ItemMeta metaManage = NAV_MANAGE.getItemStack().getItemMeta();
         metaManage.setDisplayName(ChatColor.RED + "Warps bearbeiten");
+        metaManage.setCustomModelData(11);
         ItemMeta metaSearch = NAV_SEARCH.getItemStack().getItemMeta();
         metaSearch.setDisplayName(ChatColor.GOLD + "Suchen");
+        metaSearch.setCustomModelData(15);
         ItemMeta metaLobbySort = NAV_LOBBY_SORT.getItemStack().getItemMeta();
         metaLobbySort.setDisplayName(ChatColor.GOLD + "Zurück");
         ItemMeta metaLobbyAround = NAV_LOBBY_AROUND.getItemStack().getItemMeta();

@@ -14,6 +14,7 @@ import de.btegermany.teleportation.TeleportationBungee.data.Database;
 import de.btegermany.teleportation.TeleportationBungee.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBungee.util.BukkitPlayer;
 import de.btegermany.teleportation.TeleportationBungee.util.Utils;
+import de.btegermany.teleportation.TeleportationBungee.util.WarpIdsManager;
 import fr.thesmyler.bungee2forge.BungeeToForgePlugin;
 import fr.thesmyler.bungee2forge.api.ForgeChannel;
 import fr.thesmyler.bungee2forge.api.ForgeChannelRegistry;
@@ -37,6 +38,7 @@ public class TeleportationBungee extends Plugin {
     public static final ForgeChannel TERRAMAP_MAP_SYNC_CHANNEL = ForgeChannelRegistry.instance().get("terramap:mapsync");
     public static final ForgeChannel TERRAMAP_PLUGIN_CHANNEL = ForgeChannelRegistry.instance().get("terramap:sh");
     private Database database;
+    private WarpIdsManager warpIdsManager;
     private RegistriesProvider registriesProvider;
     private GeoData geoData;
     private PluginMessenger pluginMessenger;
@@ -56,23 +58,24 @@ public class TeleportationBungee extends Plugin {
 
         // initialize objects
         this.geoData = new GeoData(this);
-        this.pluginMessenger = new PluginMessenger();
         ConfigReader configReader = new ConfigReader(this, this.geoData);
         this.database = new Database(configReader);
         this.database.connect();
+        this.warpIdsManager = new WarpIdsManager(database);
         this.registriesProvider = new RegistriesProvider(this.database, this);
         this.registriesProvider.getWarpsRegistry().loadWarps();
+        this.pluginMessenger = new PluginMessenger(this.registriesProvider);
         configReader.readServers(this.registriesProvider.getWarpsRegistry());
         Utils utils = new Utils(this.pluginMessenger, this.registriesProvider);
 
         // register commands
-        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TeleportCommand(utils));
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TeleportCommand(utils, this.registriesProvider, this.pluginMessenger));
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpaCommand(utils, this.registriesProvider));
-        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpacceptCommand(utils, this.registriesProvider));
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpacceptCommand(utils, this.registriesProvider, this.pluginMessenger));
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpaDenyCommand(this.registriesProvider));
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpaCancelCommand(utils));
-        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpHereCommand(utils));
-        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpBackCommand(this.registriesProvider));
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpHereCommand(utils, this.registriesProvider, this.pluginMessenger));
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpBackCommand(this.registriesProvider, this.pluginMessenger));
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpllCommand(this.geoData, this.pluginMessenger, this.registriesProvider));
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new EventCommand(this.registriesProvider, this.pluginMessenger));
 
@@ -163,5 +166,9 @@ public class TeleportationBungee extends Plugin {
 
     public static TeleportationBungee getInstance() {
         return instance;
+    }
+
+    public WarpIdsManager getWarpIdsManager() {
+        return this.warpIdsManager;
     }
 }

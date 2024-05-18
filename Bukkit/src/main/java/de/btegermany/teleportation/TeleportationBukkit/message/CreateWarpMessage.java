@@ -1,21 +1,25 @@
 package de.btegermany.teleportation.TeleportationBukkit.message;
 
+import de.btegermany.teleportation.TeleportationAPI.message.PluginMessage;
 import de.btegermany.teleportation.TeleportationBukkit.util.WarpInCreation;
+
+import java.util.List;
 
 public class CreateWarpMessage extends PluginMessage {
 
     public CreateWarpMessage(WarpInCreation warp) {
-        byteOutput.writeUTF("warp_create");
-        byteOutput.writeUTF(warp.getPlayer().getUniqueId().toString());
-        byteOutput.writeUTF(warp.getName());
-        byteOutput.writeUTF(warp.getCity());
-        byteOutput.writeUTF(warp.getState().displayName);
-        byteOutput.writeUTF(String.valueOf(warp.getPlayer().getLocation().getX()));
-        byteOutput.writeUTF(String.valueOf(warp.getPlayer().getLocation().getZ()));
-        byteOutput.writeUTF(warp.getHeadId() != null ? warp.getHeadId() : "null");
-        byteOutput.writeUTF(String.valueOf(warp.getPlayer().getLocation().getYaw()));
-        byteOutput.writeUTF(String.valueOf(warp.getPlayer().getLocation().getPitch()));
-        byteOutput.writeUTF(String.valueOf(warp.getPlayer().getLocation().getY()));
+        super("warp_create", MessageType.NORMAL);
+        super.content.addAll(List.of(
+                warp.getPlayer().getUniqueId().toString(),
+                warp.getName(),
+                warp.getCity(),
+                warp.getState().displayName,
+                String.valueOf(warp.getPlayer().getLocation().getX()),
+                String.valueOf(warp.getPlayer().getLocation().getZ()),
+                warp.getHeadId() != null ? warp.getHeadId() : "null",
+                String.valueOf(warp.getPlayer().getLocation().getYaw()),
+                String.valueOf(warp.getPlayer().getLocation().getPitch()),
+                String.valueOf(warp.getPlayer().getLocation().getY())));
     }
 
 }

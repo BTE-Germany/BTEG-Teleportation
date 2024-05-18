@@ -27,9 +27,9 @@ public class TeleportationBukkit extends JavaPlugin {
 	public void onEnable() {
 		//initialize objects
 		pagedInventoryAPI = new PagedInventoryAPI(this);
-		this.pluginMessenger = new PluginMessenger(this);
 		RegistriesProvider registriesProvider = new RegistriesProvider(this);
 		registriesProvider.getLobbyCitiesRegistry().loadLobbyCities();
+		this.pluginMessenger = new PluginMessenger(this, registriesProvider);
 		TeleportationHandler teleportationHandler = new TeleportationHandler(this.pluginMessenger);
 
 		//register plugin channel

@@ -1,5 +1,8 @@
 package de.btegermany.teleportation.TeleportationBungee.command;
 
+import de.btegermany.teleportation.TeleportationBungee.message.PluginMessenger;
+import de.btegermany.teleportation.TeleportationBungee.message.withresponse.RequestLastLocationMessage;
+import de.btegermany.teleportation.TeleportationBungee.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBungee.util.Utils;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -16,10 +19,14 @@ import static de.btegermany.teleportation.TeleportationBungee.TeleportationBunge
 public class TpHereCommand extends Command implements TabExecutor {
 
     private final Utils utils;
+    private final RegistriesProvider registriesProvider;
+    private final PluginMessenger pluginMessenger;
 
-    public TpHereCommand(Utils utils) {
+    public TpHereCommand(Utils utils, RegistriesProvider registriesProvider, PluginMessenger pluginMessenger) {
         super("TpHere");
         this.utils = utils;
+        this.registriesProvider = registriesProvider;
+        this.pluginMessenger = pluginMessenger;
     }
 
     @Override
@@ -43,9 +50,11 @@ public class TpHereCommand extends Command implements TabExecutor {
 
 
         if(target != null) {
-
             player.sendMessage(getFormattedMessage(target.getName() + " wird zu dir teleportiert..."));
-            utils.teleport(target, player);
+            RequestLastLocationMessage requestLastLocationMessage = new RequestLastLocationMessage(player, this.registriesProvider, () -> {
+                this.utils.teleport(target, player);
+            });
+            this.pluginMessenger.sendMessageToServers(requestLastLocationMessage, player.getServer().getInfo());
         } else {
             player.sendMessage(getFormattedMessage("Der Spieler wurde nicht gefunden!"));
         }

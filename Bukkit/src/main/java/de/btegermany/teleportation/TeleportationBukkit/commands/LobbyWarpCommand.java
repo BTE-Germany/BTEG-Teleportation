@@ -1,6 +1,6 @@
 package de.btegermany.teleportation.TeleportationBukkit.commands;
 
-import de.btegermany.teleportation.TeleportationBukkit.message.GetGuiDataMessage;
+import de.btegermany.teleportation.TeleportationBukkit.message.withresponse.GetGuiDataMessage;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBukkit.util.LobbyCity;
@@ -107,7 +107,7 @@ public class LobbyWarpCommand implements CommandExecutor, TabExecutorEnhanced {
 
         // get gui data for city
         String city = args[0];
-        this.pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), String.format("lobbywarp_%s", city), 0, 1));
+        this.pluginMessenger.send(new GetGuiDataMessage(this.registriesProvider, this.pluginMessenger, player.getUniqueId().toString(), String.format("lobbywarp_%s", city), 0, 1));
 
         return true;
     }

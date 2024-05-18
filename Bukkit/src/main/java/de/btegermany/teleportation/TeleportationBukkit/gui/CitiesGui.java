@@ -4,7 +4,7 @@ import com.tchristofferson.pagedinventories.IPagedInventory;
 import com.tchristofferson.pagedinventories.NavigationRow;
 import com.tchristofferson.pagedinventories.handlers.PagedInventoryClickHandler;
 import com.tchristofferson.pagedinventories.handlers.PagedInventorySwitchPageHandler;
-import de.btegermany.teleportation.TeleportationBukkit.message.GetGuiDataMessage;
+import de.btegermany.teleportation.TeleportationBukkit.message.withresponse.GetGuiDataMessage;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintItem;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintRange;
@@ -26,7 +26,7 @@ public class CitiesGui extends MultiplePagesWarpGuiAbstract {
             @Override
             public void handle(ClickHandler clickHandler) {
                 if(clickHandler.getCurrentItem() == null || clickHandler.getCurrentItem().getItemMeta() == null || clickHandler.getCurrentItem().getItemMeta().getDisplayName().length() < 3) return;
-                pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), "city_" + clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2), 0, 1));
+                pluginMessenger.send(new GetGuiDataMessage(registriesProvider, pluginMessenger, player.getUniqueId().toString(), "city_" + clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2), 0, 1));
                 registriesProvider.getMultiplePagesGuisRegistry().unregister(player);
             }
         });
@@ -34,7 +34,7 @@ public class CitiesGui extends MultiplePagesWarpGuiAbstract {
             @Override
             public void handle(SwitchHandler switchHandler) {
                 if(!switchHandler.getPageAction().equals(PageAction.NEXT)) return;
-                pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), "Städte", inventory.getSize()));
+                pluginMessenger.send(new GetGuiDataMessage(registriesProvider, pluginMessenger, player.getUniqueId().toString(), "Städte", inventory.getSize()));
             }
         });
     }

@@ -88,7 +88,8 @@ public class Skulls {
         WARP_HOUSE ("7b56e49085f55d5de215afd26fc4f1afe9c34313eff98e3e58245def06e5858c"),
         PLUS ("5ff31431d64587ff6ef98c0675810681f8c13bf96f51d9cb07ed7852b2ffd1"),
         MINUS ("4e4b8b8d2362c864e062301487d94d3272a6b570afbf80c2c5b148c954579d46"),
-        EDIT ("a7ed66f5a70209d821167d156fdbc0ca3bf11ad54ed5d86e75c265f7e5029ec1");
+        EDIT ("a7ed66f5a70209d821167d156fdbc0ca3bf11ad54ed5d86e75c265f7e5029ec1"),
+        DICE ("8a084d0a1c6fc2163de30d8b148ab4d363220d5c972d5f88eb8dc86176ccdb3e");
 
         final String id;
 

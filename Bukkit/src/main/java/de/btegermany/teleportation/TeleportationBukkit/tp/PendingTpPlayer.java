@@ -9,8 +9,8 @@ public class PendingTpPlayer extends PendingTeleportationAbstract {
 
     UUID targetUUID;
 
-    public PendingTpPlayer(UUID playerUUID, UUID targetUUID) {
-        super(playerUUID);
+    public PendingTpPlayer(UUID playerUUID, UUID targetUUID, String originServerName) {
+        super(playerUUID, originServerName);
         this.targetUUID = targetUUID;
     }
 

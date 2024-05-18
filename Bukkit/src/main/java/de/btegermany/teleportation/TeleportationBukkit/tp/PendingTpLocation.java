@@ -16,8 +16,8 @@ public class PendingTpLocation extends PendingTeleportationAbstract {
     private final float yaw;
     private final float pitch;
 
-    public PendingTpLocation(UUID playerUUID, World world, double x, double y, double z, float yaw, float pitch) {
-        super(playerUUID);
+    public PendingTpLocation(UUID playerUUID, World world, double x, double y, double z, float yaw, float pitch, String originServerName) {
+        super(playerUUID, originServerName);
         this.world = world;
         this.x = x;
         this.y = y;

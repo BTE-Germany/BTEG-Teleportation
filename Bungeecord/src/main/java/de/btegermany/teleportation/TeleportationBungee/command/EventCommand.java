@@ -2,6 +2,7 @@ package de.btegermany.teleportation.TeleportationBungee.command;
 
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
 import de.btegermany.teleportation.TeleportationBungee.message.PluginMessenger;
+import de.btegermany.teleportation.TeleportationBungee.message.withresponse.RequestLastLocationMessage;
 import de.btegermany.teleportation.TeleportationBungee.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBungee.util.Warp;
 import net.md_5.bungee.api.CommandSender;
@@ -32,7 +33,10 @@ public class EventCommand extends Command {
             return;
         }
 
-        this.pluginMessenger.performCommand(player, "nwarp event");
+        RequestLastLocationMessage requestLastLocationMessage = new RequestLastLocationMessage(player, this.registriesProvider, () -> {
+            this.pluginMessenger.performCommand(player, "nwarp event");
+        });
+        this.pluginMessenger.sendMessageToServers(requestLastLocationMessage, player.getServer().getInfo());
     }
 
 }

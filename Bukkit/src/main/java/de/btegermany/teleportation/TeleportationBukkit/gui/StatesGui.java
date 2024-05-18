@@ -4,7 +4,7 @@ import com.tchristofferson.pagedinventories.IPagedInventory;
 import com.tchristofferson.pagedinventories.NavigationRow;
 import com.tchristofferson.pagedinventories.handlers.PagedInventoryClickHandler;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.SinglePageWarpGuiAbstract;
-import de.btegermany.teleportation.TeleportationBukkit.message.GetGuiDataMessage;
+import de.btegermany.teleportation.TeleportationBukkit.message.withresponse.GetGuiDataMessage;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.util.Skulls;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintItem;
@@ -28,7 +28,7 @@ public class StatesGui extends SinglePageWarpGuiAbstract {
             @Override
             public void handle(ClickHandler clickHandler) {
                 if(clickHandler.getCurrentItem().getItemMeta() == null || clickHandler.getCurrentItem().getItemMeta().getDisplayName().length() < 3) return;
-                pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), "bl_" + clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2), 0, 1));
+                pluginMessenger.send(new GetGuiDataMessage(registriesProvider, pluginMessenger, player.getUniqueId().toString(), "bl_" + clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2), 0, 1));
             }
         });
     }

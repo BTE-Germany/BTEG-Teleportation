@@ -1,27 +1,26 @@
 package de.btegermany.teleportation.TeleportationBukkit.registry;
 
+import de.btegermany.teleportation.TeleportationAPI.registry.PluginMessagesWithResponseRegistry;
 import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
 
 public class RegistriesProvider {
 
     private final MultiplePagesGuisRegistry multiplePagesGuisRegistry;
     private final PlayersEnteringDeleteWarpIdRegistry playersEnteringDeleteWarpIdRegistry;
-    private final WarpsInCreationRegistry warpsInCreationRegistry;
     private final PlayersEnteringChangeWarpIdRegistry playersEnteringChangeWarpIdRegistry;
-    private final WarpsGettingChangedRegistry warpsGettingChangedRegistry;
     private final LobbyCitiesRegistry lobbyCitiesRegistry;
     private final CitiesRegistry citiesRegistry;
     private final WarpTagsRegistry warpTagsRegistry;
+    private final PluginMessagesWithResponseRegistry pluginMessagesWithResponseRegistry;
 
     public RegistriesProvider(TeleportationBukkit plugin) {
         this.multiplePagesGuisRegistry = new MultiplePagesGuisRegistry();
         this.playersEnteringDeleteWarpIdRegistry = new PlayersEnteringDeleteWarpIdRegistry();
-        this.warpsInCreationRegistry = new WarpsInCreationRegistry();
         this.playersEnteringChangeWarpIdRegistry = new PlayersEnteringChangeWarpIdRegistry();
-        this.warpsGettingChangedRegistry = new WarpsGettingChangedRegistry();
         this.lobbyCitiesRegistry = new LobbyCitiesRegistry(plugin, "lobbycities.yml");
         this.citiesRegistry = new CitiesRegistry();
         this.warpTagsRegistry = new WarpTagsRegistry();
+        this.pluginMessagesWithResponseRegistry = new PluginMessagesWithResponseRegistry();
     }
 
     // Getters
@@ -34,16 +33,8 @@ public class RegistriesProvider {
         return playersEnteringDeleteWarpIdRegistry;
     }
 
-    public WarpsInCreationRegistry getWarpsInCreationRegistry() {
-        return warpsInCreationRegistry;
-    }
-
     public PlayersEnteringChangeWarpIdRegistry getPlayersEnteringChangeWarpIdRegistry() {
         return playersEnteringChangeWarpIdRegistry;
-    }
-
-    public WarpsGettingChangedRegistry getWarpsGettingChangedRegistry() {
-        return warpsGettingChangedRegistry;
     }
 
     public LobbyCitiesRegistry getLobbyCitiesRegistry() {
@@ -56,5 +47,9 @@ public class RegistriesProvider {
 
     public WarpTagsRegistry getWarpTagsRegistry() {
         return warpTagsRegistry;
+    }
+
+    public PluginMessagesWithResponseRegistry getPluginMessagesWithResponseRegistry() {
+        return pluginMessagesWithResponseRegistry;
     }
 }

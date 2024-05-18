@@ -1,6 +1,7 @@
 package de.btegermany.teleportation.TeleportationBukkit.listener;
 
-import de.btegermany.teleportation.TeleportationBukkit.gui.*;
+import de.btegermany.teleportation.TeleportationAPI.message.PluginMessage;
+import de.btegermany.teleportation.TeleportationBukkit.message.response.LastLocationResponseMessage;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.registry.CitiesRegistry;
 import de.btegermany.teleportation.TeleportationBukkit.registry.WarpTagsRegistry;
@@ -16,8 +17,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.util.NumberConversions;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
 import java.io.ByteArrayInputStream;
@@ -45,28 +44,35 @@ public class PluginMsgListener implements PluginMessageListener {
 			return;
 		}
 
-		DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
+		DataInputStream dataInput = new DataInputStream(new ByteArrayInputStream(message));
 
 		try {
-			String tag = in.readUTF();
+			PluginMessage.MessageType messageType = PluginMessage.MessageType.valueOf(dataInput.readUTF());
+			int requestId = -1;
+			if(messageType == PluginMessage.MessageType.WITH_RESPONSE || messageType == PluginMessage.MessageType.RESPONSE) {
+				requestId = Integer.parseInt(dataInput.readUTF());
+			}
+			String tag = dataInput.readUTF();
 
 			switch (tag) {
 
 				case "teleport_player" -> {
-					UUID playerUUID = UUID.fromString(in.readUTF());
-					UUID targetUUID = UUID.fromString(in.readUTF());
+					UUID playerUUID = UUID.fromString(dataInput.readUTF());
+					UUID targetUUID = UUID.fromString(dataInput.readUTF());
+					String originServerName = dataInput.readUTF();
 
-					teleportationHandler.handle(new PendingTpPlayer(playerUUID, targetUUID));
+					teleportationHandler.handle(new PendingTpPlayer(playerUUID, targetUUID, originServerName));
 				}
 
 				case "teleport_coords" -> {
-					UUID playerUUID = UUID.fromString(in.readUTF());
-					String[] coords = in.readUTF().split(",");
+					UUID playerUUID = UUID.fromString(dataInput.readUTF());
+					String[] coords = dataInput.readUTF().split(",");
 					double x = Double.parseDouble(coords[0]);
 					double y = Double.parseDouble(coords[1]);
 					double z = Double.parseDouble(coords[2]);
-					float yaw = Float.parseFloat(in.readUTF());
-					float pitch = Float.parseFloat(in.readUTF());
+					float yaw = Float.parseFloat(dataInput.readUTF());
+					float pitch = Float.parseFloat(dataInput.readUTF());
+					String originServerName = dataInput.readUTF();
 					World world = Bukkit.getWorld("world");
 					if (world == null) {
 						world = Bukkit.getWorlds().get(0);
@@ -75,71 +81,29 @@ public class PluginMsgListener implements PluginMessageListener {
 						y = world.getHighestBlockYAt((int) x, (int) z) + 1;
 					}
 
-					teleportationHandler.handle(new PendingTpLocation(playerUUID, world, x, y, z, yaw, pitch));
+					teleportationHandler.handle(new PendingTpLocation(playerUUID, world, x, y, z, yaw, pitch, originServerName));
 				}
 
 				case "gui_data" -> {
-					JSONObject object = new JSONObject(in.readUTF());
-					String metaTitle = object.getString("title");
-					UUID playerUUID = UUID.fromString(object.getString("player_uuid"));
-					JSONArray pagesData = object.getJSONArray("pagesData");
-
-					String group = metaTitle.split("_").length > 0 ? metaTitle.split("_")[0] : metaTitle;
-					String title = metaTitle.equals(group) ? group : metaTitle.substring(group.length() + 1);
-					Player targetPlayer = Bukkit.getPlayer(playerUUID);
-					if (targetPlayer == null || !targetPlayer.isOnline()) return;
-
-
-					if (registriesProvider.getMultiplePagesGuisRegistry().isRegistered(targetPlayer)) {
-						registriesProvider.getMultiplePagesGuisRegistry().getGui(targetPlayer).addPages(pagesData);
-					} else {
-						switch (group) {
-							case "Alle" ->
-									new AllGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
-							case "Städte" ->
-									new CitiesGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
-							case "Tags" ->
-									new TagsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
-							case "Events" ->
-									new EventsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
-							case "Plotregionen" ->
-									new PlotsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
-							case "Normen Hubs" ->
-									new NormenHubsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
-							case "city" ->
-									new CitiesDetailGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
-							case "tag" ->
-								new TagsDetailGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
-							case "bl" ->
-									new StatesDetailGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
-							case "search" ->
-									new SearchResultsGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
-							case "server" ->
-									new ServersDetailGui(targetPlayer, pluginMessenger, pagesData, title, registriesProvider).open();
-							case "lobbywarp" ->
-									new LobbyWarpGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
-							case "lobbywarp-around" ->
-									new LobbyWarpAroundGui(targetPlayer, title, pluginMessenger, pagesData, registriesProvider).open();
-						}
-					}
+					this.registriesProvider.getPluginMessagesWithResponseRegistry().getPluginMessageWithResponse(requestId).accept(dataInput);
 				}
 
 				case "warp_info" -> {
-					UUID playerUUID = UUID.fromString(in.readUTF());
-					int responseNumber = Integer.parseInt(in.readUTF());
-					int id = Integer.parseInt(in.readUTF());
-					String name = in.readUTF();
-					String city = in.readUTF();
-					String state = in.readUTF();
-					double latitude = Double.parseDouble(in.readUTF());
-					double longitude = Double.parseDouble(in.readUTF());
-					String headId = in.readUTF();
+					UUID playerUUID = UUID.fromString(dataInput.readUTF());
+					int responseNumber = Integer.parseInt(dataInput.readUTF());
+					int id = Integer.parseInt(dataInput.readUTF());
+					String name = dataInput.readUTF();
+					String city = dataInput.readUTF();
+					String state = dataInput.readUTF();
+					double latitude = Double.parseDouble(dataInput.readUTF());
+					double longitude = Double.parseDouble(dataInput.readUTF());
+					String headId = dataInput.readUTF();
 					if (headId.equals("null")) {
 						headId = null;
 					}
-					float yaw = Float.parseFloat(in.readUTF());
-					float pitch = Float.parseFloat(in.readUTF());
-					double height = Double.parseDouble(in.readUTF());
+					float yaw = Float.parseFloat(dataInput.readUTF());
+					float pitch = Float.parseFloat(dataInput.readUTF());
+					double height = Double.parseDouble(dataInput.readUTF());
 					Player targetPlayer = Bukkit.getPlayer(playerUUID);
 					if (targetPlayer == null || !targetPlayer.isOnline()) return;
 
@@ -207,8 +171,8 @@ public class PluginMsgListener implements PluginMessageListener {
 				}
 
 				case "command_perform" -> {
-					UUID playerUUID = UUID.fromString(in.readUTF());
-					String command = in.readUTF();
+					UUID playerUUID = UUID.fromString(dataInput.readUTF());
+					String command = dataInput.readUTF();
 					Player targetPlayer = Bukkit.getPlayer(playerUUID);
 					if (targetPlayer == null || !targetPlayer.isOnline()) return;
 
@@ -220,7 +184,7 @@ public class PluginMsgListener implements PluginMessageListener {
 					citiesRegistry.unregisterAll();
 					while (true) {
 						try {
-							String city = in.readUTF();
+							String city = dataInput.readUTF();
 							citiesRegistry.register(city);
 						} catch (EOFException e) {
 							break;
@@ -233,12 +197,17 @@ public class PluginMsgListener implements PluginMessageListener {
 					warpTagsRegistry.unregisterAll();
 					while (true) {
 						try {
-							String warpTag = in.readUTF();
+							String warpTag = dataInput.readUTF();
 							warpTagsRegistry.register(warpTag);
 						} catch (EOFException e) {
 							break;
 						}
 					}
+				}
+
+				case "last_location_request" -> {
+					UUID playerUUID = UUID.fromString(dataInput.readUTF());
+					this.pluginMessenger.send(new LastLocationResponseMessage(requestId, playerUUID));
 				}
 			}
 
@@ -246,8 +215,12 @@ public class PluginMsgListener implements PluginMessageListener {
 			e.printStackTrace();
 			if (player.getName().equals("JaskerX")) {
 				player.sendMessage("EXCEPTION");
-				player.sendMessage(e.getMessage());
-				player.sendMessage(e.getLocalizedMessage());
+				if(e.getMessage() != null) {
+					player.sendMessage(e.getMessage());
+				}
+				if(e.getMessage() != null) {
+					player.sendMessage(e.getLocalizedMessage());
+				}
 				for(StackTraceElement s : e.getStackTrace()) {
 					player.sendMessage(s.toString());
 				}

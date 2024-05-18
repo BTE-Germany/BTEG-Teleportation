@@ -1,9 +1,7 @@
 package de.btegermany.teleportation.TeleportationBungee.command;
 
-
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
+import de.btegermany.teleportation.TeleportationBungee.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBungee.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBungee.util.LastLocation;
 import net.md_5.bungee.api.CommandSender;
@@ -14,10 +12,12 @@ import net.md_5.bungee.api.plugin.Command;
 public class TpBackCommand extends Command {
 
     private final RegistriesProvider registriesProvider;
+    private final PluginMessenger pluginMessenger;
 
-    public TpBackCommand(RegistriesProvider registriesProvider) {
+    public TpBackCommand(RegistriesProvider registriesProvider, PluginMessenger pluginMessenger) {
         super("TpBack");
         this.registriesProvider = registriesProvider;
+        this.pluginMessenger = pluginMessenger;
     }
 
     @Override
@@ -44,19 +44,11 @@ public class TpBackCommand extends Command {
             return;
         }
         LastLocation lastLocation = registriesProvider.getLastLocationsRegistry().getLastLocation(player);
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeUTF("teleport_coords");
-        out.writeUTF(player.getUniqueId().toString());
-        out.writeUTF(lastLocation.getCoordinates());
-        out.writeUTF(String.valueOf(lastLocation.getYaw()));
-        out.writeUTF(String.valueOf(lastLocation.getPitch()));
-        // if needed connect to the right server
-        if(!lastLocation.getServerInfo().equals(player.getServer().getInfo())) {
-            player.connect(lastLocation.getServerInfo());
-        }
-        // send teleportation data and unregister "used" LastLocation
-        lastLocation.getServerInfo().sendData(TeleportationBungee.PLUGIN_CHANNEL, out.toByteArray());
-        registriesProvider.getLastLocationsRegistry().unregister(player);
+        String[] coordinatesSplit = lastLocation.getCoordinates().split(",");
+        double x = Double.parseDouble(coordinatesSplit[0]);
+        double y = Double.parseDouble(coordinatesSplit[1]);
+        double z = Double.parseDouble(coordinatesSplit[2]);
+        this.pluginMessenger.teleportToCoords(player, lastLocation.getServerInfo(), x, y, z, lastLocation.getYaw(), lastLocation.getPitch());
     }
 
 }

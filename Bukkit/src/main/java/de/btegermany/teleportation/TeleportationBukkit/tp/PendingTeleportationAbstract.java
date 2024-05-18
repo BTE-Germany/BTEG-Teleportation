@@ -7,10 +7,12 @@ public abstract class PendingTeleportationAbstract {
 
     UUID playerUUID;
     private final LocalDateTime expirationTime;
+    private final String originServerName;
 
-    public PendingTeleportationAbstract(UUID playerUUID) {
+    public PendingTeleportationAbstract(UUID playerUUID, String originServerName) {
         this.playerUUID = playerUUID;
-        expirationTime = LocalDateTime.now().plusMinutes(1);
+        this.expirationTime = LocalDateTime.now().plusMinutes(1);
+        this.originServerName = originServerName;
     }
 
     public abstract void teleport();
@@ -24,4 +26,7 @@ public abstract class PendingTeleportationAbstract {
         return playerUUID;
     }
 
+    public String getOriginServerName() {
+        return originServerName;
+    }
 }

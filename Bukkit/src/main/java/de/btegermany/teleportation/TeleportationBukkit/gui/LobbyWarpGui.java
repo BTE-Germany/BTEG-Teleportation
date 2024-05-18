@@ -8,7 +8,7 @@ import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintIt
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintRange;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.GuiBlueprint;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.MultiplePagesDetailWarpGuiAbstract;
-import de.btegermany.teleportation.TeleportationBukkit.message.GetGuiDataMessage;
+import de.btegermany.teleportation.TeleportationBukkit.message.withresponse.GetGuiDataMessage;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBukkit.util.LobbyCity;
@@ -37,7 +37,7 @@ public class LobbyWarpGui extends MultiplePagesDetailWarpGuiAbstract {
                             return;
                         }
                         LobbyCity lobbyCity = lobbyCityOptional.get();
-                        pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), String.format("lobbywarp-around_" + lobbyCity.getCity() + "_" + lobbyCity.getCenterLat() + "_" + lobbyCity.getCenterLon() + "_" + lobbyCity.getRadius()), 0, 1));
+                        pluginMessenger.send(new GetGuiDataMessage(registriesProvider, pluginMessenger, player.getUniqueId().toString(), String.format("lobbywarp-around_" + lobbyCity.getCity() + "_" + lobbyCity.getCenterLat() + "_" + lobbyCity.getCenterLon() + "_" + lobbyCity.getRadius()), 0, 1));
                         player.closeInventory();
                     }
                 }

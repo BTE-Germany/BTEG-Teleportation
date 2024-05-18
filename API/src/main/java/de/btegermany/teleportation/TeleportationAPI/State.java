@@ -1,4 +1,4 @@
-package de.btegermany.teleportation.TeleportationBungee.util;
+package de.btegermany.teleportation.TeleportationAPI;
 
 public enum State {
 

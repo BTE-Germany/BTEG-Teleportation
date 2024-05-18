@@ -2,7 +2,8 @@ package de.btegermany.teleportation.TeleportationBukkit.commands;
 
 import de.btegermany.teleportation.TeleportationBukkit.gui.WarpGui;
 import de.btegermany.teleportation.TeleportationBukkit.message.*;
-import de.btegermany.teleportation.TeleportationBukkit.util.State;
+import de.btegermany.teleportation.TeleportationAPI.State;
+import de.btegermany.teleportation.TeleportationBukkit.message.withresponse.GetGuiDataMessage;
 import de.btegermany.teleportation.TeleportationBukkit.util.TabExecutorEnhanced;
 import de.btegermany.teleportation.TeleportationBukkit.util.WarpGettingChanged;
 import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
@@ -42,6 +43,10 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
         if(args.length == 0) {
             new WarpGui(player, this.pluginMessenger, this.registriesProvider).open();
             return true;
+        }
+
+        if(args[0].equalsIgnoreCase("help")) {
+            return false;
         }
 
         if(!args[0].equals("create") && !args[0].equals("delete") && !args[0].equals("change") && !args[0].equals("tag")) {
@@ -109,11 +114,11 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
                     return false;
                 }
                 String tag = args[1];
-                int warpId = Integer.parseInt(args[3]);
 
                 switch (args[2].toLowerCase()) {
-                    case "add" -> this.pluginMessenger.send(new WarpAddTagMessage(player, tag, warpId));
-                    case "remove" -> this.pluginMessenger.send(new WarpRemoveTagMessage(player, tag, warpId));
+                    case "add" -> this.pluginMessenger.send(new WarpAddTagMessage(player, tag, Integer.parseInt(args[3])));
+                    case "remove" -> this.pluginMessenger.send(new WarpRemoveTagMessage(player, tag, Integer.parseInt(args[3])));
+                    case "edit" -> this.pluginMessenger.send(new WarpEditTagMessage(player, tag, args[3]));
                 }
             }
         }
@@ -129,7 +134,7 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
             searchBuilder.append(args[i]);
         }
         String search = new String(searchBuilder);
-        this.pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), String.format("search_%s", search), 0, 1));
+        this.pluginMessenger.send(new GetGuiDataMessage(this.registriesProvider, this.pluginMessenger, player.getUniqueId().toString(), String.format("search_%s", search), 0, 1));
     }
 
     @Override
@@ -142,7 +147,7 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
                 if(!sender.hasPermission("bteg.warps.manage")) {
                     break;
                 }
-                result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[0], "create", "delete", "change", "tag"));
+                result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[0], "help", "create", "delete", "change", "tag"));
             }
             case 2 -> {
                 if(!sender.hasPermission("bteg.warps.manage") || !args[0].equalsIgnoreCase("tag")) {
@@ -160,7 +165,7 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
                     break;
                 }
                 if(args[0].equalsIgnoreCase("tag")) {
-                    result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[2], "add", "remove"));
+                    result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[2], "add", "remove", "edit"));
                 }
             }
         }

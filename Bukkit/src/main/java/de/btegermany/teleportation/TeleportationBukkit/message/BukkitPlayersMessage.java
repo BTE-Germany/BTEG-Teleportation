@@ -1,5 +1,6 @@
 package de.btegermany.teleportation.TeleportationBukkit.message;
 
+import de.btegermany.teleportation.TeleportationAPI.message.PluginMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.json.JSONArray;
@@ -10,8 +11,8 @@ import java.util.Collection;
 public class BukkitPlayersMessage extends PluginMessage {
 
     public BukkitPlayersMessage(Collection<? extends Player> players) {
-        byteOutput.writeUTF("players_online");
-        byteOutput.writeUTF(Bukkit.getServer().getIp() + ":" + Bukkit.getPort());
+        super("players_online", MessageType.NORMAL);
+
         JSONArray jsonArray = new JSONArray();
         players.forEach(player -> {
             JSONObject playerObject = new JSONObject();
@@ -24,7 +25,8 @@ public class BukkitPlayersMessage extends PluginMessage {
             playerObject.put("gamemode", player.getGameMode().toString());
             jsonArray.put(playerObject);
         });
-        byteOutput.writeUTF(jsonArray.toString());
+        super.content.add(Bukkit.getServer().getIp() + ":" + Bukkit.getPort());
+        super.content.add(jsonArray.toString());
     }
 
 }

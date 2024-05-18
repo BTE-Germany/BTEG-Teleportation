@@ -1,6 +1,8 @@
 package de.btegermany.teleportation.TeleportationBungee.command;
 
 
+import de.btegermany.teleportation.TeleportationBungee.message.PluginMessenger;
+import de.btegermany.teleportation.TeleportationBungee.message.withresponse.RequestLastLocationMessage;
 import de.btegermany.teleportation.TeleportationBungee.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBungee.registry.TpasRegistry;
 import de.btegermany.teleportation.TeleportationBungee.util.Utils;
@@ -21,11 +23,13 @@ public class TpacceptCommand extends Command implements TabExecutor {
 
     private final Utils utils;
     private final RegistriesProvider registriesProvider;
+    private final PluginMessenger pluginMessenger;
 
-    public TpacceptCommand(Utils utils, RegistriesProvider registriesProvider) {
+    public TpacceptCommand(Utils utils, RegistriesProvider registriesProvider, PluginMessenger pluginMessenger) {
         super("Tpaccept");
         this.utils = utils;
         this.registriesProvider = registriesProvider;
+        this.pluginMessenger = pluginMessenger;
     }
 
     @Override
@@ -53,8 +57,11 @@ public class TpacceptCommand extends Command implements TabExecutor {
             }
             if(tpasRegistry.isRegistered(target) && tpasRegistry.getTpa(target).equals(player.getUniqueId())) {
                 target.sendMessage(getFormattedMessage("Deine Anfrage wurde angenommen!"));
-                utils.teleport(target, player);
-                tpasRegistry.unregister(target);
+                RequestLastLocationMessage requestLastLocationMessage = new RequestLastLocationMessage(player, this.registriesProvider, () -> {
+                    this.utils.teleport(target, player);
+                    tpasRegistry.unregister(target);
+                });
+                this.pluginMessenger.sendMessageToServers(requestLastLocationMessage, player.getServer().getInfo());
             } else {
                 player.sendMessage(getFormattedMessage("Du hast keine Anfrage von diesem Spieler erhalten!"));
             }

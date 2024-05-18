@@ -1,14 +1,18 @@
 package de.btegermany.teleportation.TeleportationBukkit.message;
 
+import de.btegermany.teleportation.TeleportationAPI.message.PluginMessage;
 import org.bukkit.entity.Player;
+
+import java.util.List;
 
 public class WarpAddTagMessage extends PluginMessage {
 
     public WarpAddTagMessage(Player player, String tag, int warpId) {
-        byteOutput.writeUTF("tag_add");
-        byteOutput.writeUTF(player.getUniqueId().toString());
-        byteOutput.writeUTF(tag);
-        byteOutput.writeUTF(String.valueOf(warpId));
+        super("tag_add", MessageType.NORMAL);
+        super.content.addAll(List.of(
+                player.getUniqueId().toString(),
+                tag,
+                String.valueOf(warpId)));
     }
 
 }

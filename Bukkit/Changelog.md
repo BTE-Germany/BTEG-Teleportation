@@ -12,4 +12,10 @@
   - added tab completion with cities for /nwarp
 - 1.1.4
   - removed normen hubs from nwarp gui
-  - added warp tags
+  - added warp tags 
+- 1.1.5
+  - added command for editing tags
+  - allowed /nwarp help
+- 1.1.6
+  - custom item textures (guis)
+  - new system for plugin messages

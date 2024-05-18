@@ -7,7 +7,7 @@ import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintIt
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintRange;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.GuiBlueprint;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.MultiplePagesDetailWarpGuiAbstract;
-import de.btegermany.teleportation.TeleportationBukkit.message.GetGuiDataMessage;
+import de.btegermany.teleportation.TeleportationBukkit.message.withresponse.GetGuiDataMessage;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBukkit.util.Skulls;
@@ -25,7 +25,7 @@ public class TagsDetailGui extends MultiplePagesDetailWarpGuiAbstract {
             @Override
             public void handle(SwitchHandler switchHandler) {
                 if(!switchHandler.getPageAction().equals(PageAction.NEXT)) return;
-                pluginMessenger.send(new GetGuiDataMessage(player.getUniqueId().toString(), "tag_" + tag, inventory.getSize()));
+                pluginMessenger.send(new GetGuiDataMessage(registriesProvider, pluginMessenger, player.getUniqueId().toString(), "tag_" + tag, inventory.getSize()));
             }
         });
     }

@@ -1,6 +1,5 @@
 package de.btegermany.teleportation.TeleportationBukkit.tp;
 
-import de.btegermany.teleportation.TeleportationBukkit.message.LastLocationMessage;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 
 import java.util.HashMap;
@@ -19,7 +18,6 @@ public class TeleportationHandler {
     // teleport if possible, otherwise store teleportation until it's possible
     public void handle(PendingTeleportationAbstract teleportation) {
         if(teleportation.canTeleport()) {
-            pluginMessenger.send(new LastLocationMessage(teleportation.getPlayerUUID()));
             teleportation.teleport();
         } else {
             pendingTps.put(teleportation.getPlayerUUID(), teleportation);

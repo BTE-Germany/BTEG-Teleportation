@@ -15,3 +15,8 @@
   - added /event
   - removed normen hubs from nwarp gui
   - added warp tags
+- 1.1.5
+  - added command for editing tags
+  - reusing warp ids
+- 1.1.6
+  - new system for plugin messages
