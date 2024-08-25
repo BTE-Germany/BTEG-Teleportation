@@ -8,10 +8,8 @@ import de.btegermany.teleportation.TeleportationBungee.registry.RegistriesProvid
 import de.btegermany.teleportation.TeleportationBungee.data.ConfigReader;
 import de.btegermany.teleportation.TeleportationBungee.data.Database;
 import de.btegermany.teleportation.TeleportationBungee.message.PluginMessenger;
-import de.btegermany.teleportation.TeleportationBungee.util.BukkitPlayer;
 import de.btegermany.teleportation.TeleportationBungee.util.Utils;
 import de.btegermany.teleportation.TeleportationBungee.util.WarpIdsManager;
-import fr.thesmyler.bungee2forge.BungeeToForgePlugin;
 import fr.thesmyler.bungee2forge.api.ForgeChannel;
 import fr.thesmyler.bungee2forge.api.ForgeChannelRegistry;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
@@ -19,10 +17,8 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
-import java.util.Collection;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
