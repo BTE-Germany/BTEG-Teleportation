@@ -16,8 +16,6 @@ public class ServerLeaveListener implements Listener {
 
     @EventHandler
     public void onServerDisconnect(ServerDisconnectEvent event) {
-        this.registriesProvider.getSentCoordinatesFormatWarningRegistry().unregister(event.getPlayer());
-
         // unregister Bukkit Player from registry
         this.registriesProvider.getBukkitPlayersRegistry().unregister(event.getPlayer());
     }

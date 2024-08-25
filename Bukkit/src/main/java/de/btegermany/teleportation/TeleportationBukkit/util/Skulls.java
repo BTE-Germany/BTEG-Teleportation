@@ -2,37 +2,23 @@ package de.btegermany.teleportation.TeleportationBukkit.util;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.profile.PlayerProfile;
+import org.bukkit.profile.PlayerTextures;
 
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Base64;
 import java.util.UUID;
 
 public class Skulls {
 
     public static ItemStack getSkull(Skin skin) {
-
-        ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
-
-        try {
-            String urlBase64 = new String(Base64.getEncoder().encode(("{\"textures\":{\"SKIN\":{\"url\":\"https://textures.minecraft.net/texture/" + skin.id + "\"}}}").getBytes()));
-            SkullMeta meta = (SkullMeta) head.getItemMeta();
-
-            GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-            profile.getProperties().put("textures", new Property("textures", urlBase64));
-
-            Field profileField = meta.getClass().getDeclaredField("profile");
-            profileField.setAccessible(true);
-            profileField.set(meta, profile);
-
-            head.setItemMeta(meta);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-
-        return head;
+        return Skulls.getSkullFromId(skin.id);
     }
 
     public static ItemStack getSkullFromId(String id) {
@@ -40,18 +26,16 @@ public class Skulls {
         ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
 
         try {
-            String urlBase64 = new String(Base64.getEncoder().encode(("{\"textures\":{\"SKIN\":{\"url\":\"https://textures.minecraft.net/texture/" + id + "\"}}}").getBytes()));
+            PlayerProfile playerProfile = Bukkit.createPlayerProfile(UUID.fromString("4da5d3b2-565d-11ef-b11e-325096b39f47")); // random uuid
+            PlayerTextures playerTextures = playerProfile.getTextures();
+            playerTextures.setSkin(new URL("http://textures.minecraft.net/texture/" + id));
+            playerProfile.setTextures(playerTextures);
+
             SkullMeta meta = (SkullMeta) head.getItemMeta();
-
-            GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-            profile.getProperties().put("textures", new Property("textures", urlBase64));
-
-            Field profileField = meta.getClass().getDeclaredField("profile");
-            profileField.setAccessible(true);
-            profileField.set(meta, profile);
-
+            meta.setOwnerProfile(playerProfile);
             head.setItemMeta(meta);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+
+        } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
 
@@ -89,7 +73,8 @@ public class Skulls {
         PLUS ("5ff31431d64587ff6ef98c0675810681f8c13bf96f51d9cb07ed7852b2ffd1"),
         MINUS ("4e4b8b8d2362c864e062301487d94d3272a6b570afbf80c2c5b148c954579d46"),
         EDIT ("a7ed66f5a70209d821167d156fdbc0ca3bf11ad54ed5d86e75c265f7e5029ec1"),
-        DICE ("8a084d0a1c6fc2163de30d8b148ab4d363220d5c972d5f88eb8dc86176ccdb3e");
+        DICE ("8a084d0a1c6fc2163de30d8b148ab4d363220d5c972d5f88eb8dc86176ccdb3e"),
+        HOME ("12d7a751eb071e08dbbc95bc5d9d66e5f51dc6712640ad2dfa03defbb68a7f3a");
 
         final String id;
 

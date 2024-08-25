@@ -49,6 +49,7 @@ public class ConfigReader {
                 ServerInfo serverInfo = ProxyServer.getInstance().getServerInfo(serverName);
                 if(serverInfo == null) {
                     this.plugin.getLogger().info("Couldn't find Server '" + serverName + "'");
+                    continue;
                 }
                 List<String> states = new ArrayList<>(config.getStringList(serverName + ".bundesländer"));
                 List<String> cities = new ArrayList<>(config.getStringList(serverName + ".städte"));

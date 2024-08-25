@@ -20,3 +20,5 @@
   - reusing warp ids
 - 1.1.6
   - new system for plugin messages
+  - sending warning everytime an inaccurate coordinate format is used for /tpll
+  - disabled Terramap support

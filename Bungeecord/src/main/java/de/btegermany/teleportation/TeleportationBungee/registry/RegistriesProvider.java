@@ -10,7 +10,6 @@ public class RegistriesProvider {
     private final TpasRegistry tpasRegistry;
     private final BukkitPlayersRegistry bukkitPlayersRegistry;
     private final WarpsRegistry warpsRegistry;
-    private final SentCoordinatesFormatWarningRegistry sentCoordinatesFormatWarningRegistry;
     private final WarpTagsRegistry warpTagsRegistry;
     private final PluginMessagesWithResponseRegistry pluginMessagesWithResponseRegistry;
 
@@ -20,7 +19,6 @@ public class RegistriesProvider {
         this.bukkitPlayersRegistry = new BukkitPlayersRegistry();
         this.warpTagsRegistry = new WarpTagsRegistry(database);
         this.warpsRegistry = new WarpsRegistry(database, plugin, this.warpTagsRegistry);
-        this.sentCoordinatesFormatWarningRegistry = new SentCoordinatesFormatWarningRegistry();
         this.pluginMessagesWithResponseRegistry = new PluginMessagesWithResponseRegistry();
     }
 
@@ -38,10 +36,6 @@ public class RegistriesProvider {
 
     public WarpsRegistry getWarpsRegistry() {
         return warpsRegistry;
-    }
-
-    public SentCoordinatesFormatWarningRegistry getSentCoordinatesFormatWarningRegistry() {
-        return sentCoordinatesFormatWarningRegistry;
     }
 
     public WarpTagsRegistry getWarpTagsRegistry() {

@@ -79,9 +79,8 @@ public class TpllCommand extends Command {
         args[1] = args[1].replace("\u2066", "").replace("\u2069", "");
 
         // check format of coordinates because of inaccuracy
-        if(!this.registriesProvider.getSentCoordinatesFormatWarningRegistry().isRegistered(player) && (CoordinateFormats.isDegreesMinutes(args[0] + " " + args[1]) || CoordinateFormats.isDegreesMinutesSeconds(args[0] + " " + args[1]))) {
+        if(CoordinateFormats.isDegreesMinutes(args[0] + " " + args[1]) || CoordinateFormats.isDegreesMinutesSeconds(args[0] + " " + args[1])) {
             player.sendMessage(new TextComponent("ᾠ §cAchtung: §6Du verwendest ein ungenaues Koordinatenformat. §cFalls du gerade etwas baust, nutze bitte ausschließlich Dezimalkoordinaten §6(z.B. 12.3456(°)). Kopiere sie einfach über Rechtsklick auf Google Maps oder Google Earth (bei letzterem muss das Format unter 'Tools -> Einstellungen -> Formate und Einheiten' zu 'Dezimal' geändert werden)."));
-            this.registriesProvider.getSentCoordinatesFormatWarningRegistry().register(player);
         }
 
         // convert input coordinates to degrees format

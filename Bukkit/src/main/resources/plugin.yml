@@ -4,6 +4,7 @@ api-version: '1.20'
 main: de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit
 author: JaskerX
 description: This plugin covers most teleportation functions across the network.
+loadbefore: [Essentials]
 
 commands:
   tp:
@@ -27,7 +28,7 @@ commands:
   tpback:
     description: Teleport back to the location you have been teleported from.
     usage: /tpback
-  nwarp:
+  warp:
     usage: |
       /nwarp
       /nwarp [search]
@@ -39,7 +40,7 @@ commands:
       /nwarp tag [tag] add/remove [warpId]
       /nwarp tag [tag old] edit [tag new]
     aliases:
-      - warp
+      - nwarp
   lobbywarp:
     usage: |
       /lobbywarp [city]

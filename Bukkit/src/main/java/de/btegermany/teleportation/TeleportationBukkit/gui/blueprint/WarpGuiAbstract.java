@@ -41,7 +41,7 @@ public abstract class WarpGuiAbstract {
     public static final NextNavigationItem NAV_NEXT = new NextNavigationItem(Skulls.getSkull(Skulls.Skin.ARROW_RIGHT), 8);
     public static final PreviousNavigationItem NAV_PREVIOUS = new PreviousNavigationItem(Skulls.getSkull(Skulls.Skin.ARROW_LEFT), 7);
     public static final CloseNavigationItem NAV_CLOSE = new CloseNavigationItem(new ItemStack(Material.BARRIER), 4);
-    public final CustomNavigationItem NAV_SORT = new CustomNavigationItem(new ItemStack(Material.HOPPER), 0) {
+    public final CustomNavigationItem NAV_SORT = new CustomNavigationItem(Skulls.getSkull(Skulls.Skin.HOME), 0) {
         @Override
         public void handleClick(PagedInventoryCustomNavigationHandler pagedInventoryCustomNavigationHandler) {
             openSortGui();
@@ -163,11 +163,11 @@ public abstract class WarpGuiAbstract {
     }
 
     public void openSortGui() {
-        new WarpGui(player, pluginMessenger, registriesProvider).open();
+        new WarpGui(this.player, this.pluginMessenger, this.registriesProvider).open();
     }
 
     public void openManageGui() {
-        new ManageWarpsGui(player, pluginMessenger, registriesProvider).open();
+        new ManageWarpsGui(this.player, this.pluginMessenger, this.registriesProvider).open();
     }
 
     public void openLobbySortGui() {

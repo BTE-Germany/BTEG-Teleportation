@@ -5,6 +5,9 @@ import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBukkit.util.LobbyCity;
 import de.btegermany.teleportation.TeleportationBukkit.util.TabExecutorEnhanced;
+import li.cinnazeyy.langlibs.core.language.LangLibAPI;
+import li.cinnazeyy.langlibs.core.language.LanguageUtil;
+import li.cinnazeyy.langlibs.util.LangUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -42,6 +45,15 @@ public class LobbyWarpCommand implements CommandExecutor, TabExecutorEnhanced {
             return true;
         }
 
+        if(args.length < 2) {
+            // get gui data for city
+            this.pluginMessenger.send(new GetGuiDataMessage(this.registriesProvider, this.pluginMessenger, player.getUniqueId().toString(), String.format("lobbywarp_%s", args[0]), 0, 1));
+            return true;
+        }
+
+        // format city name
+        String city = args[1].substring(0, 1).toUpperCase() + args[1].substring(1).toLowerCase();
+
         // add city
         if(args[0].equalsIgnoreCase("add")) {
             // check permissions
@@ -52,9 +64,6 @@ public class LobbyWarpCommand implements CommandExecutor, TabExecutorEnhanced {
             if(args.length < 5) {
                 return false;
             }
-
-            // format city name
-            String city = args[1].substring(0, 1).toUpperCase() + args[1].substring(1).toLowerCase();
 
             // check if city already exists
             if(this.registriesProvider.getLobbyCitiesRegistry().doesExist(city)) {
@@ -89,10 +98,6 @@ public class LobbyWarpCommand implements CommandExecutor, TabExecutorEnhanced {
             if(!player.hasPermission("bteg.warps.manage")) {
                 return true;
             }
-            // check args length
-            if(args.length < 2) {
-                return false;
-            }
 
             // find the city if it has been registered
             Optional<LobbyCity> lobbyCityOptional = this.registriesProvider.getLobbyCitiesRegistry().getLobbyCities().stream().filter(lobbyCity -> lobbyCity.getCity().equalsIgnoreCase(args[1])).findFirst();
@@ -104,10 +109,6 @@ public class LobbyWarpCommand implements CommandExecutor, TabExecutorEnhanced {
             player.sendMessage(getFormattedMessage("Die Stadt wurde gelöscht."));
             return true;
         }
-
-        // get gui data for city
-        String city = args[0];
-        this.pluginMessenger.send(new GetGuiDataMessage(this.registriesProvider, this.pluginMessenger, player.getUniqueId().toString(), String.format("lobbywarp_%s", city), 0, 1));
 
         return true;
     }

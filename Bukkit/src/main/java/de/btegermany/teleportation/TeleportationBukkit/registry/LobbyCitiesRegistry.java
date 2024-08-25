@@ -56,13 +56,15 @@ public class LobbyCitiesRegistry {
             lobbyCities.add(lobbyCity);
 
             Location armorStandLocation = lobbyCity.getBlock().getLocation();
-            armorStandLocation.setX(armorStandLocation.getX() + 0.5);
-            armorStandLocation.setZ(armorStandLocation.getZ() + 0.5);
+            armorStandLocation.getChunk().addPluginChunkTicket(this.plugin);
             lobbyCity.getBlock().getWorld()
-                    .getNearbyEntities(armorStandLocation, 0, 1, 0)
+                    .getNearbyEntities(armorStandLocation, 0.5, 1, 0.5)
                     .stream()
                     .filter(entity -> entity instanceof ArmorStand)
                     .forEach(Entity::remove);
+
+            armorStandLocation.setX(armorStandLocation.getX() + 0.5);
+            armorStandLocation.setZ(armorStandLocation.getZ() + 0.5);
 
             ArmorStand armorStand = (ArmorStand) armorStandLocation.getWorld().spawnEntity(armorStandLocation, EntityType.ARMOR_STAND);
             armorStand.setGravity(false);
@@ -70,6 +72,8 @@ public class LobbyCitiesRegistry {
             armorStand.setCustomNameVisible(true);
             armorStand.setVisible(false);
             armorStand.setCustomName(ChatColor.GOLD + "" + ChatColor.BOLD + city);
+
+            armorStandLocation.getChunk().removePluginChunkTicket(this.plugin);
         }
     }
 

@@ -19,3 +19,6 @@
 - 1.1.6
   - custom item textures (guis)
   - new system for plugin messages
+  - fixed check whether players are on the right server
+  - autocomplete works with /nwarp as well as /warp
+  - fixed LobbyCities ArmorStands not being removed properly

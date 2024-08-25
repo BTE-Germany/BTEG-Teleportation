@@ -5,10 +5,6 @@ import de.btegermany.teleportation.TeleportationBungee.geo.GeoData;
 import de.btegermany.teleportation.TeleportationBungee.listener.PluginMsgListener;
 import de.btegermany.teleportation.TeleportationBungee.listener.ServerLeaveListener;
 import de.btegermany.teleportation.TeleportationBungee.registry.RegistriesProvider;
-import de.btegermany.teleportation.TeleportationBungee.terramap.PlayerSyncPacket;
-import de.btegermany.teleportation.TeleportationBungee.terramap.PluginHelloPacket;
-import de.btegermany.teleportation.TeleportationBungee.terramap.RegisterForUpdatePacket;
-import de.btegermany.teleportation.TeleportationBungee.terramap.TerramapListener;
 import de.btegermany.teleportation.TeleportationBungee.data.ConfigReader;
 import de.btegermany.teleportation.TeleportationBungee.data.Database;
 import de.btegermany.teleportation.TeleportationBungee.message.PluginMessenger;
@@ -51,10 +47,11 @@ public class TeleportationBungee extends Plugin {
         instance = this;
 
         // enable support for Terramap
-        BungeeToForgePlugin.onEnable(this);
+        // mod is not available for newer versions, therefore not active
+        /*BungeeToForgePlugin.onEnable(this);
         TERRAMAP_MAP_SYNC_CHANNEL.registerPacket(0, RegisterForUpdatePacket.class);
         TERRAMAP_MAP_SYNC_CHANNEL.registerPacket(1, PlayerSyncPacket.class);
-        TERRAMAP_PLUGIN_CHANNEL.registerPacket(0, PluginHelloPacket.class);
+        TERRAMAP_PLUGIN_CHANNEL.registerPacket(0, PluginHelloPacket.class);*/
 
         // initialize objects
         this.geoData = new GeoData(this);
@@ -84,11 +81,11 @@ public class TeleportationBungee extends Plugin {
 
         // register listeners
         ProxyServer.getInstance().getPluginManager().registerListener(this, new PluginMsgListener(this.pluginMessenger, this.database, this.geoData, this.registriesProvider));
-        ProxyServer.getInstance().getPluginManager().registerListener(this, new TerramapListener());
+        //ProxyServer.getInstance().getPluginManager().registerListener(this, new TerramapListener());
         ProxyServer.getInstance().getPluginManager().registerListener(this, new ServerLeaveListener(this.registriesProvider));
 
         // schedule task to send Terramap data
-        ProxyServer.getInstance().getScheduler().schedule(this, () -> {
+        /*ProxyServer.getInstance().getScheduler().schedule(this, () -> {
             Collection<BukkitPlayer> players = this.registriesProvider.getBukkitPlayersRegistry().getBukkitPlayers().values();
             if(players.isEmpty()) {
                 return;
@@ -96,14 +93,14 @@ public class TeleportationBungee extends Plugin {
             BukkitPlayer[] playersArray = players.toArray(new BukkitPlayer[0]);
             PlayerSyncPacket playerSyncPacket = new PlayerSyncPacket(playersArray, this.geoData);
             TERRAMAP_MAP_SYNC_CHANNEL.send(playerSyncPacket, ProxyServer.getInstance().getPlayers().toArray(new ProxiedPlayer[0]));
-        }, 0, 500, TimeUnit.MILLISECONDS);
+        }, 0, 500, TimeUnit.MILLISECONDS);*/
 
         // schedule task to check if the players are on the right server. If not they will be teleported to the right server
-        startStateBorderCheck();
+        this.startStateBorderCheck();
 
         // schedule task to send cities warps are located in and warp tags to all servers
-        scheduleSendWarpCities();
-        scheduleSendWarpTags();
+        this.scheduleSendWarpCities();
+        this.scheduleSendWarpTags();
 
         //DatabaseConverter databaseConverter = new DatabaseConverter(this, database, new File(this.getDataFolder(), "BTEGTeleportationBungee.db"));
         //databaseConverter.convertDbFileToDatabase();
@@ -114,9 +111,9 @@ public class TeleportationBungee extends Plugin {
         this.database.disconnect();
 
         // disable Terramap
-        TERRAMAP_MAP_SYNC_CHANNEL.deregisterAllPackets();
+        /*TERRAMAP_MAP_SYNC_CHANNEL.deregisterAllPackets();
         TERRAMAP_PLUGIN_CHANNEL.deregisterAllPackets();
-        BungeeToForgePlugin.onDisable(this);
+        BungeeToForgePlugin.onDisable(this);*/
 
         this.scheduledExecutorServiceCheckStateBorders.shutdownNow();
         this.scheduledExecutorServiceSendWarpCities.shutdownNow();
