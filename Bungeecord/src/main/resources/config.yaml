@@ -1,5 +1,0 @@
-database:
-  mysql:
-    url: ""
-    user: ""
-    password: ""

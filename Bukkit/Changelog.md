@@ -22,3 +22,5 @@
   - fixed check whether players are on the right server
   - autocomplete works with /nwarp as well as /warp
   - fixed LobbyCities ArmorStands not being removed properly
+- 2.0.0
+  - changed plugin messaging channel (proxy now Velocity)

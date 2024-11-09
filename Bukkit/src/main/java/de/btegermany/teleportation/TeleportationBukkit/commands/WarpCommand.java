@@ -2,7 +2,7 @@ package de.btegermany.teleportation.TeleportationBukkit.commands;
 
 import de.btegermany.teleportation.TeleportationBukkit.gui.WarpGui;
 import de.btegermany.teleportation.TeleportationBukkit.message.*;
-import de.btegermany.teleportation.TeleportationAPI.State;
+import de.btegermany.teleportation.TeleportationAPI.FederalState;
 import de.btegermany.teleportation.TeleportationBukkit.message.withresponse.GetGuiDataMessage;
 import de.btegermany.teleportation.TeleportationBukkit.util.TabExecutorEnhanced;
 import de.btegermany.teleportation.TeleportationBukkit.util.WarpGettingChanged;
@@ -78,7 +78,7 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
                 WarpInCreation warpInCreation = new WarpInCreation(player);
                 warpInCreation.setName(inputSeperated[0]);
                 warpInCreation.setCity(inputSeperated[1]);
-                warpInCreation.setState(State.getStateFromInput(inputSeperated[2]));
+                warpInCreation.setState(FederalState.getStateFromInput(inputSeperated[2]));
                 if (warpInCreation.getState() == null) {
                     player.sendMessage(TeleportationBukkit.getFormattedMessage(String.format("§9\"%s\" §6ist weder Name noch eine gültige Abkürzung eines Bundeslandes. Bitte überprüfe deine Eingabe.", inputSeperated[2])));
                     return true;

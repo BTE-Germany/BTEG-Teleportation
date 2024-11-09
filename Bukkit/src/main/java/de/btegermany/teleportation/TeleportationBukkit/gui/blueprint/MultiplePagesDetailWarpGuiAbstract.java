@@ -24,14 +24,14 @@ public abstract class MultiplePagesDetailWarpGuiAbstract extends MultiplePagesWa
             public void handle(ClickHandler clickHandler) {
                 if(clickHandler.getCurrentItem() == null || clickHandler.getCurrentItem().getItemMeta() == null) return;
                 List<String> lore = clickHandler.getCurrentItem().getItemMeta().getLore();
-                if(lore == null || lore.size() == 0) return;
+                if(lore == null || lore.isEmpty()) return;
                 Optional<String> optionalCommand = lore.stream().filter(s -> s.startsWith("/tpll")).findFirst();
                 Optional<String> optionalRotation = lore.stream().filter(s -> s.startsWith("Drehung:")).findFirst();
                 Optional<String> optionalHeight = lore.stream().filter(s -> s.startsWith("Höhe:")).findFirst();
                 if(optionalCommand.isEmpty() || optionalRotation.isEmpty() || optionalHeight.isEmpty()) return;
 
                 // execute tpll command for warp
-                String command = optionalCommand.get();
+                String command = optionalCommand.get().substring(1);
                 String[] rotation = optionalRotation.get().substring("Drehung: ".length()).replace(",", "").split(" ");
                 double height = Double.parseDouble(optionalHeight.get().substring("Höhe: ".length()));
                 pluginMessenger.send(new ExecuteCommandMessage(player.getUniqueId().toString(), command + " " + height + " yaw=" + rotation[0] + " pitch=" + rotation[1]));

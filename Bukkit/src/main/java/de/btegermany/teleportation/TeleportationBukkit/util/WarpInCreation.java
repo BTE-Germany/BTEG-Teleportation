@@ -1,13 +1,13 @@
 package de.btegermany.teleportation.TeleportationBukkit.util;
 
-import de.btegermany.teleportation.TeleportationAPI.State;
+import de.btegermany.teleportation.TeleportationAPI.FederalState;
 import org.bukkit.entity.Player;
 
 public class WarpInCreation {
 
     private String name;
     private String city;
-    private State state;
+    private FederalState state;
     private String headId;
     private final Player player;
 
@@ -25,7 +25,7 @@ public class WarpInCreation {
         this.city = city;
     }
 
-    public void setState(State state) {
+    public void setState(FederalState state) {
         this.state = state;
     }
 
@@ -41,7 +41,7 @@ public class WarpInCreation {
         return city;
     }
 
-    public State getState() {
+    public FederalState getState() {
         return state;
     }
 
