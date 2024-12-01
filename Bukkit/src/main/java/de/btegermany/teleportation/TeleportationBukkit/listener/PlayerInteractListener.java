@@ -29,7 +29,7 @@ public class PlayerInteractListener implements Listener {
         Block block = event.getClickedBlock();
         Player player = event.getPlayer();
         // check if pressure plate
-        if(!event.getAction().equals(Action.PHYSICAL) || block == null|| block.getType() != Material.LIGHT_WEIGHTED_PRESSURE_PLATE) {
+        if(!event.getAction().equals(Action.PHYSICAL) || block == null || !(block.getType() == Material.LIGHT_WEIGHTED_PRESSURE_PLATE || block.getType() == Material.HEAVY_WEIGHTED_PRESSURE_PLATE)) {
             return;
         }
 
