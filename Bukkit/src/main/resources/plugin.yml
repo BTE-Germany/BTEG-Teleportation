@@ -44,5 +44,5 @@ commands:
   lobbywarp:
     usage: |
       /lobbywarp [city]
-      /lobbywarp add [city] [center-latitude] [center-longitude] [radius]
+      /lobbywarp add [center-latitude] [center-longitude] [radius] [city]
       /lobbywarp remove [city]

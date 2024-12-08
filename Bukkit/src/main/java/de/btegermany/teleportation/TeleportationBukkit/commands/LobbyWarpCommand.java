@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +21,7 @@ import static de.btegermany.teleportation.TeleportationBukkit.TeleportationBukki
 
 public class LobbyWarpCommand implements CommandExecutor, TabExecutorEnhanced {
 
+    private static final int CITY_INDEX = 4;
     private final PluginMessenger pluginMessenger;
     private final RegistriesProvider registriesProvider;
 
@@ -42,14 +44,9 @@ public class LobbyWarpCommand implements CommandExecutor, TabExecutorEnhanced {
             return true;
         }
 
-        if(args.length < 2) {
-            // get gui data for city
-            this.pluginMessenger.send(new GetGuiDataMessage(this.registriesProvider, this.pluginMessenger, player.getUniqueId().toString(), String.format("lobbywarp_%s", args[0]), 0, 1));
-            return true;
+        if (args[0].equalsIgnoreCase("help")) {
+            return false;
         }
-
-        // format city name
-        String city = args[1].substring(0, 1).toUpperCase() + args[1].substring(1).toLowerCase();
 
         // add city
         if(args[0].equalsIgnoreCase("add")) {
@@ -58,9 +55,11 @@ public class LobbyWarpCommand implements CommandExecutor, TabExecutorEnhanced {
                 return true;
             }
             // check args length
-            if(args.length < 5) {
+            if(args.length <= CITY_INDEX) {
                 return false;
             }
+
+            String city = this.getCityFromArgs(CITY_INDEX, args);
 
             // check if city already exists
             if(this.registriesProvider.getLobbyCitiesRegistry().doesExist(city)) {
@@ -69,9 +68,9 @@ public class LobbyWarpCommand implements CommandExecutor, TabExecutorEnhanced {
             }
 
             // create LobbyCity object from args
-            double centerLat = Double.parseDouble(args[2].replace(",", ""));
-            double centerLon = Double.parseDouble(args[3]);
-            int radius = Integer.parseInt(args[4]);
+            double centerLat = Double.parseDouble(args[CITY_INDEX - 3].replace(",", ""));
+            double centerLon = Double.parseDouble(args[CITY_INDEX - 2]);
+            int radius = Integer.parseInt(args[CITY_INDEX - 1]);
             LobbyCity lobbyCity = new LobbyCity.LobbyCityBuilder()
                     .setCity(city)
                     .setCenterLat(centerLat)
@@ -96,8 +95,10 @@ public class LobbyWarpCommand implements CommandExecutor, TabExecutorEnhanced {
                 return true;
             }
 
+            String city = this.getCityFromArgs(1, args);
+
             // find the city if it has been registered
-            Optional<LobbyCity> lobbyCityOptional = this.registriesProvider.getLobbyCitiesRegistry().getLobbyCities().stream().filter(lobbyCity -> lobbyCity.getCity().equalsIgnoreCase(args[1])).findFirst();
+            Optional<LobbyCity> lobbyCityOptional = this.registriesProvider.getLobbyCitiesRegistry().getLobbyCities().stream().filter(lobbyCity -> lobbyCity.getCity().equalsIgnoreCase(city)).findFirst();
             if(lobbyCityOptional.isEmpty()) {
                 player.sendMessage(getFormattedErrorMessage("Für diese Stadt wurde keine Druckplatte festgelegt!"));
                 return true;
@@ -107,21 +108,31 @@ public class LobbyWarpCommand implements CommandExecutor, TabExecutorEnhanced {
             return true;
         }
 
+        // get gui data for city
+        String city = this.getCityFromArgs(0, args);
+        this.pluginMessenger.send(new GetGuiDataMessage(this.registriesProvider, this.pluginMessenger, player.getUniqueId().toString(), String.format("lobbywarp_%s", city), 0, 1));
         return true;
     }
 
     @Override
     public List<String> onTabComplete(@Nonnull CommandSender commandSender, @Nonnull Command command, @Nonnull String s, @Nonnull String[] args) {
-        if(!commandSender.hasPermission("bteg.warps.manage")) {
+        if (!commandSender.hasPermission("bteg.warps.manage")) {
             return null;
         }
 
-        List<String> result = new ArrayList<>();
-        switch (args.length) {
-            case 1 -> {
-                result.addAll(this.getValidSuggestions(args[0], "add", "remove"));
-            }
+        if (args.length == 1) {
+            return this.getValidSuggestions(args[0], "add", "remove");
         }
-        return result;
+
+        if (args[0].equalsIgnoreCase("remove")) {
+            String city = this.getCityFromArgs(1, args);
+            return this.getValidSuggestions(city, this.registriesProvider.getLobbyCitiesRegistry().getLobbyCities().stream().map(LobbyCity::getCity).toArray(String[]::new));
+        }
+
+        return new ArrayList<>();
+    }
+
+    private String getCityFromArgs(int startIndex, String... args) {
+        return String.join(" ", Arrays.copyOfRange(args, startIndex, args.length));
     }
 }
