@@ -4,23 +4,16 @@ import com.tchristofferson.pagedinventories.IPagedInventory;
 import com.tchristofferson.pagedinventories.NavigationRow;
 import com.tchristofferson.pagedinventories.handlers.PagedInventoryClickHandler;
 import com.tchristofferson.pagedinventories.handlers.PagedInventorySwitchPageHandler;
+import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.*;
 import de.btegermany.teleportation.TeleportationBukkit.message.withresponse.GetGuiDataMessage;
-import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintItem;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintRange;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.GuiBlueprint;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.MultiplePagesWarpGuiAbstract;
-import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBukkit.util.Skulls;
-import org.bukkit.entity.Player;
-import org.json.JSONArray;
 
 import javax.annotation.Nonnull;
 
-public class CitiesGui extends MultiplePagesWarpGuiAbstract {
+public class CitiesGui extends MultiPageWarpGuiAbstract {
 
-    public CitiesGui(Player player, PluginMessenger pluginMessenger, JSONArray contentJSON, RegistriesProvider registriesProvider) {
-        super(player, "Städte", pluginMessenger, contentJSON, Skulls.Skin.CITY_HOUSE.getId(), registriesProvider);
+    public CitiesGui(MultiPageGuiArgs guiArgs) {
+        super(guiArgs, "Städte", Skulls.Skin.CITY_HOUSE.getId());
 
         inventory.addHandler(new PagedInventoryClickHandler() {
             @Override

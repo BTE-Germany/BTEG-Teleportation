@@ -4,25 +4,18 @@ import com.tchristofferson.pagedinventories.IPagedInventory;
 import com.tchristofferson.pagedinventories.NavigationRow;
 import com.tchristofferson.pagedinventories.handlers.PagedInventoryCustomNavigationHandler;
 import com.tchristofferson.pagedinventories.navigationitems.CustomNavigationItem;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintItem;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintRange;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.GuiBlueprint;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.MultiplePagesDetailWarpGuiAbstract;
+import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.*;
 import de.btegermany.teleportation.TeleportationBukkit.message.withresponse.GetGuiDataMessage;
-import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
-import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBukkit.util.LobbyCity;
 import de.btegermany.teleportation.TeleportationBukkit.util.Skulls;
-import org.bukkit.entity.Player;
-import org.json.JSONArray;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
 
-public class LobbyWarpGui extends MultiplePagesDetailWarpGuiAbstract {
+public class LobbyWarpGui extends MultiPageDetailWarpGuiAbstract {
 
-    public LobbyWarpGui(Player player, String city, PluginMessenger pluginMessenger, JSONArray contentJSON, RegistriesProvider registriesProvider) {
-        super(player, city, pluginMessenger, contentJSON, Skulls.Skin.WARP_HOUSE.getId(), registriesProvider);
+    public LobbyWarpGui(MultiPageGuiArgs guiArgs, String city) {
+        super(guiArgs, city, Skulls.Skin.WARP_HOUSE.getId());
     }
 
     @Nonnull

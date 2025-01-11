@@ -1,6 +1,7 @@
 package de.btegermany.teleportation.TeleportationBukkit.commands;
 
 import de.btegermany.teleportation.TeleportationBukkit.gui.WarpGui;
+import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.GuiArgs;
 import de.btegermany.teleportation.TeleportationBukkit.message.*;
 import de.btegermany.teleportation.TeleportationAPI.State;
 import de.btegermany.teleportation.TeleportationBukkit.message.withresponse.GetGuiDataMessage;
@@ -41,7 +42,7 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
         }
 
         if(args.length == 0) {
-            new WarpGui(player, this.pluginMessenger, this.registriesProvider).open();
+            new WarpGui(new GuiArgs(player, this.pluginMessenger, this.registriesProvider)).open();
             return true;
         }
 

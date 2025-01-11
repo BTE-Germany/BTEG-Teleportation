@@ -4,7 +4,6 @@ import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -15,8 +14,8 @@ public abstract class SinglePageWarpGuiAbstract extends WarpGuiAbstract {
 
     protected List<BlueprintItem> blueprintItems;
 
-    public SinglePageWarpGuiAbstract(Player player, String title, PluginMessenger pluginMessenger, RegistriesProvider registriesProvider) {
-        super(player, title, false, pluginMessenger, registriesProvider);
+    public SinglePageWarpGuiAbstract(GuiArgs guiArgs, String title) {
+        super(guiArgs, title, false);
 
         currentInventory = Bukkit.createInventory(player, (blueprint.getRowsCount() + 1) * 9, title);
         blueprintItems = blueprint.getAllItems();

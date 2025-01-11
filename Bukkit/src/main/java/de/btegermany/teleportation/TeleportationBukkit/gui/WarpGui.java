@@ -3,15 +3,9 @@ package de.btegermany.teleportation.TeleportationBukkit.gui;
 import com.tchristofferson.pagedinventories.IPagedInventory;
 import com.tchristofferson.pagedinventories.NavigationRow;
 import com.tchristofferson.pagedinventories.handlers.PagedInventoryClickHandler;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintItem;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintRange;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.GuiBlueprint;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.SinglePageWarpGuiAbstract;
+import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.*;
 import de.btegermany.teleportation.TeleportationBukkit.message.withresponse.GetGuiDataMessage;
-import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
-import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -21,8 +15,8 @@ import java.util.List;
 
 public class WarpGui extends SinglePageWarpGuiAbstract {
 
-    public WarpGui(Player player, PluginMessenger pluginMessenger, RegistriesProvider registriesProvider) {
-        super(player, "Warp Kategorien", pluginMessenger, registriesProvider);
+    public WarpGui(GuiArgs guiArgs) {
+        super(guiArgs, "Warp Kategorien");
 
         inventory.addHandler(new PagedInventoryClickHandler() {
             @Override
@@ -32,7 +26,7 @@ public class WarpGui extends SinglePageWarpGuiAbstract {
                     case "Tags", "Städte", "Events", "Plotregionen", "Normen Hubs", "Alle" ->
                             pluginMessenger.send(new GetGuiDataMessage(registriesProvider, pluginMessenger, player.getUniqueId().toString(), clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2), 0, 1));
                     case "Bundesländer" ->
-                            new StatesGui(clickHandler.getPlayer(), pluginMessenger, registriesProvider).open();
+                            new StatesGui(new GuiArgs(clickHandler.getPlayer(), pluginMessenger, registriesProvider)).open();
                 }
             }
         });

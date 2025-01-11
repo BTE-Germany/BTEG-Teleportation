@@ -3,23 +3,16 @@ package de.btegermany.teleportation.TeleportationBukkit.gui;
 import com.tchristofferson.pagedinventories.IPagedInventory;
 import com.tchristofferson.pagedinventories.NavigationRow;
 import com.tchristofferson.pagedinventories.handlers.PagedInventoryClickHandler;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintItem;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintRange;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.GuiBlueprint;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.MultiplePagesWarpGuiAbstract;
+import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.*;
 import de.btegermany.teleportation.TeleportationBukkit.message.withresponse.GetGuiDataMessage;
-import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
-import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBukkit.util.Skulls;
-import org.bukkit.entity.Player;
-import org.json.JSONArray;
 
 import javax.annotation.Nonnull;
 
-public class TagsGui extends MultiplePagesWarpGuiAbstract {
+public class TagsGui extends MultiPageWarpGuiAbstract {
 
-    public TagsGui(Player player, PluginMessenger pluginMessenger, JSONArray pagesData, RegistriesProvider registriesProvider) {
-        super(player, "Tags", pluginMessenger, pagesData, Skulls.Skin.EDIT.getId(), registriesProvider);
+    public TagsGui(MultiPageGuiArgs guiArgs) {
+        super(guiArgs, "Tags", Skulls.Skin.EDIT.getId());
 
         inventory.addHandler(new PagedInventoryClickHandler() {
             @Override

@@ -2,18 +2,14 @@ package de.btegermany.teleportation.TeleportationBukkit.gui.blueprint;
 
 import com.tchristofferson.pagedinventories.handlers.PagedInventoryClickHandler;
 import de.btegermany.teleportation.TeleportationBukkit.message.ExecuteCommandMessage;
-import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
-import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
-import org.bukkit.entity.Player;
-import org.json.JSONArray;
 
 import java.util.List;
 import java.util.Optional;
 
-public abstract class MultiplePagesDetailWarpGuiAbstract extends MultiplePagesWarpGuiAbstract {
+public abstract class MultiPageDetailWarpGuiAbstract extends MultiPageWarpGuiAbstract {
 
-    public MultiplePagesDetailWarpGuiAbstract(Player player, String title, PluginMessenger pluginMessenger, JSONArray contentJSON, String headId, RegistriesProvider registriesProvider) {
-        super(player, title, pluginMessenger, contentJSON, headId, registriesProvider);
+    public MultiPageDetailWarpGuiAbstract(MultiPageGuiArgs guiArgs, String title, String headId) {
+        super(guiArgs, title, headId);
     }
 
     @Override
@@ -24,7 +20,7 @@ public abstract class MultiplePagesDetailWarpGuiAbstract extends MultiplePagesWa
             public void handle(ClickHandler clickHandler) {
                 if(clickHandler.getCurrentItem() == null || clickHandler.getCurrentItem().getItemMeta() == null) return;
                 List<String> lore = clickHandler.getCurrentItem().getItemMeta().getLore();
-                if(lore == null || lore.size() == 0) return;
+                if(lore == null || lore.isEmpty()) return;
                 Optional<String> optionalCommand = lore.stream().filter(s -> s.startsWith("/tpll")).findFirst();
                 Optional<String> optionalRotation = lore.stream().filter(s -> s.startsWith("Drehung:")).findFirst();
                 Optional<String> optionalHeight = lore.stream().filter(s -> s.startsWith("Höhe:")).findFirst();

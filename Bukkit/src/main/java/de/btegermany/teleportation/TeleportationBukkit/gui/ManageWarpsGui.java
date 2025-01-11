@@ -4,19 +4,13 @@ import com.tchristofferson.pagedinventories.IPagedInventory;
 import com.tchristofferson.pagedinventories.NavigationRow;
 import com.tchristofferson.pagedinventories.handlers.PagedInventoryClickHandler;
 import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintItem;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintRange;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.GuiBlueprint;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.SinglePageWarpGuiAbstract;
-import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
-import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
+import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.*;
 import de.btegermany.teleportation.TeleportationBukkit.util.Skulls;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -26,8 +20,8 @@ import java.util.List;
 
 public class ManageWarpsGui extends SinglePageWarpGuiAbstract {
 
-    public ManageWarpsGui(Player player, PluginMessenger pluginMessenger, RegistriesProvider registriesProvider) {
-        super(player, "Warps bearbeiten", pluginMessenger, registriesProvider);
+    public ManageWarpsGui(GuiArgs guiArgs) {
+        super(guiArgs, "Warps bearbeiten");
 
         inventory.addHandler(new PagedInventoryClickHandler() {
             @Override

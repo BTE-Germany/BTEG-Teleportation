@@ -4,10 +4,8 @@ import com.tchristofferson.pagedinventories.handlers.PagedInventoryCloseHandler;
 import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.util.Skulls;
-import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.json.JSONArray;
@@ -16,18 +14,18 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class MultiplePagesWarpGuiAbstract extends WarpGuiAbstract {
+public abstract class MultiPageWarpGuiAbstract extends WarpGuiAbstract {
 
     protected final PluginMessenger pluginMessenger;
     protected final JSONArray pagesData;
     protected final String headId;
 
-    public MultiplePagesWarpGuiAbstract(Player player, String title, PluginMessenger pluginMessenger, JSONArray pagesData, String headId, RegistriesProvider registriesProvider) {
-        super(player, title, pagesData.length() > 1, pluginMessenger, registriesProvider);
-        this.pluginMessenger = pluginMessenger;
-        this.pagesData = pagesData;
+    public MultiPageWarpGuiAbstract(MultiPageGuiArgs guiArgs, String title, String headId) {
+        super(guiArgs.guiArgs(), title, guiArgs.contentJSON().length() > 1);
+        this.pluginMessenger = guiArgs.pluginMessenger();
+        this.pagesData = guiArgs.contentJSON();
         this.headId = headId;
-        addPages(pagesData);
+        this.addPages(pagesData);
         inventory.addHandler(new PagedInventoryCloseHandler() {
             @Override
             public void handle(CloseHandler closeHandler) {

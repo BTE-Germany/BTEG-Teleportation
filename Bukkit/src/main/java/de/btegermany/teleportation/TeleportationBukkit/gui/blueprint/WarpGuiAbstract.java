@@ -84,12 +84,12 @@ public abstract class WarpGuiAbstract {
     };
     public final CustomNavigationItem NAV_PLACEHOLDER_DEFAULT;
 
-    public WarpGuiAbstract(Player player, String title, boolean showNextPrevious, PluginMessenger pluginMessenger, RegistriesProvider registriesProvider) {
-        this.player = player;
+    public WarpGuiAbstract(GuiArgs guiArgs, String title, boolean showNextPrevious) {
+        this.player = guiArgs.player();
         this.title = title;
         this.showNextPrevious = showNextPrevious;
-        this.pluginMessenger = pluginMessenger;
-        this.registriesProvider = registriesProvider;
+        this.pluginMessenger = guiArgs.pluginMessenger();
+        this.registriesProvider = guiArgs.registriesProvider();
 
         // default placeholder
         ItemStack placeholderDefaultItem = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
@@ -163,11 +163,11 @@ public abstract class WarpGuiAbstract {
     }
 
     public void openSortGui() {
-        new WarpGui(this.player, this.pluginMessenger, this.registriesProvider).open();
+        new WarpGui(new GuiArgs(this.player, this.pluginMessenger, this.registriesProvider)).open();
     }
 
     public void openManageGui() {
-        new ManageWarpsGui(this.player, this.pluginMessenger, this.registriesProvider).open();
+        new ManageWarpsGui(new GuiArgs(this.player, this.pluginMessenger, this.registriesProvider)).open();
     }
 
     public void openLobbySortGui() {

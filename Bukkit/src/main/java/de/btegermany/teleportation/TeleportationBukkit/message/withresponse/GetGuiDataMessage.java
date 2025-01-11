@@ -2,6 +2,7 @@ package de.btegermany.teleportation.TeleportationBukkit.message.withresponse;
 
 import de.btegermany.teleportation.TeleportationAPI.message.PluginMessageWithResponse;
 import de.btegermany.teleportation.TeleportationBukkit.gui.*;
+import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.MultiPageGuiArgs;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import org.bukkit.Bukkit;
@@ -28,35 +29,25 @@ public class GetGuiDataMessage extends PluginMessageWithResponse {
                 Player targetPlayer = Bukkit.getPlayer(playerUUIDGui);
                 if (targetPlayer == null || !targetPlayer.isOnline()) return;
 
+                MultiPageGuiArgs guiArgs = new MultiPageGuiArgs(targetPlayer, pluginMessenger, registriesProvider, pagesData);
 
                 if (registriesProvider.getMultiplePagesGuisRegistry().isRegistered(targetPlayer)) {
                     registriesProvider.getMultiplePagesGuisRegistry().getGui(targetPlayer).addPages(pagesData);
                 } else {
                     switch (group) {
-                        case "Alle" -> new AllGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
-                        case "Städte" ->
-                                new CitiesGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
-                        case "Tags" -> new TagsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
-                        case "Events" ->
-                                new EventsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
-                        case "Plotregionen" ->
-                                new PlotsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
-                        case "Normen Hubs" ->
-                                new NormenHubsGui(targetPlayer, pluginMessenger, pagesData, registriesProvider).open();
-                        case "city" ->
-                                new CitiesDetailGui(targetPlayer, titleGui, pluginMessenger, pagesData, registriesProvider).open();
-                        case "tag" ->
-                                new TagsDetailGui(targetPlayer, titleGui, pluginMessenger, pagesData, registriesProvider).open();
-                        case "bl" ->
-                                new StatesDetailGui(targetPlayer, titleGui, pluginMessenger, pagesData, registriesProvider).open();
-                        case "search" ->
-                                new SearchResultsGui(targetPlayer, titleGui, pluginMessenger, pagesData, registriesProvider).open();
-                        case "server" ->
-                                new ServersDetailGui(targetPlayer, pluginMessenger, pagesData, titleGui, registriesProvider).open();
-                        case "lobbywarp" ->
-                                new LobbyWarpGui(targetPlayer, titleGui, pluginMessenger, pagesData, registriesProvider).open();
-                        case "lobbywarp-around" ->
-                                new LobbyWarpAroundGui(targetPlayer, titleGui, pluginMessenger, pagesData, registriesProvider).open();
+                        case "Alle" -> new AllGui(guiArgs).open();
+                        case "Städte" -> new CitiesGui(guiArgs).open();
+                        case "Tags" -> new TagsGui(guiArgs).open();
+                        case "Events" -> new EventsGui(guiArgs).open();
+                        case "Plotregionen" -> new PlotsGui(guiArgs).open();
+                        case "Normen Hubs" -> new NormenHubsGui(guiArgs).open();
+                        case "city" -> new CitiesDetailGui(guiArgs, titleGui).open();
+                        case "tag" -> new TagsDetailGui(guiArgs, titleGui).open();
+                        case "bl" -> new StatesDetailGui(guiArgs, titleGui).open();
+                        case "search" -> new SearchResultsGui(guiArgs, titleGui).open();
+                        case "server" -> new ServersDetailGui(guiArgs, titleGui).open();
+                        case "lobbywarp" -> new LobbyWarpGui(guiArgs, titleGui).open();
+                        case "lobbywarp-around" -> new LobbyWarpAroundGui(guiArgs, titleGui).open();
                     }
                 }
             } catch (IOException e) {

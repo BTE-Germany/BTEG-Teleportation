@@ -1,6 +1,6 @@
 package de.btegermany.teleportation.TeleportationBukkit.registry;
 
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.MultiplePagesWarpGuiAbstract;
+import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.MultiPageWarpGuiAbstract;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -9,18 +9,18 @@ import java.util.UUID;
 
 public class MultiplePagesGuisRegistry implements Registry {
 
-    private final Map<UUID, MultiplePagesWarpGuiAbstract> multiplePagesWarpGuis;
+    private final Map<UUID, MultiPageWarpGuiAbstract> multiplePagesWarpGuis;
 
     public MultiplePagesGuisRegistry() {
         this.multiplePagesWarpGuis = new HashMap<>();
     }
 
-    public void register(Player player, MultiplePagesWarpGuiAbstract multiplePagesWarpGuiAbstract) {
-        this.register(player.getUniqueId(), multiplePagesWarpGuiAbstract);
+    public void register(Player player, MultiPageWarpGuiAbstract multiPageWarpGuiAbstract) {
+        this.register(player.getUniqueId(), multiPageWarpGuiAbstract);
     }
 
-    public void register(UUID playerUUID, MultiplePagesWarpGuiAbstract multiplePagesWarpGuiAbstract) {
-        multiplePagesWarpGuis.put(playerUUID, multiplePagesWarpGuiAbstract);
+    public void register(UUID playerUUID, MultiPageWarpGuiAbstract multiPageWarpGuiAbstract) {
+        multiplePagesWarpGuis.put(playerUUID, multiPageWarpGuiAbstract);
     }
 
     @Override
@@ -28,11 +28,11 @@ public class MultiplePagesGuisRegistry implements Registry {
         multiplePagesWarpGuis.remove(playerUUID);
     }
 
-    public MultiplePagesWarpGuiAbstract getGui(Player player) {
+    public MultiPageWarpGuiAbstract getGui(Player player) {
         return this.getGui(player.getUniqueId());
     }
 
-    public MultiplePagesWarpGuiAbstract getGui(UUID playerUUID) {
+    public MultiPageWarpGuiAbstract getGui(UUID playerUUID) {
         return multiplePagesWarpGuis.get(playerUUID);
     }
 
@@ -41,7 +41,7 @@ public class MultiplePagesGuisRegistry implements Registry {
         return multiplePagesWarpGuis.containsKey(playerUUID);
     }
 
-    public Map<UUID, MultiplePagesWarpGuiAbstract> getMultiplePagesWarpGuis() {
+    public Map<UUID, MultiPageWarpGuiAbstract> getMultiplePagesWarpGuis() {
         return multiplePagesWarpGuis;
     }
 }

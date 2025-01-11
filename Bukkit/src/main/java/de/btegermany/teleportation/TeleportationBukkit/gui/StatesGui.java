@@ -3,15 +3,9 @@ package de.btegermany.teleportation.TeleportationBukkit.gui;
 import com.tchristofferson.pagedinventories.IPagedInventory;
 import com.tchristofferson.pagedinventories.NavigationRow;
 import com.tchristofferson.pagedinventories.handlers.PagedInventoryClickHandler;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.SinglePageWarpGuiAbstract;
+import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.*;
 import de.btegermany.teleportation.TeleportationBukkit.message.withresponse.GetGuiDataMessage;
-import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.util.Skulls;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintItem;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.BlueprintRange;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.GuiBlueprint;
-import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -21,8 +15,8 @@ import java.util.List;
 
 public class StatesGui extends SinglePageWarpGuiAbstract {
 
-    public StatesGui(Player player, PluginMessenger pluginMessenger, RegistriesProvider registriesProvider) {
-        super(player, "Bundesländer", pluginMessenger, registriesProvider);
+    public StatesGui(GuiArgs guiArgs) {
+        super(guiArgs, "Bundesländer");
 
         inventory.addHandler(new PagedInventoryClickHandler() {
             @Override
