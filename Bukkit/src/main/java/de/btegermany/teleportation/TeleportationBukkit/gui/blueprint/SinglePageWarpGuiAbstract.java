@@ -1,7 +1,5 @@
 package de.btegermany.teleportation.TeleportationBukkit.gui.blueprint;
 
-import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
-import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
