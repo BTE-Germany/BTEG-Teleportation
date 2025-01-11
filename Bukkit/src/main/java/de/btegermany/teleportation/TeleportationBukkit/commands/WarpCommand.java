@@ -15,6 +15,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -75,6 +77,11 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
                 }
                 String headId = inputSeperated.length >= 4 && !(inputSeperated[3].isEmpty() || inputSeperated[3].matches(" *; *")) ? inputSeperated[3] : null;
 
+                if (!this.isHeadIdValid(headId)) {
+                    player.sendMessage(TeleportationBukkit.getFormattedErrorMessage("Bitte überprüfe die headId."));
+                    return true;
+                }
+
                 WarpInCreation warpInCreation = new WarpInCreation(player);
                 warpInCreation.setName(inputSeperated[0]);
                 warpInCreation.setCity(inputSeperated[1]);
@@ -98,6 +105,11 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
                 String column = args[2].toLowerCase();
                 column = column.equalsIgnoreCase("headId") ? "head_id" : column;
                 String value = args.length == 3 ? "null" : String.join(" ", Stream.of(args).skip(3).filter(arg -> !arg.isEmpty()).toArray(String[]::new));
+
+                if (column.equals("head_id") && !this.isHeadIdValid(value)) {
+                    player.sendMessage(TeleportationBukkit.getFormattedErrorMessage("Bitte überprüfe die headId."));
+                    return true;
+                }
 
                 WarpGettingChanged warpGettingChanged = new WarpGettingChanged(id, column);
                 warpGettingChanged.setValue(value);
@@ -125,7 +137,7 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
         return true;
     }
 
-    public void findWarps(Player player, String[] args) {
+    private void findWarps(Player player, String[] args) {
         StringBuilder searchBuilder = new StringBuilder();
         for(int i = 0; i < args.length; i++) {
             if(i >= 1) {
@@ -135,6 +147,10 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
         }
         String search = new String(searchBuilder);
         this.pluginMessenger.send(new GetGuiDataMessage(this.registriesProvider, this.pluginMessenger, player.getUniqueId().toString(), String.format("search_%s", search), 0, 1));
+    }
+
+    private boolean isHeadIdValid(String headId) {
+        return headId != null && headId.matches("[a-z0-9]*");
     }
 
     @Override
