@@ -15,8 +15,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -77,7 +75,7 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
                 }
                 String headId = inputSeperated.length >= 4 && !(inputSeperated[3].isEmpty() || inputSeperated[3].matches(" *; *")) ? inputSeperated[3] : null;
 
-                if (!this.isHeadIdValid(headId)) {
+                if (this.isHeadIdInvalid(headId)) {
                     player.sendMessage(TeleportationBukkit.getFormattedErrorMessage("Bitte überprüfe die headId."));
                     return true;
                 }
@@ -106,7 +104,7 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
                 column = column.equalsIgnoreCase("headId") ? "head_id" : column;
                 String value = args.length == 3 ? "null" : String.join(" ", Stream.of(args).skip(3).filter(arg -> !arg.isEmpty()).toArray(String[]::new));
 
-                if (column.equals("head_id") && !this.isHeadIdValid(value)) {
+                if (column.equals("head_id") && this.isHeadIdInvalid(value)) {
                     player.sendMessage(TeleportationBukkit.getFormattedErrorMessage("Bitte überprüfe die headId."));
                     return true;
                 }
@@ -149,7 +147,7 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
         this.pluginMessenger.send(new GetGuiDataMessage(this.registriesProvider, this.pluginMessenger, player.getUniqueId().toString(), String.format("search_%s", search), 0, 1));
     }
 
-    private boolean isHeadIdValid(String headId) {
+    private boolean isHeadIdInvalid(String headId) {
         return headId != null && headId.matches("[a-z0-9]*");
     }
 
