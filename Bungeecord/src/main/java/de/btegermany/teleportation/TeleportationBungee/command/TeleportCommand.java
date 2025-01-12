@@ -34,28 +34,50 @@ public class TeleportCommand extends Command implements TabExecutor {
             return;
         }
 
-        // check permissions
-        if(!player.hasPermission("teleportation.tp")) {
-            player.sendMessage(new ComponentBuilder("ᾠ §cDu §cbist §cnicht §cberechtigt, §cdiesen §cCommand §causzuführen!").create());
-            return;
-        }
-        // check args length
-        if(args.length != 1) {
-            player.sendMessage(TeleportationBungee.getFormattedMessage("Bitte gib einen Spieler an!"));
-            return;
-        }
-        ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
+        switch (args.length) {
+            case 1 -> {
+                // check permissions
+                if(!player.hasPermission("teleportation.tp.player")) {
+                    player.sendMessage(new ComponentBuilder("ᾠ §cDu §cbist §cnicht §cberechtigt, §cdiesen §cCommand §causzuführen!").create());
+                    return;
+                }
+                ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
 
 
-        // will teleport player to target player if target player exists
-        if(target != null) {
-            player.sendMessage(TeleportationBungee.getFormattedMessage("Du wirst teleportiert..."));
-            RequestLastLocationMessage requestLastLocationMessage = new RequestLastLocationMessage(player, this.registriesProvider, () -> {
-                this.utils.teleport(player, target);
-            });
-            this.pluginMessenger.sendMessageToServers(requestLastLocationMessage, player.getServer().getInfo());
-        } else {
-            player.sendMessage(TeleportationBungee.getFormattedMessage("Der Spieler wurde nicht gefunden!"));
+                // will teleport player to target player if target player exists
+                if(target != null) {
+                    player.sendMessage(TeleportationBungee.getFormattedMessage("Du wirst teleportiert..."));
+                    RequestLastLocationMessage requestLastLocationMessage = new RequestLastLocationMessage(player, this.registriesProvider, () -> {
+                        this.utils.teleport(player, target);
+                    });
+                    this.pluginMessenger.sendMessageToServers(requestLastLocationMessage, player.getServer().getInfo());
+                } else {
+                    player.sendMessage(TeleportationBungee.getFormattedMessage("Der Spieler wurde nicht gefunden!"));
+                }
+            }
+            case 3 -> {
+                // check permissions
+                if(!player.hasPermission("teleportation.tp.coords")) {
+                    player.sendMessage(new ComponentBuilder("ᾠ §cDu §cbist §cnicht §cberechtigt, §cdiesen §cCommand §causzuführen!").create());
+                    return;
+                }
+
+                // teleport to coordinates
+                try {
+                    double x = Double.parseDouble(args[0]);
+                    double y = Double.parseDouble(args[1]);
+                    double z = Double.parseDouble(args[2]);
+                    x += x % 1 == 0 ? 0.5 : 0;
+                    z += z % 1 == 0 ? 0.5 : 0;
+                    float yaw = 12345;
+                    float pitch = 12345;
+                    player.sendMessage(new ComponentBuilder(String.format("ᾠ §6Du §6wirst §6zu §2%s §2%s §2%s §6teleportiert.", x, y, z)).create());
+                    this.pluginMessenger.teleportToCoords(player, player.getServer().getInfo(), x, y, z, yaw, pitch);
+                } catch (NumberFormatException e) {
+                    player.sendMessage(new ComponentBuilder("ᾠ §cBitte §cüberprüfe §cdie §cKoordinaten!").create());
+                }
+            }
+            default -> player.sendMessage(new ComponentBuilder("ᾠ §cBitte §cgib §ceinen §cSpieler §coder §cKoordinaten §can!").create());
         }
     }
 
