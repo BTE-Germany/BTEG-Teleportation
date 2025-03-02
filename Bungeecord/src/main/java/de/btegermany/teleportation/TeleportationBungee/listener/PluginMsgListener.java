@@ -447,31 +447,21 @@ public class PluginMsgListener implements Listener {
                     ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerUUID);
                     if (player == null || !player.isConnected()) return;
 
-                    Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps();
-                    Warp warp = null;
+                    Warp warp = this.getRandomWarp();
 
-                    do {
-                        int i = 0;
-                        int searchedIndex = new Random().nextInt(warps.size());
+                    ProxyServer.getInstance().getPluginManager().dispatchCommand(player, warp.getTpllCommand());
+                    TextComponent textComponent = new TextComponent(String.format("ᾠ %sDies ist %s in %s, %s.", ChatColor.GOLD, ChatColor.GREEN + warp.getName() + ChatColor.GOLD, ChatColor.GREEN + warp.getCity(), warp.getState() + ChatColor.GOLD));
+                    TextComponent button = new TextComponent(String.format("ᾠ %sKlicke hier, um dich zum nächsten Warp zu teleportieren.", ChatColor.BLUE));
+                    button.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nwarp random"));
+                    player.sendMessage(textComponent);
+                    player.sendMessage(button);
+                }
 
-                        for (Warp randomWarp : warps) {
-                            if (i < searchedIndex) {
-                                i++;
-                                continue;
-                            }
-                            if(randomWarp.getCity().isEmpty()) {
-                                break;
-                            }
-                            warp = randomWarp;
-                            ProxyServer.getInstance().getPluginManager().dispatchCommand(player, warp.getTpllCommand());
-                            TextComponent textComponent = new TextComponent(String.format("ᾠ %sDies ist %s in %s, %s.", ChatColor.GOLD, ChatColor.GREEN + warp.getName() + ChatColor.GOLD, ChatColor.GREEN + warp.getCity(), warp.getState() + ChatColor.GOLD));
-                            TextComponent button = new TextComponent(String.format("ᾠ %sKlicke hier, um dich zum nächsten Warp zu teleportieren.", ChatColor.BLUE));
-                            button.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nwarp random"));
-                            player.sendMessage(textComponent);
-                            player.sendMessage(button);
-                            break;
-                        }
-                    } while (warp == null);
+                case "get_random_warp" -> {
+                    //TODO: player
+                    Warp warp = this.getRandomWarp();
+
+                    //player.send
                 }
 
                 case "tag_add" -> {
@@ -559,6 +549,30 @@ public class PluginMsgListener implements Listener {
             pagesData.put(object);
         }
         return pagesData;
+    }
+
+    private Warp getRandomWarp() {
+        Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps();
+        Warp warp = null;
+
+        do {
+            int i = 0;
+            int searchedIndex = new Random().nextInt(warps.size());
+
+            for (Warp randomWarp : warps) {
+                if (i < searchedIndex) {
+                    i++;
+                    continue;
+                }
+                if(randomWarp.getCity().isEmpty()) {
+                    break;
+                }
+                warp = randomWarp;
+                break;
+            }
+        } while (warp == null);
+
+        return warp;
     }
 
 }

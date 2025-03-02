@@ -9,6 +9,7 @@ import de.btegermany.teleportation.TeleportationBungee.data.ConfigReader;
 import de.btegermany.teleportation.TeleportationBungee.data.Database;
 import de.btegermany.teleportation.TeleportationBungee.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBungee.util.Utils;
+import de.btegermany.teleportation.TeleportationBungee.util.Warp;
 import de.btegermany.teleportation.TeleportationBungee.util.WarpIdsManager;
 import fr.thesmyler.bungee2forge.api.ForgeChannel;
 import fr.thesmyler.bungee2forge.api.ForgeChannelRegistry;
@@ -34,9 +35,11 @@ public class TeleportationBungee extends Plugin {
     private RegistriesProvider registriesProvider;
     private GeoData geoData;
     private PluginMessenger pluginMessenger;
+    private ConfigReader configReader;
     private ScheduledExecutorService scheduledExecutorServiceCheckStateBorders;
     private ScheduledExecutorService scheduledExecutorServiceSendWarpCities;
     private ScheduledExecutorService scheduledExecutorServiceSendWarpTags;
+    private Warp eventWarp = null;
 
     @Override
     public void onEnable() {
@@ -51,14 +54,15 @@ public class TeleportationBungee extends Plugin {
 
         // initialize objects
         this.geoData = new GeoData(this);
-        ConfigReader configReader = new ConfigReader(this, this.geoData);
-        this.database = new Database(configReader);
+        this.configReader = new ConfigReader(this, this.geoData);
+        this.database = new Database(this.configReader);
         this.database.connect();
         this.warpIdsManager = new WarpIdsManager(database);
         this.registriesProvider = new RegistriesProvider(this.database, this);
         this.registriesProvider.getWarpsRegistry().loadWarps();
         this.pluginMessenger = new PluginMessenger(this.registriesProvider);
-        configReader.readServers(this.registriesProvider.getWarpsRegistry());
+        this.configReader.readServers(this.registriesProvider.getWarpsRegistry());
+        this.eventWarp = this.configReader.readEventWarp(this.registriesProvider.getWarpsRegistry());
         Utils utils = new Utils(this.pluginMessenger, this.registriesProvider);
 
         // register commands
@@ -163,5 +167,14 @@ public class TeleportationBungee extends Plugin {
 
     public WarpIdsManager getWarpIdsManager() {
         return this.warpIdsManager;
+    }
+
+    public Warp getEventWarp() {
+        return eventWarp;
+    }
+
+    public void setEventWarp(Warp warp) {
+        this.eventWarp = warp;
+        this.configReader.saveEventWarp();
     }
 }
