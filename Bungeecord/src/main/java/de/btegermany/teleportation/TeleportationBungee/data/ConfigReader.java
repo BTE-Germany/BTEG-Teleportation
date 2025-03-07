@@ -12,7 +12,6 @@ import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 import org.apache.commons.io.FileUtils;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +22,7 @@ public class ConfigReader {
 
     private final TeleportationBungee plugin;
     private final GeoData geoData;
+    private String pluginFolderPath;
 
     public ConfigReader(TeleportationBungee plugin, GeoData geoData) {
         this.plugin = plugin;
@@ -83,7 +83,7 @@ public class ConfigReader {
     }
 
     // read the database config and return the data (url, user, password)
-    public List<String> readDatabaseConfig() {
+    public List<String> readDataConfig() {
         List<String> data = new ArrayList<>();
 
         ConfigurationProvider provider = YamlConfiguration.getProvider(YamlConfiguration.class);
@@ -93,12 +93,14 @@ public class ConfigReader {
         File configFile = new File(dir, "config.yaml");
 
         try {
-            if(!configFile.exists()) {
+            if (!configFile.exists()) {
                 try (InputStream inputStream = plugin.getResourceAsStream(configFile.getName())) {
                     FileUtils.copyInputStreamToFile(inputStream, configFile);
                 }
             }
             Configuration config = provider.load(configFile);
+
+            this.pluginFolderPath = config.getString("plugin-folder", dir.getAbsolutePath());
 
             data.add(config.getString("database.mysql.url"));
             data.add(config.getString("database.mysql.user"));
@@ -115,12 +117,12 @@ public class ConfigReader {
     public Warp readEventWarp(WarpsRegistry warpsRegistry) {
         ConfigurationProvider provider = YamlConfiguration.getProvider(YamlConfiguration.class);
         File dir = plugin.getDataFolder();
-        if(!dir.getParentFile().exists()) dir.getParentFile().mkdir();
-        if(!dir.exists()) dir.mkdir();
-        File configFile = new File(dir, "config.yaml");
+        if (!dir.getParentFile().exists()) dir.getParentFile().mkdir();
+        if (!dir.exists()) dir.mkdir();
+        File configFile = new File(this.pluginFolderPath, "config.yaml");
 
         try {
-            if(!configFile.exists()) {
+            if (!configFile.exists()) {
                 try (InputStream inputStream = plugin.getResourceAsStream(configFile.getName())) {
                     FileUtils.copyInputStreamToFile(inputStream, configFile);
                 }
@@ -145,7 +147,7 @@ public class ConfigReader {
         File dir = plugin.getDataFolder();
         if(!dir.getParentFile().exists()) dir.getParentFile().mkdir();
         if(!dir.exists()) dir.mkdir();
-        File configFile = new File(dir, "config.yaml");
+        File configFile = new File(this.pluginFolderPath, "config.yaml");
 
         try {
             if(!configFile.exists()) {

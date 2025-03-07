@@ -15,7 +15,7 @@ public class Database {
 
     // connect to the database and create the warps table if it doesn't exist yet
     public void connect() {
-        List<String> configData = this.configReader.readDatabaseConfig();
+        List<String> configData = this.configReader.readDataConfig();
         try {
             this.connection = DriverManager.getConnection(configData.get(0), configData.get(1), configData.get(2));
 
