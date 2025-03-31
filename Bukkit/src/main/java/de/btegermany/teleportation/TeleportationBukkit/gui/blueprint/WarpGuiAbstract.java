@@ -23,8 +23,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.components.CustomModelDataComponent;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 public abstract class WarpGuiAbstract {
 
@@ -108,12 +110,18 @@ public abstract class WarpGuiAbstract {
         metaClose.setDisplayName(ChatColor.DARK_RED + "Schließen");
         ItemMeta metaSort = NAV_SORT.getItemStack().getItemMeta();
         metaSort.setDisplayName(ChatColor.GOLD + "ZUR ÜBERSICHT");
+
         ItemMeta metaManage = NAV_MANAGE.getItemStack().getItemMeta();
         metaManage.setDisplayName(ChatColor.RED + "Warps bearbeiten");
-        metaManage.setCustomModelData(11);
+        CustomModelDataComponent modelDataComponentManage = metaManage.getCustomModelDataComponent();
+        modelDataComponentManage.setStrings(List.of("config"));
+        metaManage.setCustomModelDataComponent(modelDataComponentManage);
         ItemMeta metaSearch = NAV_SEARCH.getItemStack().getItemMeta();
         metaSearch.setDisplayName(ChatColor.GOLD + "Suchen");
-        metaSearch.setCustomModelData(15);
+        CustomModelDataComponent modelDataComponentSearch = metaSearch.getCustomModelDataComponent();
+        modelDataComponentSearch.setStrings(List.of("search"));
+        metaSearch.setCustomModelDataComponent(modelDataComponentSearch);
+
         ItemMeta metaLobbySort = NAV_LOBBY_SORT.getItemStack().getItemMeta();
         metaLobbySort.setDisplayName(ChatColor.GOLD + "Zurück");
         ItemMeta metaLobbyAround = NAV_LOBBY_AROUND.getItemStack().getItemMeta();

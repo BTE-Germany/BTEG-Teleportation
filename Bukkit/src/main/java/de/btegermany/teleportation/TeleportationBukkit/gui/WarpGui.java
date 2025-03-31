@@ -8,6 +8,7 @@ import de.btegermany.teleportation.TeleportationBukkit.message.withresponse.GetG
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.components.CustomModelDataComponent;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -55,36 +56,30 @@ public class WarpGui extends SinglePageWarpGuiAbstract {
     @Nonnull
     @Override
     public List<ItemStack> getContent() {
-        ItemStack itemCities = new ItemStack(Material.PAPER);
-        ItemMeta metaCities = itemCities.getItemMeta();
-        metaCities.setDisplayName("Städte");
-        metaCities.setCustomModelData(7);
-        itemCities.setItemMeta(metaCities);
-        ItemStack itemStates = new ItemStack(Material.PAPER);
-        ItemMeta metaStates = itemStates.getItemMeta();
-        metaStates.setDisplayName("Bundesländer");
-        metaStates.setCustomModelData(3);
-        itemStates.setItemMeta(metaStates);
+        ItemStack itemCities = this.getItem("Städte", "city");
+        ItemStack itemStates = this.getItem("Bundesländer", "germany");
+
         ItemStack itemTags = new ItemStack(Material.NAME_TAG);
         ItemMeta metaTags = itemCities.getItemMeta();
         metaTags.setDisplayName("Tags");
         itemTags.setItemMeta(metaTags);
-        ItemStack itemEvents = new ItemStack(Material.PAPER);
-        ItemMeta metaEvents = itemCities.getItemMeta();
-        metaEvents.setDisplayName("Events");
-        metaEvents.setCustomModelData(12);
-        itemEvents.setItemMeta(metaEvents);
-        ItemStack itemPlots = new ItemStack(Material.PAPER);
-        ItemMeta metaPlots = itemPlots.getItemMeta();
-        metaPlots.setDisplayName("Plotregionen");
-        metaPlots.setCustomModelData(2);
-        itemPlots.setItemMeta(metaPlots);
-        ItemStack itemAll = new ItemStack(Material.PAPER);
-        ItemMeta metaAll = itemCities.getItemMeta();
-        metaAll.setDisplayName("Alle");
-        metaAll.setCustomModelData(4);
-        itemAll.setItemMeta(metaAll);
+
+        ItemStack itemEvents = this.getItem("Events", "event_warp");
+        ItemStack itemPlots = this.getItem("Plotregionen", "plot");
+        ItemStack itemAll = this.getItem("Alle", "all_warps");
 
         return Arrays.asList(itemCities, itemStates, itemTags, itemEvents, itemPlots, itemAll);
     }
+
+    private ItemStack getItem(String displayName, String modelData) {
+        ItemStack itemStack = new ItemStack(Material.PAPER);
+        ItemMeta meta = itemStack.getItemMeta();
+        meta.setDisplayName(displayName);
+        CustomModelDataComponent modelDataComponent = meta.getCustomModelDataComponent();
+        modelDataComponent.setStrings(List.of(modelData));
+        meta.setCustomModelDataComponent(modelDataComponent);
+        itemStack.setItemMeta(meta);
+        return itemStack;
+    }
+
 }
