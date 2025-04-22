@@ -79,9 +79,6 @@ public class TeleportationBungee extends Plugin {
         // schedule task to send cities warps are located in and warp tags to all servers
         this.scheduleSendWarpCities();
         this.scheduleSendWarpTags();
-
-        //DatabaseConverter databaseConverter = new DatabaseConverter(this, database, new File(this.getDataFolder(), "BTEGTeleportationBungee.db"));
-        //databaseConverter.convertDbFileToDatabase();
     }
 
     @Override
@@ -112,8 +109,7 @@ public class TeleportationBungee extends Plugin {
 
     private void scheduleSendWarpCities() {
         this.scheduledExecutorServiceSendWarpCities = Executors.newSingleThreadScheduledExecutor();
-        this.scheduledExecutorServiceSendWarpCities.scheduleAtFixedRate(() ->
-                        this.pluginMessenger.sendWarpCitiesToServers(this.registriesProvider.getWarpsRegistry().getWarps()),
+        this.scheduledExecutorServiceSendWarpCities.scheduleAtFixedRate(() -> this.pluginMessenger.sendWarpCitiesToServers(this.registriesProvider.getWarpsRegistry().getWarps()),
                 0,
                 10,
                 TimeUnit.SECONDS);
@@ -121,8 +117,7 @@ public class TeleportationBungee extends Plugin {
 
     private void scheduleSendWarpTags() {
         this.scheduledExecutorServiceSendWarpTags = Executors.newSingleThreadScheduledExecutor();
-        this.scheduledExecutorServiceSendWarpTags.scheduleAtFixedRate(() ->
-                        this.pluginMessenger.sendWarpTagsToServers(this.registriesProvider.getWarpTagsRegistry().getTags()),
+        this.scheduledExecutorServiceSendWarpTags.scheduleAtFixedRate(() -> this.pluginMessenger.sendWarpTagsToServers(this.registriesProvider.getWarpTagsRegistry().getTags()),
                 5,
                 10,
                 TimeUnit.SECONDS);
