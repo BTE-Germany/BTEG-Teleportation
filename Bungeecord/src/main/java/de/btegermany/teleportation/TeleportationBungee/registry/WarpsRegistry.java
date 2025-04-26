@@ -4,8 +4,8 @@ import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
 import de.btegermany.teleportation.TeleportationBungee.data.Database;
 import de.btegermany.teleportation.TeleportationBungee.util.Warp;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import org.jspecify.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;

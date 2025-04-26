@@ -31,7 +31,7 @@ public class ConfigReader {
 
     // read the servers config and add them as GeoServers to GeoData
     public void readServers(WarpsRegistry warpsRegistry) {
-        ConfigurationProvider provider = YamlConfiguration.getProvider(YamlConfiguration.class);
+        ConfigurationProvider provider = ConfigurationProvider.getProvider(YamlConfiguration.class);
         File dir = plugin.getDataFolder();
         if(!dir.getParentFile().exists()) dir.getParentFile().mkdir();
         if(!dir.exists()) dir.mkdir();
@@ -49,7 +49,7 @@ public class ConfigReader {
             for(String serverName : config.getKeys()) {
                 ServerInfo serverInfo = ProxyServer.getInstance().getServerInfo(serverName);
                 if(serverInfo == null) {
-                    this.plugin.getLogger().info("Couldn't find Server '" + serverName + "'");
+                    this.plugin.getLogger().info(() -> "Couldn't find Server '" + serverName + "'");
                     continue;
                 }
                 List<String> states = new ArrayList<>(config.getStringList(serverName + ".bundesländer"));
@@ -64,15 +64,10 @@ public class ConfigReader {
                 if(isEarthServerRaw != null) {
                     isEarthServer = (boolean) isEarthServerRaw;
                 }
-                boolean showPlayersOnTerramap = true;
-                Object showPlayersOnTerramapRaw = config.get(serverName + ".showPlayersOnTerramap");
-                if(showPlayersOnTerramapRaw != null) {
-                    showPlayersOnTerramap = (boolean) showPlayersOnTerramapRaw;
-                }
                 String normenWarpName = config.getString(serverName + ".normen-warp");
                 Warp normenWarp = normenWarpName.isEmpty() ? null : warpsRegistry.getWarps().stream().filter(warp -> warp.getName().equals(normenWarpName)).findFirst().orElse(null);
 
-                geoServers.add(new GeoServer(serverInfo, states, cities, tpllPassthrough, isEarthServer, showPlayersOnTerramap, normenWarp));
+                geoServers.add(new GeoServer(serverInfo, states, cities, tpllPassthrough, isEarthServer, normenWarp));
             }
             geoData.setGeoServers(geoServers);
 
@@ -86,7 +81,7 @@ public class ConfigReader {
     public List<String> readDataConfig() {
         List<String> data = new ArrayList<>();
 
-        ConfigurationProvider provider = YamlConfiguration.getProvider(YamlConfiguration.class);
+        ConfigurationProvider provider = ConfigurationProvider.getProvider(YamlConfiguration.class);
         File dir = plugin.getDataFolder();
         if(!dir.getParentFile().exists()) dir.getParentFile().mkdir();
         if(!dir.exists()) dir.mkdir();
@@ -115,7 +110,7 @@ public class ConfigReader {
     }
 
     public Warp readEventWarp(WarpsRegistry warpsRegistry) {
-        ConfigurationProvider provider = YamlConfiguration.getProvider(YamlConfiguration.class);
+        ConfigurationProvider provider = ConfigurationProvider.getProvider(YamlConfiguration.class);
         File dir = plugin.getDataFolder();
         if (!dir.getParentFile().exists()) dir.getParentFile().mkdir();
         if (!dir.exists()) dir.mkdir();
@@ -143,7 +138,7 @@ public class ConfigReader {
     }
 
     public void saveEventWarp() {
-        ConfigurationProvider provider = YamlConfiguration.getProvider(YamlConfiguration.class);
+        ConfigurationProvider provider = ConfigurationProvider.getProvider(YamlConfiguration.class);
         File dir = plugin.getDataFolder();
         if(!dir.getParentFile().exists()) dir.getParentFile().mkdir();
         if(!dir.exists()) dir.mkdir();
