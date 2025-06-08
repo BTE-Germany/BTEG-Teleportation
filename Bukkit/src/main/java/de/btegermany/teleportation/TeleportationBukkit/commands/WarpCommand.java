@@ -81,6 +81,8 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
                     return true;
                 }
 
+                headId = headId.replace("http://textures.minecraft.net/texture/", "");
+
                 WarpInCreation warpInCreation = new WarpInCreation(player);
                 warpInCreation.setName(inputSeperated[0]);
                 warpInCreation.setCity(inputSeperated[1]);
@@ -105,9 +107,13 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
                 column = column.equalsIgnoreCase("headId") ? "head_id" : column;
                 String value = args.length == 3 ? "null" : String.join(" ", Stream.of(args).skip(3).filter(arg -> !arg.isEmpty()).toArray(String[]::new));
 
-                if (column.equals("head_id") && this.isHeadIdInvalid(value)) {
-                    player.sendMessage(TeleportationBukkit.getFormattedErrorMessage("Bitte überprüfe die headId."));
-                    return true;
+                if (column.equals("head_id")) {
+                    if (this.isHeadIdInvalid(value)) {
+                        player.sendMessage(TeleportationBukkit.getFormattedErrorMessage("Bitte überprüfe die headId."));
+                        return true;
+                    }
+
+                    value = value.replace("http://textures.minecraft.net/texture/", "");
                 }
 
                 WarpGettingChanged warpGettingChanged = new WarpGettingChanged(id, column);
@@ -149,7 +155,7 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
     }
 
     private boolean isHeadIdInvalid(String headId) {
-        return headId != null && headId.matches("[a-z0-9]*");
+        return headId == null || !headId.matches("(http://textures\\.minecraft\\.net/texture/)?[a-z0-9]+");
     }
 
     @Override

@@ -1,14 +1,13 @@
 package de.btegermany.teleportation.TeleportationBukkit.util;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
+import com.destroystokyo.paper.profile.ProfileProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.profile.PlayerProfile;
-import org.bukkit.profile.PlayerTextures;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.Base64;
 import java.util.UUID;
 
 public class Skulls {
@@ -19,21 +18,14 @@ public class Skulls {
 
     public static ItemStack getSkullFromId(String id) {
 
-        ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
+        ItemStack head = new ItemStack(Material.PLAYER_HEAD);
 
-        try {
-            PlayerProfile playerProfile = Bukkit.createPlayerProfile(UUID.fromString("4da5d3b2-565d-11ef-b11e-325096b39f47")); // random uuid
-            PlayerTextures playerTextures = playerProfile.getTextures();
-            playerTextures.setSkin(new URL("http://textures.minecraft.net/texture/" + id));
-            playerProfile.setTextures(playerTextures);
+        head.editMeta(SkullMeta.class, skullMeta -> {
+            final PlayerProfile playerProfile = Bukkit.createProfile(UUID.fromString("4da5d3b2-565d-11ef-b11e-325096b39f47")); // random uuid
+            playerProfile.setProperty(new ProfileProperty("textures", Base64.getEncoder().encodeToString(("{\"textures\":{\"SKIN\":{\"url\":\"http://textures.minecraft.net/texture/" + id + "\"}}}").getBytes())));
 
-            SkullMeta meta = (SkullMeta) head.getItemMeta();
-            meta.setOwnerProfile(playerProfile);
-            head.setItemMeta(meta);
-
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+            skullMeta.setPlayerProfile(playerProfile);
+        });
 
         return head;
     }
