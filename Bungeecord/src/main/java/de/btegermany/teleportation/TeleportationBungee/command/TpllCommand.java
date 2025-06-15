@@ -19,7 +19,6 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
@@ -51,30 +50,9 @@ public class TpllCommand extends Command {
             // remove empty args
             args = Stream.of(args).filter(arg -> !arg.isEmpty()).toArray(String[]::new);
 
-            // will perform tpll/tpc directly on the server and return, if tpll pass through is  true
-            Optional<GeoServer> optional = geoData.getGeoServers().stream().filter(geoServer -> player.getServer().getInfo().equals(geoServer.getServerInfo())).findFirst();
-            if (optional.isPresent() && optional.get().isTpllPassthrough()) {
-                StringBuilder builder = new StringBuilder();
-                for (String arg : args) {
-                    builder.append(" ").append(arg);
-                }
-                if (player.getServer().getInfo().getName().equals("Vanilla-1")) {
-                    this.pluginMessenger.performCommand(player, "tpc" + builder);
-                    return;
-                }
-                this.pluginMessenger.performCommand(player, "tpll" + builder);
-                return;
-            }
-
             // check args length
             if (args.length < 2) {
                 sender.sendMessage(getFormattedMessage("Usage: /tpll <latitude> <longitude>"));
-                return;
-            }
-
-            // check permissions
-            if (!sender.hasPermission("bteg.tpll")) {
-                sender.sendMessage(getFormattedMessage("No permission for /tpll"));
                 return;
             }
 
@@ -93,6 +71,31 @@ public class TpllCommand extends Command {
                 sender.sendMessage(getFormattedMessage("Bitte überprüfe deine Koordinaten!"));
                 return;
             }
+
+            // will perform tpll/tpc directly on the server and return, if tpll pass through is true
+            Optional<GeoServer> optional = this.geoData.getGeoServers().stream().filter(geoServer -> player.getServer().getInfo().equals(geoServer.getServerInfo())).findFirst();
+            if (optional.isPresent() && optional.get().isTpllPassthrough()) {
+                StringBuilder builder = new StringBuilder()
+                        .append(" ").append(coordinates[0])
+                        .append(" ").append(coordinates[1]);
+                for (int i = 2; i < args.length; i++) {
+                    builder.append(" ").append(args[i]);
+                }
+
+                if (player.getServer().getInfo().getName().equals("Vanilla-1")) {
+                    this.pluginMessenger.performCommand(player, "tpc" + builder);
+                    return;
+                }
+                this.pluginMessenger.performCommand(player, "tpll" + builder);
+                return;
+            }
+
+            // check permissions
+            if (!sender.hasPermission("bteg.tpll")) {
+                sender.sendMessage(getFormattedMessage("No permission for /tpll"));
+                return;
+            }
+
             // get additional args
             String heightRaw = null;
             if (args.length >= 3 && args[2].matches("\\d+(.\\d+)?")) {
