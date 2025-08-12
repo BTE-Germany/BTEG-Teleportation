@@ -49,10 +49,12 @@ public class GeoData {
     public ServerInfo getServerFromLocation(double lat, double lon) {
         GeoLocation location = getLocation(lat, lon);
         if (location == null) {
+            plugin.getLogger().severe("Could not determine location for coordinates: " + lat + ", " + lon);
             return null;
         }
 
         if (!location.getCountry().equals("Deutschland")) {
+            plugin.getLogger().severe("Location is not in Germany: " + location.getCountry());
             return null;
         }
 
@@ -74,6 +76,7 @@ public class GeoData {
             }
         }
 
+        plugin.getLogger().severe("Could not find server for location: " + location);
         return null;
     }
 
