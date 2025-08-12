@@ -110,8 +110,8 @@
         </dependency>
         <dependency>
             <groupId>li.cinnazeyy</groupId>
-            <artifactId>LangLibs</artifactId>
-            <version>1.3.2</version>
+            <artifactId>LangLibs-API</artifactId>
+            <version>1.5.1</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
