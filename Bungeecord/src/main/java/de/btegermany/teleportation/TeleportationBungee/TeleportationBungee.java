@@ -148,4 +148,8 @@ public class TeleportationBungee extends Plugin {
         this.eventWarp = warp;
         this.configReader.saveEventWarp();
     }
+
+    public GeoData getGeoData() {
+        return geoData;
+    }
 }
