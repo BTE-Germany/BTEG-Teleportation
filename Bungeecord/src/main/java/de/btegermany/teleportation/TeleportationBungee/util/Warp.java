@@ -3,7 +3,7 @@ package de.btegermany.teleportation.TeleportationBungee.util;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Warp {
+public class Warp implements Comparable<Warp> {
 
     private final int id;
     private String name;
@@ -120,5 +120,10 @@ public class Warp {
 
     public List<String> getTags() {
         return tags;
+    }
+
+    @Override
+    public int compareTo(Warp warp) {
+        return this.name.compareTo(warp.getName());
     }
 }

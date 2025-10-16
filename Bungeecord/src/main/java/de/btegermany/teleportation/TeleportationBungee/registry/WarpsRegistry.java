@@ -9,10 +9,7 @@ import org.jspecify.annotations.Nullable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class WarpsRegistry {
@@ -26,7 +23,7 @@ public class WarpsRegistry {
         this.database = database;
         this.plugin = plugin;
         this.warpTagsRegistry = warpTagsRegistry;
-        this.warps = new HashSet<>();
+        this.warps = new TreeSet<>();
     }
 
     public synchronized void loadWarps() {
