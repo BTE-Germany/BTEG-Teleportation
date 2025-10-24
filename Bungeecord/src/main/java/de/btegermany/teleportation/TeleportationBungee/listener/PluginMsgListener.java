@@ -92,7 +92,8 @@ public class PluginMsgListener implements Listener {
                             final List<JSONObject> currentPage = new ArrayList<>();
                             Set<String> citiesAdded = new HashSet<>();
 
-                            List<Warp> warpsOrderedByCity = this.registriesProvider.getWarpsRegistry().getWarps().stream().sorted(Comparator.comparing(Warp::getCity)).toList();
+                            List<Warp> warpsOrderedByCity = this.registriesProvider.getWarpsRegistry().getWarps().stream()
+                                    .sorted(Comparator.comparing(Warp::getCity)).toList();
                             for(Warp warp : warpsOrderedByCity) {
                                 if(!citiesAdded.add(warp.getCity())) {
                                     continue;
@@ -125,7 +126,8 @@ public class PluginMsgListener implements Listener {
                             final Map<Integer, List<JSONObject>> pagesMap = new HashMap<>();
                             final List<JSONObject> currentPage = new ArrayList<>();
 
-                            List<String> tags = this.registriesProvider.getWarpTagsRegistry().getTags().stream().sorted(String::compareToIgnoreCase).toList();
+                            List<String> tags = this.registriesProvider.getWarpTagsRegistry().getTags().stream()
+                                    .sorted(String::compareToIgnoreCase).toList();
                             for(String tag : tags) {
                                 JSONObject object = new JSONObject();
                                 object.put("name", tag);
@@ -152,50 +154,65 @@ public class PluginMsgListener implements Listener {
                         }
                         case "Events" -> {
                             if(pages[0] == 0) {
-                                Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getName().endsWith("[Event]")).collect(Collectors.toSet());
+                                Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream()
+                                        .filter(warp -> warp.getName().endsWith("[Event]"))
+                                        .collect(Collectors.toCollection(TreeSet::new));
                                 this.cachedGuiData.put(playerUUID, this.getJSONObjectsFromWarps(warps));
                             }
                             this.pluginMessenger.sendGuiData(requestId, player, metaTitle, this.getJSONArrayFromCache(playerUUID, pages));
                         }
                         case "Plotregionen" -> {
                             if(pages[0] == 0) {
-                                Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getName().endsWith("[Plotgebiet]")).collect(Collectors.toSet());
+                                Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream()
+                                        .filter(warp -> warp.getName().endsWith("[Plotgebiet]"))
+                                        .collect(Collectors.toCollection(TreeSet::new));
                                 this.cachedGuiData.put(playerUUID, this.getJSONObjectsFromWarps(warps));
                             }
                             this.pluginMessenger.sendGuiData(requestId, player, metaTitle, this.getJSONArrayFromCache(playerUUID, pages));
                         }
                         case "Normen Hubs" -> {
                             if(pages[0] == 0) {
-                                Set<Warp> warps = this.geoData.getGeoServers().stream().map(GeoServer::getNormenWarp).filter(Objects::nonNull).collect(Collectors.toSet());
+                                Set<Warp> warps = this.geoData.getGeoServers().stream()
+                                        .map(GeoServer::getNormenWarp)
+                                        .filter(Objects::nonNull)
+                                        .collect(Collectors.toCollection(TreeSet::new));
                                 this.cachedGuiData.put(playerUUID, this.getJSONObjectsFromWarps(warps));
                             }
                             this.pluginMessenger.sendGuiData(requestId, player, metaTitle, this.getJSONArrayFromCache(playerUUID, pages));
                         }
                         case "city", "lobbywarp" -> {
                             if(pages[0] == 0) {
-                                Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getCity().equalsIgnoreCase(title)).collect(Collectors.toSet());
+                                Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream()
+                                        .filter(warp -> warp.getCity().equalsIgnoreCase(title))
+                                        .collect(Collectors.toCollection(TreeSet::new));
                                 this.cachedGuiData.put(playerUUID, this.getJSONObjectsFromWarps(warps));
                             }
                             this.pluginMessenger.sendGuiData(requestId, player, metaTitle, this.getJSONArrayFromCache(playerUUID, pages));
                         }
                         case "tag" -> {
                             if(pages[0] == 0) {
-                                Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getTags().stream().anyMatch(tag -> tag.equalsIgnoreCase(title))).collect(Collectors.toSet());
+                                Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream()
+                                        .filter(warp -> warp.getTags().stream().anyMatch(tag -> tag.equalsIgnoreCase(title)))
+                                        .collect(Collectors.toCollection(TreeSet::new));
                                 this.cachedGuiData.put(playerUUID, this.getJSONObjectsFromWarps(warps));
                             }
                             this.pluginMessenger.sendGuiData(requestId, player, metaTitle, this.getJSONArrayFromCache(playerUUID, pages));
                         }
                         case "bl" -> {
                             if(pages[0] == 0) {
-                                Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getState().equals(title)).collect(Collectors.toSet());
+                                Set<Warp> warps = this.registriesProvider.getWarpsRegistry().getWarps().stream()
+                                        .filter(warp -> warp.getState().equals(title))
+                                        .collect(Collectors.toCollection(TreeSet::new));
                                 this.cachedGuiData.put(playerUUID, this.getJSONObjectsFromWarps(warps));
                             }
                             this.pluginMessenger.sendGuiData(requestId, player, metaTitle, this.getJSONArrayFromCache(playerUUID, pages));
                         }
                         case "search" -> {
-                            List<Warp> warpsSearch1 = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getName().equalsIgnoreCase(title)).collect(Collectors.toList());
+                            List<Warp> warpsSearch1 = new ArrayList<>(this.registriesProvider.getWarpsRegistry().getWarps().stream()
+                                    .filter(warp -> warp.getName().equalsIgnoreCase(title))
+                                    .toList());
                             if (warpsSearch1.size() == 1) {
-                                Warp warp = warpsSearch1.get(0);
+                                Warp warp = warpsSearch1.getFirst();
                                 String stayServer = null;
                                 for (GeoServer geoServer : this.geoData.getGeoServers()) {
                                     if (warp.equals(geoServer.getNormenWarp())) {
@@ -207,7 +224,9 @@ public class PluginMsgListener implements Listener {
                                 return;
                             }
 
-                            List<Warp> warpsSearch2 = this.registriesProvider.getWarpsRegistry().getWarps().stream().filter(warp -> warp.getCity().equalsIgnoreCase(title)).toList();
+                            List<Warp> warpsSearch2 = this.registriesProvider.getWarpsRegistry().getWarps().stream()
+                                    .filter(warp -> warp.getCity().equalsIgnoreCase(title))
+                                    .toList();
 
                             if (warpsSearch1.isEmpty() && warpsSearch2.isEmpty()) {
                                 player.sendMessage(TeleportationBungee.getFormattedMessage("Leider wurden keine Warps gefunden!"));

@@ -124,6 +124,14 @@ public class Warp implements Comparable<Warp> {
 
     @Override
     public int compareTo(Warp warp) {
-        return this.name.compareTo(warp.getName());
+        int compareCity = this.city.compareToIgnoreCase(warp.getCity());
+        if (compareCity != 0) {
+            return compareCity;
+        }
+        int compareState = this.state.compareToIgnoreCase(warp.getState());
+        if (compareState != 0) {
+            return compareState;
+        }
+        return this.name.compareToIgnoreCase(warp.getName());
     }
 }
