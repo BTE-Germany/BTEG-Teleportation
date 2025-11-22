@@ -21,6 +21,16 @@ public class PlayerJoinListener implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 
+		//cleanup expired tps
+		if (this.teleportationHandler.getPendingTps().size() > 15) {
+			this.teleportationHandler.getPendingTps().forEach((playerUUID, pendingTeleportation) -> {
+				if (pendingTeleportation.isValid()) {
+					return;
+				}
+				this.teleportationHandler.getPendingTps().remove(playerUUID);
+			});
+		}
+
 		// check if there is a teleportation for this player still pending
 		if(!this.teleportationHandler.getPendingTps().containsKey(player.getUniqueId())) {
 			return;

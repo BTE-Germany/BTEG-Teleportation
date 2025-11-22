@@ -109,6 +109,30 @@ public class ConfigReader {
         return null;
     }
 
+    public String readNormenServer() {
+        ConfigurationProvider provider = ConfigurationProvider.getProvider(YamlConfiguration.class);
+        File dir = plugin.getDataFolder();
+        if (!dir.getParentFile().exists()) dir.getParentFile().mkdir();
+        if (!dir.exists()) dir.mkdir();
+        File configFile = new File(this.pluginFolderPath, "config.yaml");
+
+        try {
+            if (!configFile.exists()) {
+                try (InputStream inputStream = plugin.getResourceAsStream(configFile.getName())) {
+                    FileUtils.copyInputStreamToFile(inputStream, configFile);
+                }
+            }
+            Configuration config = provider.load(configFile);
+
+            return config.getString("normen-server", null);
+
+        } catch (IOException e) {
+            plugin.getLogger().warning("Config unter \"" + configFile.getPath() + "\" konnte nicht geladen werden!");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public Warp readEventWarp(WarpsRegistry warpsRegistry) {
         ConfigurationProvider provider = ConfigurationProvider.getProvider(YamlConfiguration.class);
         File dir = plugin.getDataFolder();

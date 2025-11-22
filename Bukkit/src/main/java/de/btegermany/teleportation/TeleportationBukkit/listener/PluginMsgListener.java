@@ -5,6 +5,7 @@ import de.btegermany.teleportation.TeleportationBukkit.message.response.LastLoca
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.registry.CitiesRegistry;
 import de.btegermany.teleportation.TeleportationBukkit.registry.WarpTagsRegistry;
+import de.btegermany.teleportation.TeleportationBukkit.tp.PendingTpNormen;
 import de.btegermany.teleportation.TeleportationBukkit.tp.PendingTpPlayer;
 import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
 import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
@@ -82,6 +83,13 @@ public class PluginMsgListener implements PluginMessageListener {
 					}
 
 					teleportationHandler.handle(new PendingTpLocation(playerUUID, world, x, y, z, yaw, pitch, originServerName));
+				}
+
+				case "teleport_normen" -> {
+					UUID playerUUID = UUID.fromString(dataInput.readUTF());
+					String originServerName = dataInput.readUTF();
+
+					teleportationHandler.handle(new PendingTpNormen(playerUUID, originServerName));
 				}
 
 				case "gui_data" -> {
