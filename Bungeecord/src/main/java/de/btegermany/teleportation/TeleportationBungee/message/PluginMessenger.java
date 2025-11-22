@@ -11,9 +11,8 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONArray;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class PluginMessenger {
 
@@ -71,25 +70,32 @@ public class PluginMessenger {
         this.sendMessageToServers(new GuiDataResponseMessage(requestId, player, title, pagesData), player.getServer().getInfo());
     }
 
-    // connects the player to the server if needed and sends a Plugin Message with the teleportation data to the specified server
+    // connects the player to the server if needed and sends a Plugin Message with the teleportation data to the specified server (with timeout)
     private void send(ProxiedPlayer player, ServerInfo server, PluginMessage pluginMessage) {
         if(!player.getServer().getInfo().equals(server)) {
             player.connect(server);
         }
-        if(!server.getPlayers().isEmpty()) {
-            server.sendData(TeleportationBungee.PLUGIN_CHANNEL, pluginMessage.getBytes());
-            return;
-        }
-        new Thread(() -> {
-            while(!server.equals(player.getServer().getInfo())) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+
+        long period = TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS);
+        long timeout = TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS);
+        Timer timer = new Timer();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+            private long periodSum = 0;
+
+            @Override
+            public void run() {
+                if ((periodSum += period) >= timeout) {
+                    timer.cancel();
                 }
+
+                if (!server.equals(player.getServer().getInfo())) {
+                    return;
+                }
+                server.sendData(TeleportationBungee.PLUGIN_CHANNEL, pluginMessage.getBytes());
+                timer.cancel();
             }
-            server.sendData(TeleportationBungee.PLUGIN_CHANNEL, pluginMessage.getBytes());
-        }).start();
+        }, 0, period);
     }
 
 }
