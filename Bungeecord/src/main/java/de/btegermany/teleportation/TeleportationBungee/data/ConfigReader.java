@@ -109,7 +109,7 @@ public class ConfigReader {
         return null;
     }
 
-    public String readNormenServer() {
+    public String[] readNormenServerAndWorld() {
         ConfigurationProvider provider = ConfigurationProvider.getProvider(YamlConfiguration.class);
         File dir = plugin.getDataFolder();
         if (!dir.getParentFile().exists()) dir.getParentFile().mkdir();
@@ -124,7 +124,10 @@ public class ConfigReader {
             }
             Configuration config = provider.load(configFile);
 
-            return config.getString("normen-server", null);
+            String normenServer = config.getString("normen-server", null);
+            String normenWorld = config.getString("normen-world", null);
+
+            return new String[] {normenServer, normenWorld};
 
         } catch (IOException e) {
             plugin.getLogger().warning("Config unter \"" + configFile.getPath() + "\" konnte nicht geladen werden!");

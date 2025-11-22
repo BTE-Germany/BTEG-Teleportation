@@ -7,10 +7,11 @@ import java.util.List;
 
 public class TeleportToNormenMessage extends PluginMessage {
 
-    public TeleportToNormenMessage(ProxiedPlayer player) {
+    public TeleportToNormenMessage(ProxiedPlayer player, String normenWorld) {
         super("teleport_normen", MessageType.NORMAL);
         super.content.addAll(List.of(
                 player.getUniqueId().toString(),
+                normenWorld,
                 player.getServer().getInfo().getName()));
     }
 

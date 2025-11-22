@@ -8,4 +8,6 @@ database:
 plugin-folder: ""
 
 eventwarp: -1
+
 normen-server: ""
+normen-world: ""

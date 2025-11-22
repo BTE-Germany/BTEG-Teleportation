@@ -87,9 +87,10 @@ public class PluginMsgListener implements PluginMessageListener {
 
 				case "teleport_normen" -> {
 					UUID playerUUID = UUID.fromString(dataInput.readUTF());
+					String normenWorld = dataInput.readUTF();
 					String originServerName = dataInput.readUTF();
 
-					teleportationHandler.handle(new PendingTpNormen(playerUUID, originServerName));
+					teleportationHandler.handle(new PendingTpNormen(playerUUID, normenWorld, originServerName));
 				}
 
 				case "gui_data" -> {

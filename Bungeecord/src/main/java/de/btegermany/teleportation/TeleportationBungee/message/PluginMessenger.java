@@ -51,8 +51,8 @@ public class PluginMessenger {
     }
 
     // teleports a player to the normen world on the specified server
-    public void teleportToNormen(ProxiedPlayer player, ServerInfo server) {
-        this.send(player, server, new TeleportToNormenMessage(player));
+    public void teleportToNormen(ProxiedPlayer player, ServerInfo server, String normenWorld) {
+        this.send(player, server, new TeleportToNormenMessage(player, normenWorld));
     }
 
     // sends a Plugin Message in order to perform a command as a player on a server
