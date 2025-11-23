@@ -20,6 +20,9 @@ import java.util.List;
 
 public class ConfigReader {
 
+    private static final String CONFIG = "config.yaml";
+    private static final String CONFIG_SERVER = "server.yaml";
+    private static final String CONFIG_VALUES = "values.yaml";
     private final TeleportationBungee plugin;
     private final GeoData geoData;
     private String pluginFolderPath;
@@ -35,7 +38,7 @@ public class ConfigReader {
         File dir = plugin.getDataFolder();
         if(!dir.getParentFile().exists()) dir.getParentFile().mkdir();
         if(!dir.exists()) dir.mkdir();
-        File configFile = new File(dir, "server.yaml");
+        File configFile = new File(dir, CONFIG_SERVER);
 
         try {
             if(!configFile.exists()) {
@@ -85,7 +88,7 @@ public class ConfigReader {
         File dir = plugin.getDataFolder();
         if(!dir.getParentFile().exists()) dir.getParentFile().mkdir();
         if(!dir.exists()) dir.mkdir();
-        File configFile = new File(dir, "config.yaml");
+        File configFile = new File(dir, CONFIG);
 
         try {
             if (!configFile.exists()) {
@@ -114,7 +117,7 @@ public class ConfigReader {
         File dir = plugin.getDataFolder();
         if (!dir.getParentFile().exists()) dir.getParentFile().mkdir();
         if (!dir.exists()) dir.mkdir();
-        File configFile = new File(this.pluginFolderPath, "config.yaml");
+        File configFile = new File(this.pluginFolderPath, CONFIG);
 
         try {
             if (!configFile.exists()) {
@@ -141,7 +144,7 @@ public class ConfigReader {
         File dir = plugin.getDataFolder();
         if (!dir.getParentFile().exists()) dir.getParentFile().mkdir();
         if (!dir.exists()) dir.mkdir();
-        File configFile = new File(this.pluginFolderPath, "config.yaml");
+        File configFile = new File(this.pluginFolderPath, CONFIG_VALUES);
 
         try {
             if (!configFile.exists()) {
@@ -169,7 +172,7 @@ public class ConfigReader {
         File dir = plugin.getDataFolder();
         if(!dir.getParentFile().exists()) dir.getParentFile().mkdir();
         if(!dir.exists()) dir.mkdir();
-        File configFile = new File(this.pluginFolderPath, "config.yaml");
+        File configFile = new File(this.pluginFolderPath, CONFIG_VALUES);
 
         try {
             if(!configFile.exists()) {

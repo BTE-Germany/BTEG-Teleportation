@@ -7,7 +7,5 @@ database:
 # folder of plugin in template or default plugin folder for testing (.../plugins/[plugin name])
 plugin-folder: ""
 
-eventwarp: -1
-
 normen-server: ""
 normen-world: ""
