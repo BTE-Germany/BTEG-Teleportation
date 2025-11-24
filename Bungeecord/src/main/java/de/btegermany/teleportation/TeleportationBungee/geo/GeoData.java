@@ -4,6 +4,7 @@ import com.kno10.reversegeocode.query.ReverseGeocoder;
 import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -47,12 +48,22 @@ public class GeoData {
 
     // returns the server the location with the given coordinates is stored on
     public ServerInfo getServerFromLocation(double lat, double lon) {
+        return this.getServerFromLocationCheck(lat, lon, null);
+    }
+
+    // returns the server the location with the given coordinates is stored on. Meant to be used for checking coordinates, especially repeated requests in order to reduce logs for locations outside of Germany
+    public ServerInfo getServerFromLocationCheck(double lat, double lon, ProxiedPlayer player) {
         GeoLocation location = getLocation(lat, lon);
         if (location == null) {
+            plugin.getLogger().severe("Could not determine location for coordinates: " + lat + ", " + lon);
             return null;
         }
 
         if (!location.getCountry().equals("Deutschland")) {
+            // only log in relevant cases (single tp request or on Terra) and ignore e.g. on Lobby
+            if (player == null || player.getServer().getInfo().getName().startsWith("Terra")) {
+                plugin.getLogger().severe("Location is not in Germany: " + location.getCountry());
+            }
             return null;
         }
 
@@ -74,6 +85,7 @@ public class GeoData {
             }
         }
 
+        plugin.getLogger().severe("Could not find server for location: " + location);
         return null;
     }
 

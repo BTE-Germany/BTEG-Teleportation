@@ -101,8 +101,8 @@ public class TpllCommand extends Command {
             if (args.length >= 3 && args[2].matches("\\d+(.\\d+)?")) {
                 heightRaw = args[2];
             }
-            float yaw = 12345;
-            float pitch = 12345;
+            Float yaw = null;
+            Float pitch = null;
             String stayServer = null;
             for (String arg : args) {
                 if (arg.startsWith("yaw=")) {
@@ -115,8 +115,8 @@ public class TpllCommand extends Command {
                     stayServer = arg.substring("stay=".length());
                 }
             }
-            float yawFinal = yaw;
-            float pitchFinal = pitch;
+            final Float yawFinal = yaw;
+            final Float pitchFinal = pitch;
 
             // convert in-game coordinates to real life coordinates
             double[] mcCoordinates;

@@ -40,7 +40,9 @@ commands:
       /nwarp tag [tag] add/remove [warpId]
       /nwarp tag [tag old] edit [tag new]
     aliases:
+      - warps
       - nwarp
+      - nwarps
   lobbywarp:
     usage: |
       /lobbywarp [city]

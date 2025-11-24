@@ -7,12 +7,12 @@ public class LastLocation {
     private final double x;
     private final double y;
     private final double z;
-    private final float yaw;
-    private final float pitch;
+    private final Float yaw;
+    private final Float pitch;
     private final ServerInfo serverInfo;
 
     // a location a player teleported from to another location
-    public LastLocation(double x, double y, double z, float yaw, float pitch, ServerInfo serverInfo) {
+    public LastLocation(double x, double y, double z, Float yaw, Float pitch, ServerInfo serverInfo) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -27,11 +27,11 @@ public class LastLocation {
 
     // Getters
 
-    public float getYaw() {
+    public Float getYaw() {
         return yaw;
     }
 
-    public float getPitch() {
+    public Float getPitch() {
         return pitch;
     }
 

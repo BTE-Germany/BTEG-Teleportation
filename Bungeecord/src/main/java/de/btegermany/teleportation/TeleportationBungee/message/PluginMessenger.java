@@ -46,7 +46,7 @@ public class PluginMessenger {
     }
 
     // teleports a player to the specified coordinates across the network
-    public void teleportToCoords(ProxiedPlayer player, ServerInfo server, double x, double y, double z, float yaw, float pitch) {
+    public void teleportToCoords(ProxiedPlayer player, ServerInfo server, double x, double y, double z, Float yaw, Float pitch) {
         this.send(player, server, new TeleportToCoordsMessage(player, x, y, z, yaw, pitch));
     }
 
