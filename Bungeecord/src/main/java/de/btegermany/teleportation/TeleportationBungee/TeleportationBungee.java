@@ -96,7 +96,7 @@ public class TeleportationBungee extends Plugin {
                 this.registriesProvider.getBukkitPlayersRegistry().getBukkitPlayers().forEach((uuid, bukkitPlayer) -> {
                     try {
                         double[] coords = GeoData.BTE_GENERATOR_SETTINGS.projection().toGeo(bukkitPlayer.getX(), bukkitPlayer.getZ());
-                        ServerInfo serverInfo = this.geoData.getServerFromLocation(coords[1], coords[0]);
+                        ServerInfo serverInfo = this.geoData.getServerFromLocationCheck(coords[1], coords[0], bukkitPlayer.getProxiedPlayer());
                         if (!bukkitPlayer.getServerInfo().equals(serverInfo) && this.geoData.getGeoServers().stream().anyMatch(geoServer -> geoServer.getServerInfo().equals(serverInfo) && geoServer.isEarthServer()) && this.geoData.getGeoServers().stream().anyMatch(geoServer -> geoServer.getServerInfo().equals(bukkitPlayer.getServerInfo()) && geoServer.isEarthServer())) {
                             bukkitPlayer.getProxiedPlayer().sendMessage(TeleportationBungee.getFormattedMessage("Dieses Bundesland liegt auf einem anderen Server, du wirst daher auf den richtigen Server gesendet!"));
                             ProxyServer.getInstance().getPluginManager().dispatchCommand(bukkitPlayer.getProxiedPlayer(), "tpll " + coords[1] + " " + coords[0] + " yaw=" + bukkitPlayer.getYaw() + " pitch=" + bukkitPlayer.getPitch());
