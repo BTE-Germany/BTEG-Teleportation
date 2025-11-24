@@ -7,13 +7,14 @@ import java.util.List;
 
 public class TeleportToCoordsMessage extends PluginMessage {
 
-    public TeleportToCoordsMessage(ProxiedPlayer player, double x, double y, double z, float yaw, float pitch) {
+    public TeleportToCoordsMessage(ProxiedPlayer player, double x, double y, double z, Float yaw, Float pitch) {
         super("teleport_coords", MessageType.NORMAL);
         super.content.addAll(List.of(
                 player.getUniqueId().toString(),
                 x + "," + y + "," + z,
-                String.valueOf(yaw),
-                String.valueOf(pitch),
+                // default value is null. If not changed the player's current orientation will be used when teleporting to avoid confusion when yaw and pitch are set to 0
+                yaw == null ? "null" : yaw.toString(),
+                pitch == null ? "null" : pitch.toString(),
                 player.getServer().getInfo().getName()));
     }
 

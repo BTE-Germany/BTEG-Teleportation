@@ -72,8 +72,6 @@ public class TeleportCommand extends Command implements TabExecutor {
                     double z = Double.parseDouble(args[2]);
                     x += x % 1 == 0 ? 0.5 : 0;
                     z += z % 1 == 0 ? 0.5 : 0;
-                    float yaw = 0;
-                    float pitch = 0;
 
                     double[] geoCoordinates = GeoData.BTE_GENERATOR_SETTINGS.projection().toGeo(x, z);
 
@@ -85,7 +83,7 @@ public class TeleportCommand extends Command implements TabExecutor {
                     }
 
                     player.sendMessage(new ComponentBuilder(String.format("ᾠ §6Du §6wirst §6zu §2%s §2%s §2%s §6teleportiert.", x, y, z)).create());
-                    this.pluginMessenger.teleportToCoords(player, serverInfo, x, y, z, yaw, pitch);
+                    this.pluginMessenger.teleportToCoords(player, serverInfo, x, y, z, null, null);
                 } catch (NumberFormatException | OutOfProjectionBoundsException e) {
                     player.sendMessage(new ComponentBuilder("ᾠ §cBitte §cüberprüfe §cdie §cKoordinaten!").create());
                 }

@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 
 public class PluginMsgListener implements PluginMessageListener {
@@ -70,8 +71,9 @@ public class PluginMsgListener implements PluginMessageListener {
 					double x = Double.parseDouble(coords[0]);
 					double y = Double.parseDouble(coords[1]);
 					double z = Double.parseDouble(coords[2]);
-					float yaw = Float.parseFloat(dataInput.readUTF());
-					float pitch = Float.parseFloat(dataInput.readUTF());
+					// default value null. Otherwise, use the set float value
+					Float yaw = Optional.of(dataInput.readUTF()).filter(str -> !str.equals("null")).map(Float::parseFloat).orElse(null);
+					Float pitch = Optional.of(dataInput.readUTF()).filter(str -> !str.equals("null")).map(Float::parseFloat).orElse(null);
 					String originServerName = dataInput.readUTF();
 					World world = Bukkit.getWorld("world");
 					if (world == null) {

@@ -19,8 +19,8 @@ public class RequestLastLocationMessage extends PluginMessageWithResponse {
                 double x = Double.parseDouble(dataInput.readUTF());
                 double y = Double.parseDouble(dataInput.readUTF());
                 double z = Double.parseDouble(dataInput.readUTF());
-                float yaw = Float.parseFloat(dataInput.readUTF());
-                float pitch = Float.parseFloat(dataInput.readUTF());
+                Float yaw = Float.parseFloat(dataInput.readUTF());
+                Float pitch = Float.parseFloat(dataInput.readUTF());
                 if (player == null || !player.isConnected()) return;
 
                 if (!playerUUID.equals(player.getUniqueId())) {
