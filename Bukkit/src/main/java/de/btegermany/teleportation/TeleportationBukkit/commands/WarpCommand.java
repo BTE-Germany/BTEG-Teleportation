@@ -1,5 +1,6 @@
 package de.btegermany.teleportation.TeleportationBukkit.commands;
 
+import de.btegermany.teleportation.TeleportationBukkit.data.ConfigReader;
 import de.btegermany.teleportation.TeleportationBukkit.gui.WarpGui;
 import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.GuiArgs;
 import de.btegermany.teleportation.TeleportationBukkit.message.*;
@@ -27,10 +28,12 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
 
     private final PluginMessenger pluginMessenger;
     private final RegistriesProvider registriesProvider;
+    private final boolean warpsEnabled;
 
-    public WarpCommand(PluginMessenger pluginMessenger, RegistriesProvider registriesProvider) {
+    public WarpCommand(PluginMessenger pluginMessenger, RegistriesProvider registriesProvider, ConfigReader configReader) {
         this.pluginMessenger = pluginMessenger;
         this.registriesProvider = registriesProvider;
+        this.warpsEnabled = configReader.readWarpsEnabled();
     }
 
     @Override
@@ -38,6 +41,11 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
 
         if(!(sender instanceof Player player)) {
             sender.sendMessage(getFormattedErrorMessage("Diesen Command können nur Spieler ausführen!"));
+            return true;
+        }
+
+        if (!this.warpsEnabled) {
+            player.sendMessage(TeleportationBukkit.getFormattedMessage("Auf diesem Server sind Warps deaktiviert. Du kannst den Command aber auf anderen Servern wie der Lobby (/l) nutzen."));
             return true;
         }
 

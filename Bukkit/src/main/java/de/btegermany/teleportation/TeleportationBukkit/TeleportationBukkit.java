@@ -3,6 +3,7 @@ package de.btegermany.teleportation.TeleportationBukkit;
 import com.tchristofferson.pagedinventories.PagedInventoryAPI;
 import de.btegermany.teleportation.TeleportationBukkit.commands.LobbyWarpCommand;
 import de.btegermany.teleportation.TeleportationBukkit.commands.WarpCommand;
+import de.btegermany.teleportation.TeleportationBukkit.data.ConfigReader;
 import de.btegermany.teleportation.TeleportationBukkit.listener.PlayerInteractListener;
 import de.btegermany.teleportation.TeleportationBukkit.listener.PluginMsgListener;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
@@ -38,6 +39,7 @@ public class TeleportationBukkit extends JavaPlugin {
 
 		//initialize objects
 		pagedInventoryAPI = new PagedInventoryAPI(this);
+		ConfigReader configReader = new ConfigReader(this);
 		RegistriesProvider registriesProvider = new RegistriesProvider(this);
 		registriesProvider.getLobbyCitiesRegistry().loadLobbyCities();
 		this.pluginMessenger = new PluginMessenger(this, registriesProvider);
@@ -53,7 +55,7 @@ public class TeleportationBukkit extends JavaPlugin {
 		this.getServer().getPluginManager().registerEvents(new PlayerInteractListener(registriesProvider), this);
 
 		// register commands
-		this.getCommand("warp").setExecutor(new WarpCommand(this.pluginMessenger, registriesProvider));
+		this.getCommand("warp").setExecutor(new WarpCommand(this.pluginMessenger, registriesProvider, configReader));
 		this.getCommand("lobbywarp").setExecutor(new LobbyWarpCommand(this.pluginMessenger, registriesProvider));
 
 		this.startProxyPlayerSynchronization();
