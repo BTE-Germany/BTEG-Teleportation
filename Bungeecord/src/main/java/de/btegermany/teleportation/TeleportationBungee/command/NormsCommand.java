@@ -18,6 +18,8 @@ public class NormsCommand extends Command {
     private final PluginMessenger pluginMessenger;
     private final String normenServerName;
     private final String normenWorld;
+    private final float normenYaw;
+    private final float normenPitch;
 
     public NormsCommand(ConfigReader configReader, RegistriesProvider registriesProvider, PluginMessenger pluginMessenger) {
         super("norms", "bteg.norms", "normen", "norme");
@@ -28,6 +30,9 @@ public class NormsCommand extends Command {
         String[] normenServerAndWorld = configReader.readNormenServerAndWorld();
         this.normenServerName = normenServerAndWorld[0];
         this.normenWorld = normenServerAndWorld[1];
+        float[] normenYawAndPitch = configReader.readNormenYawAndPitch();
+        this.normenYaw = normenYawAndPitch[0];
+        this.normenPitch = normenYawAndPitch[1];
     }
 
     @Override
@@ -51,7 +56,7 @@ public class NormsCommand extends Command {
         ServerInfo normenServer = ProxyServer.getInstance().getServerInfo(this.normenServerName);
 
         RequestLastLocationMessage requestLastLocationMessage = new RequestLastLocationMessage(player, this.registriesProvider, () -> {
-            this.pluginMessenger.teleportToNormen(player, normenServer, this.normenWorld);
+            this.pluginMessenger.teleportToNormen(player, normenServer, this.normenWorld, this.normenYaw, this.normenPitch);
         });
         this.pluginMessenger.sendMessageToServers(requestLastLocationMessage, player.getServer().getInfo());
     }

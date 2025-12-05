@@ -10,11 +10,15 @@ import java.util.UUID;
 public class PendingTpNormen extends PendingTeleportationAbstract {
 
     private final String normenWorld;
+    private final float yaw;
+    private final float pitch;
 
-    public PendingTpNormen(UUID playerUUID, String normenWorld, String originServerName) {
+    public PendingTpNormen(UUID playerUUID, String normenWorld, String originServerName, float yaw, float pitch) {
         super(playerUUID, originServerName);
 
         this.normenWorld = normenWorld;
+        this.yaw = yaw;
+        this.pitch = pitch;
     }
 
     @Override
@@ -28,7 +32,11 @@ public class PendingTpNormen extends PendingTeleportationAbstract {
         assert player != null; // canTeleport() checked
         World world = Bukkit.getWorld(this.normenWorld);
 
-        player.teleport(new Location(world, 0.5, 5, 0.5));
+        Location location = new Location(world, 0.5, 5, 0.5);
+        location.setYaw(this.yaw);
+        location.setPitch(this.pitch);
+
+        player.teleport(location);
     }
 
 }

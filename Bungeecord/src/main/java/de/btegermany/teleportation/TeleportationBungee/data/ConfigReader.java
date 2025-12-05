@@ -139,6 +139,34 @@ public class ConfigReader {
         return null;
     }
 
+    public float[] readNormenYawAndPitch() {
+        ConfigurationProvider provider = ConfigurationProvider.getProvider(YamlConfiguration.class);
+        File dir = plugin.getDataFolder();
+        if (!dir.getParentFile().exists()) dir.getParentFile().mkdir();
+        if (!dir.exists()) dir.mkdir();
+        File configFile = new File(this.pluginFolderPath, CONFIG);
+
+        try {
+            if (!configFile.exists()) {
+                try (InputStream inputStream = plugin.getResourceAsStream(configFile.getName())) {
+                    FileUtils.copyInputStreamToFile(inputStream, configFile);
+                }
+            }
+            Configuration config = provider.load(configFile);
+
+            String[] yawAndPitch = config.getString("normen-rotation", "0/0").split("/");
+            float yaw = Float.parseFloat(yawAndPitch[0]);
+            float pitch = Float.parseFloat(yawAndPitch[1]);
+
+            return new float[] {yaw, pitch};
+
+        } catch (IOException e) {
+            plugin.getLogger().warning("Config unter \"" + configFile.getPath() + "\" konnte nicht geladen werden!");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public Warp readEventWarp(WarpsRegistry warpsRegistry) {
         ConfigurationProvider provider = ConfigurationProvider.getProvider(YamlConfiguration.class);
         File dir = plugin.getDataFolder();

@@ -9,3 +9,5 @@ plugin-folder: ""
 
 normen-server: ""
 normen-world: ""
+# default rotation of the player. Format: yaw/pitch. Default: 0/0
+normen-rotation: ""
