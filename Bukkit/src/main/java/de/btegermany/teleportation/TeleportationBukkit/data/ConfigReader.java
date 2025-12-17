@@ -22,6 +22,6 @@ public class ConfigReader {
         }
         FileConfiguration config = YamlConfiguration.loadConfiguration(file);
 
-        return config.getBoolean("warps-enabled", true);
+        return config.getBoolean("warps.enabled", true);
     }
 }

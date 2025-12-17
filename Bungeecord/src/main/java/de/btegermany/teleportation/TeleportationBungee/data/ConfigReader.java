@@ -127,8 +127,8 @@ public class ConfigReader {
             }
             Configuration config = provider.load(configFile);
 
-            String normenServer = config.getString("normen-server", null);
-            String normenWorld = config.getString("normen-world", null);
+            String normenServer = config.getString("normen.server", null);
+            String normenWorld = config.getString("normen.world", null);
 
             return new String[] {normenServer, normenWorld};
 
@@ -154,7 +154,7 @@ public class ConfigReader {
             }
             Configuration config = provider.load(configFile);
 
-            String[] yawAndPitch = config.getString("normen-rotation", "0/0").split("/");
+            String[] yawAndPitch = config.getString("normen.rotation", "0/0").split("/");
             float yaw = Float.parseFloat(yawAndPitch[0]);
             float pitch = Float.parseFloat(yawAndPitch[1]);
 
