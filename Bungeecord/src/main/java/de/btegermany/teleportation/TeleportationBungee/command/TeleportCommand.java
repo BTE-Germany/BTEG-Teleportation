@@ -105,7 +105,7 @@ public class TeleportCommand extends Command implements TabExecutor {
             };
 
             RequestPlayerWorldMessage requestPlayerWorldMessage = new RequestPlayerWorldMessage(player, world -> {
-                if ((!world.equals(Utils.WORLD_TERRA) || player.getServer().getInfo().getName().equals("Lobby-1"))) {
+                if ((!world.equals(Utils.WORLD_TERRA) || player.getServer().getInfo().getName().equalsIgnoreCase("Lobby-1"))) {
                     teleport.accept(player.getServer().getInfo());
                 } else {
                     try {
