@@ -1,6 +1,7 @@
 package de.btegermany.teleportation.TeleportationBungee.message.withresponse;
 
 import de.btegermany.teleportation.TeleportationAPI.message.PluginMessageWithResponse;
+import de.btegermany.teleportation.TeleportationBungee.TeleportationBungee;
 import de.btegermany.teleportation.TeleportationBungee.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBungee.util.LastLocation;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -21,6 +22,7 @@ public class RequestLastLocationMessage extends PluginMessageWithResponse {
                 double z = Double.parseDouble(dataInput.readUTF());
                 Float yaw = Float.parseFloat(dataInput.readUTF());
                 Float pitch = Float.parseFloat(dataInput.readUTF());
+                String world = dataInput.readUTF();
                 if (player == null || !player.isConnected()) return;
 
                 if (!playerUUID.equals(player.getUniqueId())) {
@@ -28,7 +30,7 @@ public class RequestLastLocationMessage extends PluginMessageWithResponse {
                     return;
                 }
 
-                LastLocation lastLocation = new LastLocation(x, y, z, yaw, pitch, player.getServer().getInfo());
+                LastLocation lastLocation = new LastLocation(x, y, z, yaw, pitch, world, player.getServer().getInfo());
                 registriesProvider.getLastLocationsRegistry().register(playerUUID, lastLocation);
 
                 callback.run();

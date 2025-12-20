@@ -48,7 +48,7 @@ public class TpBackCommand extends Command {
         double x = Double.parseDouble(coordinatesSplit[0]);
         double y = Double.parseDouble(coordinatesSplit[1]);
         double z = Double.parseDouble(coordinatesSplit[2]);
-        this.pluginMessenger.teleportToCoords(player, lastLocation.getServerInfo(), x, y, z, lastLocation.getYaw(), lastLocation.getPitch());
+        this.pluginMessenger.teleportToCoords(player, lastLocation.serverInfo(), x, y, z, lastLocation.yaw(), lastLocation.pitch(), lastLocation.world());
     }
 
 }

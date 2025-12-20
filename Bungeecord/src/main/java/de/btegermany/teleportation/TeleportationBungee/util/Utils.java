@@ -10,6 +10,7 @@ import static de.btegermany.teleportation.TeleportationBungee.TeleportationBunge
 
 public class Utils {
 
+    public static final String WORLD_TERRA = "world";
     private final PluginMessenger pluginMessenger;
     private final RegistriesProvider registriesProvider;
 

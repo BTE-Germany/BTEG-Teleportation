@@ -8,6 +8,7 @@ import de.btegermany.teleportation.TeleportationBungee.geo.GeoServer;
 import de.btegermany.teleportation.TeleportationBungee.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBungee.message.withresponse.RequestLastLocationMessage;
 import de.btegermany.teleportation.TeleportationBungee.registry.RegistriesProvider;
+import de.btegermany.teleportation.TeleportationBungee.util.Utils;
 import net.buildtheearth.terraminusminus.dataset.IScalarDataset;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorPipelines;
 import net.buildtheearth.terraminusminus.generator.GeneratorDatasets;
@@ -142,7 +143,7 @@ public class TpllCommand extends Command {
 
             // send teleport data and the player to the target server
             RequestLastLocationMessage requestLastLocationMessage = new RequestLastLocationMessage(player, this.registriesProvider, () -> {
-                this.pluginMessenger.teleportToCoords(player, targetServer, mcCoordinatesFinal[0], mcCoordinatesY, mcCoordinatesFinal[1], yawFinal, pitchFinal);
+                this.pluginMessenger.teleportToCoords(player, targetServer, mcCoordinatesFinal[0], mcCoordinatesY, mcCoordinatesFinal[1], yawFinal, pitchFinal, Utils.WORLD_TERRA);
             });
             this.pluginMessenger.sendMessageToServers(requestLastLocationMessage, player.getServer().getInfo());
 

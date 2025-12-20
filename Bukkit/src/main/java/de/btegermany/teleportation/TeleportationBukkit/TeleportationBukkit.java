@@ -2,6 +2,7 @@ package de.btegermany.teleportation.TeleportationBukkit;
 
 import com.tchristofferson.pagedinventories.PagedInventoryAPI;
 import de.btegermany.teleportation.TeleportationBukkit.commands.LobbyWarpCommand;
+import de.btegermany.teleportation.TeleportationBukkit.commands.TpCommand;
 import de.btegermany.teleportation.TeleportationBukkit.commands.WarpCommand;
 import de.btegermany.teleportation.TeleportationBukkit.data.ConfigReader;
 import de.btegermany.teleportation.TeleportationBukkit.listener.PlayerInteractListener;
@@ -57,6 +58,7 @@ public class TeleportationBukkit extends JavaPlugin {
 		// register commands
 		this.getCommand("warp").setExecutor(new WarpCommand(this.pluginMessenger, registriesProvider, configReader));
 		this.getCommand("lobbywarp").setExecutor(new LobbyWarpCommand(this.pluginMessenger, registriesProvider));
+		this.getCommand("tp").setExecutor(new TpCommand(this.pluginMessenger));
 
 		this.startProxyPlayerSynchronization();
 	}

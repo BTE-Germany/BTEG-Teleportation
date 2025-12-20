@@ -65,7 +65,8 @@ public class TeleportationBungee extends Plugin {
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new TpllCommand(this.geoData, this.pluginMessenger, this.registriesProvider));
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new EventCommand(this.registriesProvider, this.pluginMessenger));
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new HubCommand());
-        ProxyServer.getInstance().getPluginManager().registerCommand(this, new NormsCommand(this.configReader, registriesProvider, pluginMessenger));
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, new NormsCommand(this.configReader, this.registriesProvider, this.pluginMessenger));
+        ProxyServer.getInstance().getPluginManager().registerCommand(this, new BlCommand());
 
         // register plugin channel
         ProxyServer.getInstance().registerChannel(PLUGIN_CHANNEL);

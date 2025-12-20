@@ -3,6 +3,7 @@ package de.btegermany.teleportation.TeleportationBukkit.listener;
 import de.btegermany.teleportation.TeleportationAPI.message.PluginMessage;
 import de.btegermany.teleportation.TeleportationBukkit.message.response.LastLocationResponseMessage;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
+import de.btegermany.teleportation.TeleportationBukkit.message.response.PlayerWorldResponseMessage;
 import de.btegermany.teleportation.TeleportationBukkit.registry.CitiesRegistry;
 import de.btegermany.teleportation.TeleportationBukkit.registry.WarpTagsRegistry;
 import de.btegermany.teleportation.TeleportationBukkit.tp.PendingTpNormen;
@@ -75,16 +76,10 @@ public class PluginMsgListener implements PluginMessageListener {
 					// default value null. Otherwise, use the set float value
 					Float yaw = Optional.of(dataInput.readUTF()).filter(str -> !str.equals("null")).map(Float::parseFloat).orElse(null);
 					Float pitch = Optional.of(dataInput.readUTF()).filter(str -> !str.equals("null")).map(Float::parseFloat).orElse(null);
+					String worldName = Optional.of(dataInput.readUTF()).filter(str -> !str.equals("null")).orElse(null);
 					String originServerName = dataInput.readUTF();
-					World world = Bukkit.getWorld("world");
-					if (world == null) {
-						world = Bukkit.getWorlds().get(0);
-					}
-					if (Double.isNaN(y) || !NumberConversions.isFinite(y)) {
-						y = world.getHighestBlockYAt((int) x, (int) z) + 1;
-					}
 
-					teleportationHandler.handle(new PendingTpLocation(playerUUID, world, x, y, z, yaw, pitch, originServerName));
+					teleportationHandler.handle(new PendingTpLocation(playerUUID, x, y, z, yaw, pitch, worldName, originServerName));
 				}
 
 				case "teleport_normen" -> {
@@ -221,6 +216,11 @@ public class PluginMsgListener implements PluginMessageListener {
 				case "last_location_request" -> {
 					UUID playerUUID = UUID.fromString(dataInput.readUTF());
 					this.pluginMessenger.send(new LastLocationResponseMessage(requestId, playerUUID));
+				}
+
+				case "player_world_request" -> {
+					UUID playerUUID = UUID.fromString(dataInput.readUTF());
+					this.pluginMessenger.send(new PlayerWorldResponseMessage(requestId, playerUUID));
 				}
 			}
 

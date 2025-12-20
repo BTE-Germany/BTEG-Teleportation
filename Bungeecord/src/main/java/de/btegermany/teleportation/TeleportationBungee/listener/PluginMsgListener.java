@@ -419,7 +419,7 @@ public class PluginMsgListener implements Listener {
                     }
                 }
 
-                case "last_location" -> {
+                case "last_location", "player_world" -> {
                     this.registriesProvider.getPluginMessagesWithResponseRegistry().getPluginMessageWithResponse(requestId).accept(dataInput);
                 }
 

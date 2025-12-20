@@ -23,7 +23,8 @@ public class LastLocationResponseMessage extends PluginMessageResponse {
                 String.valueOf(location.getY()),
                 String.valueOf(location.getZ()),
                 String.valueOf(location.getYaw()),
-                String.valueOf(location.getPitch())));
+                String.valueOf(location.getPitch()),
+                location.getWorld().getName()));
     }
 
 }
