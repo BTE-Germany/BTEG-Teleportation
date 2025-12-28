@@ -28,7 +28,7 @@ public class WarpsRegistry {
 
     public synchronized void loadWarps() {
         this.warps.clear();
-        try (PreparedStatement preparedStatement = this.database.getConnection().prepareStatement("SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height FROM warps ORDER BY name")) {
+        try (PreparedStatement preparedStatement = this.database.getConnection().prepareStatement("SELECT id, name, city, state, latitude, longitude, head_id, yaw, pitch, height, world FROM warps ORDER BY name")) {
             ResultSet resultSet = this.database.executeQuerySync(preparedStatement);
             while (resultSet.next()) {
                 Warp warp = new Warp(
@@ -41,7 +41,8 @@ public class WarpsRegistry {
                         resultSet.getString("head_id"),
                         resultSet.getFloat("yaw"),
                         resultSet.getFloat("pitch"),
-                        resultSet.getInt("height")
+                        resultSet.getInt("height"),
+                        resultSet.getString("world")
                 );
 
                 try (PreparedStatement preparedStatement1 = this.database.getConnection().prepareStatement("SELECT tag FROM tags_warps WHERE warp_id = ?")) {
@@ -72,7 +73,7 @@ public class WarpsRegistry {
 
     public synchronized boolean registerSync(Warp warp) {
         try {
-            PreparedStatement preparedStatement = this.database.getConnection().prepareStatement("INSERT INTO warps (id, name, city, state, latitude, longitude, head_id, yaw, pitch, height) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            PreparedStatement preparedStatement = this.database.getConnection().prepareStatement("INSERT INTO warps (id, name, city, state, latitude, longitude, head_id, yaw, pitch, height, world) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             preparedStatement.setInt(1, warp.getId());
             preparedStatement.setString(2, warp.getName());
             preparedStatement.setString(3, warp.getCity());
@@ -83,6 +84,7 @@ public class WarpsRegistry {
             preparedStatement.setFloat(8, warp.getYaw());
             preparedStatement.setFloat(9, warp.getPitch());
             preparedStatement.setDouble(10, warp.getHeight());
+            preparedStatement.setString(11, warp.getWorld());
 
             this.database.executeUpdateSync(preparedStatement);
             this.warps.add(warp);

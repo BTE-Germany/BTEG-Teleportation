@@ -96,6 +96,9 @@ public abstract class MultiPageWarpGuiAbstract extends WarpGuiAbstract {
         if(object.has("height")) {
             lore.add("Höhe: " + object.getDouble("height"));
         }
+        if(object.has("world")) {
+            lore.add("Welt: " + object.getString("world"));
+        }
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;

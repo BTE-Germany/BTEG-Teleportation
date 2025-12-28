@@ -126,8 +126,15 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
 
                 WarpGettingChanged warpGettingChanged = new WarpGettingChanged(id, column);
                 warpGettingChanged.setValue(value);
-                if (args.length == 3 && (column.equals("yaw") || column.equals("pitch") || column.equals("height"))) {
-                    warpGettingChanged.setValue(column.equals("yaw") ? String.valueOf(player.getLocation().getYaw()) : (column.equals("pitch") ? String.valueOf(player.getLocation().getPitch()) : String.valueOf(player.getLocation().getY())));
+                if (args.length == 3 && (column.equals("yaw") || column.equals("pitch") || column.equals("height") || column.equals("world"))) {
+                    String valueNoInput = switch (column) {
+                        case "yaw" -> String.valueOf(player.getLocation().getYaw());
+                        case "pitch" -> String.valueOf(player.getLocation().getPitch());
+                        case "height" -> String.valueOf(player.getLocation().getY());
+                        case "world" -> player.getWorld().getName();
+                        default -> null;
+                    };
+                    warpGettingChanged.setValue(valueNoInput);
                 }
                 if (!column.equals("head_id") && warpGettingChanged.getValue().equals("null")) {
                     return false;
@@ -190,7 +197,7 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
                 }
 
                 if(args[0].equalsIgnoreCase("change")) {
-                    result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[2], "name", "city", "state", "coordinates", "headId", "yaw", "pitch", "height"));
+                    result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[2], "name", "city", "state", "coordinates", "headId", "yaw", "pitch", "height", "world"));
                     break;
                 }
                 if(args[0].equalsIgnoreCase("tag")) {

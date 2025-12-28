@@ -104,6 +104,7 @@ public class TpllCommand extends Command {
             }
             Float yaw = null;
             Float pitch = null;
+            String world = Utils.WORLD_TERRA;
             String stayServer = null;
             for (String arg : args) {
                 if (arg.startsWith("yaw=")) {
@@ -112,12 +113,16 @@ public class TpllCommand extends Command {
                 if (arg.startsWith("pitch=")) {
                     pitch = Float.parseFloat(arg.substring("pitch=".length()));
                 }
+                if (arg.startsWith("world=")) {
+                    world = arg.substring("world=".length());
+                }
                 if (arg.startsWith("stay=")) {
                     stayServer = arg.substring("stay=".length());
                 }
             }
             final Float yawFinal = yaw;
             final Float pitchFinal = pitch;
+            final String worldFinal = world;
 
             // convert in-game coordinates to real life coordinates
             double[] mcCoordinates;
@@ -143,7 +148,7 @@ public class TpllCommand extends Command {
 
             // send teleport data and the player to the target server
             RequestLastLocationMessage requestLastLocationMessage = new RequestLastLocationMessage(player, this.registriesProvider, () -> {
-                this.pluginMessenger.teleportToCoords(player, targetServer, mcCoordinatesFinal[0], mcCoordinatesY, mcCoordinatesFinal[1], yawFinal, pitchFinal, Utils.WORLD_TERRA);
+                this.pluginMessenger.teleportToCoords(player, targetServer, mcCoordinatesFinal[0], mcCoordinatesY, mcCoordinatesFinal[1], yawFinal, pitchFinal, worldFinal);
             });
             this.pluginMessenger.sendMessageToServers(requestLastLocationMessage, player.getServer().getInfo());
 

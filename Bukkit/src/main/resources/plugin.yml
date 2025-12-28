@@ -35,7 +35,7 @@ commands:
       /nwarp help
       /nwarp create [name; city; state; (optional: headId)]
       /nwarp change [id] [name/city/state/coordinates/headId] [value]
-      /nwarp change [id] [yaw/pitch/height]
+      /nwarp change [id] [yaw/pitch/height/world]
       /nwarp delete [id]
       /nwarp tag [tag] add/remove [warpId]
       /nwarp tag [tag old] edit [tag new]

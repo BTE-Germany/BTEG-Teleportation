@@ -112,6 +112,7 @@ public class PluginMsgListener implements PluginMessageListener {
 					float yaw = Float.parseFloat(dataInput.readUTF());
 					float pitch = Float.parseFloat(dataInput.readUTF());
 					double height = Double.parseDouble(dataInput.readUTF());
+					String world = dataInput.readUTF();
 					Player targetPlayer = Bukkit.getPlayer(playerUUID);
 					if (targetPlayer == null || !targetPlayer.isOnline()) return;
 
@@ -156,6 +157,9 @@ public class PluginMsgListener implements PluginMessageListener {
 							TextComponent changeHeight = new TextComponent(TeleportationBukkit.getFormattedMessage("§r§cHöhe §cändern"));
 							changeHeight.setColor(ChatColor.RED);
 							changeHeight.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nwarp change " + id + " height"));
+							TextComponent changeWorld = new TextComponent(TeleportationBukkit.getFormattedMessage("§r§cWelt §cändern"));
+							changeWorld.setColor(ChatColor.RED);
+							changeWorld.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nwarp change " + id + " world"));
 							targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Id: " + id));
 							targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Name: " + name));
 							targetPlayer.spigot().sendMessage(changeName);
@@ -173,6 +177,8 @@ public class PluginMsgListener implements PluginMessageListener {
 							targetPlayer.spigot().sendMessage(changePitch);
 							targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Höhe: " + height));
 							targetPlayer.spigot().sendMessage(changeHeight);
+							targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Welt: " + world));
+							targetPlayer.spigot().sendMessage(changeWorld);
 							registriesProvider.getPlayersEnteringChangeWarpIdRegistry().unregister(targetPlayer);
 						}
 					}

@@ -19,7 +19,8 @@ public class RandomWarpMessage extends PluginMessage {
                 String.valueOf(warp.getHeight()),
                 String.valueOf(warp.getYaw()),
                 String.valueOf(warp.getPitch()),
-                String.valueOf(warp.getHeadId())
+                String.valueOf(warp.getHeadId()),
+                warp.getWorld()
         ));
     }
 

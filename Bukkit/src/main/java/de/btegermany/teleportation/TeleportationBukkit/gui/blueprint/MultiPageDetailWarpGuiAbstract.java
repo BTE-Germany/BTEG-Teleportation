@@ -24,13 +24,15 @@ public abstract class MultiPageDetailWarpGuiAbstract extends MultiPageWarpGuiAbs
                 Optional<String> optionalCommand = lore.stream().filter(s -> s.startsWith("/tpll")).findFirst();
                 Optional<String> optionalRotation = lore.stream().filter(s -> s.startsWith("Drehung:")).findFirst();
                 Optional<String> optionalHeight = lore.stream().filter(s -> s.startsWith("Höhe:")).findFirst();
-                if(optionalCommand.isEmpty() || optionalRotation.isEmpty() || optionalHeight.isEmpty()) return;
+                Optional<String> optionalWorld = lore.stream().filter(s -> s.startsWith("Welt:")).findFirst();
+                if(optionalCommand.isEmpty() || optionalRotation.isEmpty() || optionalHeight.isEmpty() || optionalWorld.isEmpty()) return;
 
                 // execute tpll command for warp
                 String command = optionalCommand.get();
                 String[] rotation = optionalRotation.get().substring("Drehung: ".length()).replace(",", "").split(" ");
                 double height = Double.parseDouble(optionalHeight.get().substring("Höhe: ".length()));
-                pluginMessenger.send(new ExecuteCommandMessage(player.getUniqueId().toString(), command + " " + height + " yaw=" + rotation[0] + " pitch=" + rotation[1]));
+                String world = optionalWorld.get().substring("Welt: ".length());
+                pluginMessenger.send(new ExecuteCommandMessage(player.getUniqueId().toString(), command + " " + height + " yaw=" + rotation[0] + " pitch=" + rotation[1] + " world=" + world));
             }
         });
     }

@@ -15,9 +15,10 @@ public class Warp implements Comparable<Warp> {
     private float yaw;
     private float pitch;
     private double height;
+    private String world;
     private final List<String> tags;
 
-    public Warp(int id, String name, String city, String state, double latitude, double longitude, String headId, float yaw, float pitch, double height, List<String> tags) {
+    public Warp(int id, String name, String city, String state, double latitude, double longitude, String headId, float yaw, float pitch, double height, String world, List<String> tags) {
         this.id = id;
         this.name = name;
         this.city = city;
@@ -28,11 +29,12 @@ public class Warp implements Comparable<Warp> {
         this.yaw = yaw;
         this.pitch = pitch;
         this.height = height;
+        this.world = world;
         this.tags = tags;
     }
 
-    public Warp(int id, String name, String city, String state, double latitude, double longitude, String headId, float yaw, float pitch, double height) {
-        this(id, name, city, state, latitude, longitude, headId, yaw, pitch, height, new ArrayList<>());
+    public Warp(int id, String name, String city, String state, double latitude, double longitude, String headId, float yaw, float pitch, double height, String world) {
+        this(id, name, city, state, latitude, longitude, headId, yaw, pitch, height, world, new ArrayList<>());
     }
 
     public String getTpllCommand() {
@@ -78,6 +80,10 @@ public class Warp implements Comparable<Warp> {
         this.pitch = pitch;
     }
 
+    public void setWorld(String world) {
+        this.world = world;
+    }
+
     public int getId() {
         return id;
     }
@@ -116,6 +122,10 @@ public class Warp implements Comparable<Warp> {
 
     public double getHeight() {
         return height;
+    }
+
+    public String getWorld() {
+        return world;
     }
 
     public List<String> getTags() {

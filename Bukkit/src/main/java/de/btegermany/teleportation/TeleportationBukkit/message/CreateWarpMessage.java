@@ -19,7 +19,8 @@ public class CreateWarpMessage extends PluginMessage {
                 warp.getHeadId() != null ? warp.getHeadId() : "null",
                 String.valueOf(warp.getPlayer().getLocation().getYaw()),
                 String.valueOf(warp.getPlayer().getLocation().getPitch()),
-                String.valueOf(warp.getPlayer().getLocation().getY())));
+                String.valueOf(warp.getPlayer().getLocation().getY()),
+                warp.getPlayer().getWorld().getName()));
     }
 
 }

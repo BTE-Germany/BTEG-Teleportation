@@ -324,12 +324,13 @@ public class PluginMsgListener implements Listener {
                     float yaw = Float.parseFloat(dataInput.readUTF());
                     float pitch = Float.parseFloat(dataInput.readUTF());
                     double height = Double.parseDouble(dataInput.readUTF());
+                    String world = dataInput.readUTF();
                     if (headId.equals("null")) headId = null;
 
                     final String headIdFinal = headId;
 
                     TeleportationBungee.getInstance().getWarpIdsManager().getAndClaimNextIdAsync().thenAccept(warpId -> {
-                        Warp warp = new Warp(warpId, name, city, state, coordinates[1], coordinates[0], headIdFinal, yaw, pitch, height);
+                        Warp warp = new Warp(warpId, name, city, state, coordinates[1], coordinates[0], headIdFinal, yaw, pitch, height, world);
                         this.registriesProvider.getWarpsRegistry().registerAsync(warp).thenAccept(success -> {
                             if(success) {
                                 player.sendMessage(TeleportationBungee.getFormattedMessage(String.format("Der Warp wurde mit der Id §9\"%d\" §6erstellt!", warp.getId())));
@@ -477,7 +478,6 @@ public class PluginMsgListener implements Listener {
                 }
 
                 case "get_random_warp" -> {
-                    //TODO: player
                     Warp warp = this.getRandomWarp();
 
                     //player.send
@@ -539,6 +539,7 @@ public class PluginMsgListener implements Listener {
             object.put("yaw", warp.getYaw());
             object.put("pitch", warp.getPitch());
             object.put("height", warp.getHeight());
+            object.put("world", warp.getWorld());
             if(warp.getHeadId() != null) {
                 object.put("head_id", warp.getHeadId());
             }
