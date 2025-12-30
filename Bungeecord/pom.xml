@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.btegermany</groupId>
-    <artifactId>teleportation-bungeecord</artifactId>
+    <artifactId>bteg-teleportation-bungeecord</artifactId>
     <version>1.1.8</version>
     <packaging>jar</packaging>
 
@@ -75,7 +75,7 @@
     <dependencies>
         <dependency>
             <groupId>de.btegermany</groupId>
-            <artifactId>teleportation-api</artifactId>
+            <artifactId>bteg-teleportation-api</artifactId>
             <version>1.0.0</version>
         </dependency>
         <dependency>

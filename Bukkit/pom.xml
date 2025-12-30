@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.btegermany</groupId>
-    <artifactId>teleportation-bukkit</artifactId>
+    <artifactId>bteg-teleportation-bukkit</artifactId>
     <version>1.2.0</version>
     <packaging>jar</packaging>
 
@@ -81,7 +81,7 @@
     <dependencies>
         <dependency>
             <groupId>de.btegermany</groupId>
-            <artifactId>teleportation-api</artifactId>
+            <artifactId>bteg-teleportation-api</artifactId>
             <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>
