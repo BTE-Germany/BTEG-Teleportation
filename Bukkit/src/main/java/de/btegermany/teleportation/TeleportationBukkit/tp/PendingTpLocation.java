@@ -34,7 +34,7 @@ public class PendingTpLocation extends PendingTeleportationAbstract {
     }
 
     @Override
-    public void teleport() {
+    public boolean teleport() {
         Player player = Bukkit.getPlayer(super.playerUUID);
         World world = (worldName == null) ? player.getWorld() : Bukkit.getWorld(worldName);
         if (world == null) {
@@ -49,7 +49,7 @@ public class PendingTpLocation extends PendingTeleportationAbstract {
         location.setYaw(yaw != null ? yaw : player.getLocation().getYaw());
         location.setPitch(pitch != null ? pitch : player.getLocation().getPitch());
 
-        player.teleport(location);
+        return player.teleport(location);
     }
 
 }

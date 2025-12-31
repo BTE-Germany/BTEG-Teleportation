@@ -20,10 +20,10 @@ public class PendingTpPlayer extends PendingTeleportationAbstract {
     }
 
     @Override
-    public void teleport() {
+    public boolean teleport() {
         Player player = Bukkit.getPlayer(playerUUID);
         Player target = Bukkit.getPlayer(targetUUID);
-        player.teleport(target);
+        return player.teleport(target);
     }
 
 }

@@ -27,7 +27,7 @@ public class PendingTpNormen extends PendingTeleportationAbstract {
     }
 
     @Override
-    public void teleport() {
+    public boolean teleport() {
         Player player = Bukkit.getPlayer(playerUUID);
         assert player != null; // canTeleport() checked
         World world = Bukkit.getWorld(this.normenWorld);
@@ -36,7 +36,7 @@ public class PendingTpNormen extends PendingTeleportationAbstract {
         location.setYaw(this.yaw);
         location.setPitch(this.pitch);
 
-        player.teleport(location);
+        return player.teleport(location);
     }
 
 }

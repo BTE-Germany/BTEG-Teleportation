@@ -15,7 +15,7 @@ public abstract class PendingTeleportationAbstract {
         this.originServerName = originServerName;
     }
 
-    public abstract void teleport();
+    public abstract boolean teleport();
     public abstract boolean canTeleport();
 
     public boolean isValid() {

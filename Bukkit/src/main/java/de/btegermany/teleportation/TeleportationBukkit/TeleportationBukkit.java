@@ -52,7 +52,7 @@ public class TeleportationBukkit extends JavaPlugin {
 		this.getServer().getMessenger().registerOutgoingPluginChannel(this, PLUGIN_CHANNEL);
 
 		// register listeners
-		this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(teleportationHandler, this.pluginMessenger), this);
+		this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(this, teleportationHandler, this.pluginMessenger), this);
 		this.getServer().getPluginManager().registerEvents(new PlayerInteractListener(registriesProvider), this);
 
 		// register commands
