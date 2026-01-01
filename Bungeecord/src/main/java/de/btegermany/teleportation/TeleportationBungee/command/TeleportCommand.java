@@ -99,34 +99,39 @@ public class TeleportCommand extends Command implements TabExecutor {
 
             final double finalX = x;
             final double finalZ = z;
-            Consumer<ServerInfo> teleport = serverInfo -> {
+            Consumer<ServerInfo> teleportPlayer = serverInfo -> {
                 player.sendMessage(new ComponentBuilder(String.format("ᾠ §6Du §6wirst §6zu §2%s §2%s §2%s §6teleportiert.", finalX, y, finalZ)).create());
                 this.pluginMessenger.teleportToCoords(player, serverInfo, finalX, y, finalZ, null, null, null);
             };
 
+            ServerInfo playerServer = player.getServer().getInfo();
             RequestPlayerWorldMessage requestPlayerWorldMessage = new RequestPlayerWorldMessage(player, world -> {
-                if (player.getServer().getInfo().getName().equalsIgnoreCase("Lobby-1")) {
+                if (playerServer.getName().equalsIgnoreCase("Lobby-1") || (playerServer.getName().equalsIgnoreCase("Plot-1") && world.equals(Utils.WORLD_PLOT_LOBBY))) {
                     player.sendMessage(new ComponentBuilder("ᾠ §cDu §ckannst §cdich §cnicht §cinnerhalb §cder §cLobby §cteleportieren.").create());
-                } else if (!world.equals(Utils.WORLD_TERRA)) {
-                    teleport.accept(player.getServer().getInfo());
-                } else {
-                    try {
-                        double[] geoCoordinates = GeoData.BTE_GENERATOR_SETTINGS.projection().toGeo(finalX, finalZ);
+                    return;
+                }
 
-                        ServerInfo serverInfo = TeleportationBungee.getInstance().getGeoData().getServerFromLocation(geoCoordinates[1], geoCoordinates[0]);
+                if (!world.equals(Utils.WORLD_TERRA)) {
+                    teleportPlayer.accept(playerServer);
+                    return;
+                }
 
-                        if (serverInfo == null) {
-                            player.sendMessage(new ComponentBuilder("ᾠ §cDer §cServer §cfür §cdieses §cBundesland §cist §cnicht §cerreichbar.").create());
-                            return;
-                        }
+                try {
+                    double[] geoCoordinates = GeoData.BTE_GENERATOR_SETTINGS.projection().toGeo(finalX, finalZ);
 
-                        teleport.accept(serverInfo);
-                    } catch (OutOfProjectionBoundsException e) {
-                        player.sendMessage(new ComponentBuilder("ᾠ §cBitte §cüberprüfe §cdie §cKoordinaten!").create());
+                    ServerInfo serverInfo = TeleportationBungee.getInstance().getGeoData().getServerFromLocation(geoCoordinates[1], geoCoordinates[0]);
+
+                    if (serverInfo == null) {
+                        player.sendMessage(new ComponentBuilder("ᾠ §cDer §cServer §cfür §cdieses §cBundesland §cist §cnicht §cerreichbar.").create());
+                        return;
                     }
+
+                    teleportPlayer.accept(serverInfo);
+                } catch (OutOfProjectionBoundsException e) {
+                    player.sendMessage(new ComponentBuilder("ᾠ §cBitte §cüberprüfe §cdie §cKoordinaten!").create());
                 }
             });
-            this.pluginMessenger.sendMessageToServers(requestPlayerWorldMessage, player.getServer().getInfo());
+            this.pluginMessenger.sendMessageToServers(requestPlayerWorldMessage, playerServer);
         } catch (NumberFormatException e) {
             player.sendMessage(new ComponentBuilder("ᾠ §cBitte §cüberprüfe §cdie §cKoordinaten!").create());
         }
