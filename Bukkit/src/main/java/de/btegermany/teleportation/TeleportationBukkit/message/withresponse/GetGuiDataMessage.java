@@ -40,7 +40,6 @@ public class GetGuiDataMessage extends PluginMessageWithResponse {
                         case "Tags" -> new TagsGui(guiArgs).open();
                         case "Events" -> new EventsGui(guiArgs).open();
                         case "Plotregionen" -> new PlotsGui(guiArgs).open();
-                        case "Normen Hubs" -> new NormenHubsGui(guiArgs).open();
                         case "city" -> new CitiesDetailGui(guiArgs, titleGui).open();
                         case "tag" -> new TagsDetailGui(guiArgs, titleGui).open();
                         case "bl" -> new StatesDetailGui(guiArgs, titleGui).open();

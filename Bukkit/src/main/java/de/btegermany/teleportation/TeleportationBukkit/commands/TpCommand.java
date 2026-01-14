@@ -25,7 +25,7 @@ public class TpCommand implements CommandExecutor {
 
         String argsJoined = String.join(" ", args);
 
-        this.pluginMessenger.send(new ExecuteCommandMessage(player.getUniqueId().toString(), "/tp %s".formatted(argsJoined)));
+        this.pluginMessenger.send(new ExecuteCommandMessage(player.getUniqueId().toString(), "tp %s".formatted(argsJoined)));
 
         return true;
     }

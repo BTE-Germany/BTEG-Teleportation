@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TeleportationBukkit extends JavaPlugin {
 
-	public static final String PLUGIN_CHANNEL = "bungeecord:btegtp";
+	public static final String PLUGIN_CHANNEL = "bteg:teleportation";
 	private static PagedInventoryAPI pagedInventoryAPI;
 	private PluginMessenger pluginMessenger;
 	private ScheduledExecutorService scheduledExecutorServiceProxyPlayerSynchronization;

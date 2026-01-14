@@ -12,6 +12,7 @@
         <module>API</module>
         <module>Bukkit</module>
         <module>Bungeecord</module>
+        <module>Velocity</module>
     </modules>
 
     <properties>

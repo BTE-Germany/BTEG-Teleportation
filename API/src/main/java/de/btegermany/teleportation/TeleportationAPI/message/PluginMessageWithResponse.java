@@ -12,6 +12,7 @@ public class PluginMessageWithResponse extends PluginMessage {
         this.consumer = consumer;
     }
 
+    //TODO: (later) use ByteArrayDataInput
     public void accept(DataInputStream dataInput) {
         if(this.consumer == null) {
             return;

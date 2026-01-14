@@ -24,7 +24,7 @@ public class WarpGui extends SinglePageWarpGuiAbstract {
             public void handle(ClickHandler clickHandler) {
                 if(clickHandler.getCurrentItem() == null || clickHandler.getCurrentItem().getItemMeta() == null || clickHandler.getCurrentItem().getItemMeta().getDisplayName().length() < 3) return;
                 switch (clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2)) {
-                    case "Tags", "Städte", "Events", "Plotregionen", "Normen Hubs", "Alle" ->
+                    case "Tags", "Städte", "Events", "Plotregionen", "Alle" ->
                             pluginMessenger.send(new GetGuiDataMessage(registriesProvider, pluginMessenger, player.getUniqueId().toString(), clickHandler.getCurrentItem().getItemMeta().getDisplayName().substring(2), 0, 1));
                     case "Bundesländer" ->
                             new StatesGui(new GuiArgs(clickHandler.getPlayer(), pluginMessenger, registriesProvider)).open();

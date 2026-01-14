@@ -28,7 +28,7 @@ public abstract class MultiPageDetailWarpGuiAbstract extends MultiPageWarpGuiAbs
                 if(optionalCommand.isEmpty() || optionalRotation.isEmpty() || optionalHeight.isEmpty() || optionalWorld.isEmpty()) return;
 
                 // execute tpll command for warp
-                String command = optionalCommand.get();
+                String command = optionalCommand.get().substring("/".length());
                 String[] rotation = optionalRotation.get().substring("Drehung: ".length()).replace(",", "").split(" ");
                 double height = Double.parseDouble(optionalHeight.get().substring("Höhe: ".length()));
                 String world = optionalWorld.get().substring("Welt: ".length());
