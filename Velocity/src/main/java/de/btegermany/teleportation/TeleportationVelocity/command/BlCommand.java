@@ -11,11 +11,11 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.btegermany.teleportation.TeleportationAPI.State;
 import de.btegermany.teleportation.TeleportationVelocity.geo.GeoData;
 import de.btegermany.teleportation.TeleportationVelocity.geo.GeoServer;
+import de.btegermany.teleportation.TeleportationVelocity.util.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 public class BlCommand {
 
@@ -68,21 +68,7 @@ public class BlCommand {
                                 return Command.SINGLE_SUCCESS;
                             }
 
-                            //TODO: (later) timeout in config? unit?
-                            stateServer.ping().orTimeout(1, TimeUnit.SECONDS)
-                                    .exceptionally(throwable -> {
-                                        sendMessage(player, Component.text("Server %s is offline.".formatted(stateServer.getServerInfo().getName()), NamedTextColor.RED));
-                                        return null;
-                                    })
-                                    .thenAccept(pingResult -> {
-                                        if (pingResult == null) {
-                                            return;
-                                        }
-
-                                        sendMessage(player, Component.text("Verbinde zum richtigen Server.", NamedTextColor.GOLD));
-
-                                        player.createConnectionRequest(stateServer).connect();
-                                    });
+                            Utils.connectIfOnline(player, stateServer, "Verbinde zum richtigen Server.");
 
                             return Command.SINGLE_SUCCESS;
                         })

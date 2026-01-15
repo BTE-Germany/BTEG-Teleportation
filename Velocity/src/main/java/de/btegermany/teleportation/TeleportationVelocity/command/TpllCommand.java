@@ -25,7 +25,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 public class TpllCommand implements SimpleCommand {
@@ -129,27 +128,15 @@ public class TpllCommand implements SimpleCommand {
         }
         RegisteredServer targetServer = targetServerOptional.get();
 
-        targetServer.ping().orTimeout(1, TimeUnit.SECONDS)
-                .exceptionally(throwable -> {
-                    sendMessage(player, Component.text("Server %s is offline.".formatted(targetServer.getServerInfo().getName()), NamedTextColor.RED));
-                    return null;
-                })
-                .thenAccept(pingResult -> {
-                    if (pingResult == null) {
-                        return;
-                    }
-
-                    sendMessage(player, Component.text("Teleporting to " + coordinates[0] + ", " + coordinates[1] + ".", NamedTextColor.GOLD));
-
-                    // send teleport data and the player to the target server
-                    RequestLastLocationMessage requestLastLocationMessage = new RequestLastLocationMessage(player, this.registriesProvider, () -> {
-                        this.pluginMessenger.teleportToCoords(player, targetServer, mcCoordinatesFinal[0], mcCoordinatesY, mcCoordinatesFinal[1], yawFinal, pitchFinal, worldFinal);
-                    });
-                    if (player.getCurrentServer().isEmpty()) {
-                        return;
-                    }
-                    this.pluginMessenger.sendMessageToServers(requestLastLocationMessage, player.getCurrentServer().get().getServer());
-                });
+        // send teleport data and the player to the target server
+        RequestLastLocationMessage requestLastLocationMessage = new RequestLastLocationMessage(player, this.registriesProvider, () -> {
+            sendMessage(player, Component.text("Teleporting to " + coordinates[0] + ", " + coordinates[1] + ".", NamedTextColor.GOLD));
+            this.pluginMessenger.teleportToCoords(player, targetServer, mcCoordinatesFinal[0], mcCoordinatesY, mcCoordinatesFinal[1], yawFinal, pitchFinal, worldFinal);
+        });
+        if (player.getCurrentServer().isEmpty()) {
+            return;
+        }
+        this.pluginMessenger.sendMessageToServers(requestLastLocationMessage, player.getCurrentServer().get().getServer());
     }
 
     @Override

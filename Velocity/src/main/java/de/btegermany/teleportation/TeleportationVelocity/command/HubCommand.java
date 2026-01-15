@@ -8,11 +8,11 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import de.btegermany.teleportation.TeleportationVelocity.util.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 
 public class HubCommand {
@@ -40,20 +40,7 @@ public class HubCommand {
                     }
                     RegisteredServer lobbyServer = lobbyServerOptional.get();
 
-                    lobbyServer.ping().orTimeout(1, TimeUnit.SECONDS)
-                            .exceptionally(throwable -> {
-                                sendMessage(player, Component.text("Server %s is offline.".formatted(lobbyServer.getServerInfo().getName()), NamedTextColor.RED));
-                                return null;
-                            })
-                            .thenAccept(pingResult -> {
-                                if (pingResult == null) {
-                                    return;
-                                }
-
-                                sendMessage(player, Component.text("Verbinde zur Lobby.", NamedTextColor.GOLD));
-
-                                player.createConnectionRequest(lobbyServer).connect();
-                            });
+                    Utils.connectIfOnline(player, lobbyServer, "Verbinde zur Lobby.");
 
                     return Command.SINGLE_SUCCESS;
                 })

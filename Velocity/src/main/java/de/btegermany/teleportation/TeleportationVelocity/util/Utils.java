@@ -4,10 +4,13 @@ import static de.btegermany.teleportation.TeleportationVelocity.TeleportationVel
 
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.btegermany.teleportation.TeleportationVelocity.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationVelocity.registry.RegistriesProvider;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+
+import java.util.concurrent.TimeUnit;
 
 public class Utils {
 
@@ -41,6 +44,33 @@ public class Utils {
         this.proxyServer.getPlayer(this.registriesProvider.getTpasRegistry().getTpa(player)).ifPresent(target -> {
             sendMessage(target, Component.text(player.getUsername() + " hat die Anfrage abgebrochen!", NamedTextColor.GOLD));
         });
+    }
+
+    public static void connectIfOnline(Player player, RegisteredServer server) {
+        connectIfOnline(player, server, null, null);
+    }
+
+    public static void connectIfOnline(Player player, RegisteredServer server, String messageOk) {
+        connectIfOnline(player, server, messageOk, null);
+    }
+
+    public static void connectIfOnline(Player player, RegisteredServer server, String messageOk, String messageTimeout) {
+            server.ping().orTimeout(3, TimeUnit.SECONDS)
+                    .exceptionally(throwable -> {
+                        sendMessage(player, Component.text(messageTimeout == null ? "Server %s is offline.".formatted(server.getServerInfo().getName()) : messageTimeout, NamedTextColor.RED));
+                        return null;
+                    })
+                    .thenAccept(pingResult -> {
+                        if (pingResult == null) {
+                            return;
+                        }
+
+                        if (messageOk != null) {
+                            sendMessage(player, Component.text(messageOk, NamedTextColor.GOLD));
+                        }
+
+                        player.createConnectionRequest(server).connect();
+                    });
     }
 
 }

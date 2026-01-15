@@ -1,6 +1,5 @@
 package de.btegermany.teleportation.TeleportationAPI;
 
-//TODO: (later) update name
 public enum State {
 
     BADEN_WUERTTEMBERG ("Baden-Württemberg", "BW"),

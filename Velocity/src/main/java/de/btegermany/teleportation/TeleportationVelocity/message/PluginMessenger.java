@@ -9,9 +9,8 @@ import de.btegermany.teleportation.TeleportationAPI.message.PluginMessageWithRes
 import de.btegermany.teleportation.TeleportationVelocity.TeleportationVelocity;
 import de.btegermany.teleportation.TeleportationVelocity.message.response.GuiDataResponseMessage;
 import de.btegermany.teleportation.TeleportationVelocity.registry.RegistriesProvider;
+import de.btegermany.teleportation.TeleportationVelocity.util.Utils;
 import de.btegermany.teleportation.TeleportationVelocity.util.Warp;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.json.JSONArray;
 
 import java.util.Optional;
@@ -19,8 +18,6 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
-
-import static de.btegermany.teleportation.TeleportationVelocity.TeleportationVelocity.sendMessage;
 
 public class PluginMessenger {
 
@@ -108,19 +105,7 @@ public class PluginMessenger {
         RegisteredServer currentServer = serverConnectionOptional.get().getServer();
 
         if (!currentServer.equals(server)) {
-            //TODO: (later) auslagern? (mit Timeout in config vllt. nicht mehr notwendig?)
-            server.ping().orTimeout(1, TimeUnit.SECONDS)
-                    .exceptionally(throwable -> {
-                        sendMessage(player, Component.text("Server %s is offline.".formatted(server.getServerInfo().getName()), NamedTextColor.RED));
-                        return null;
-                    })
-                    .thenAccept(pingResult -> {
-                        if (pingResult == null) {
-                            return;
-                        }
-
-                        player.createConnectionRequest(server).connect();
-                    });
+            Utils.connectIfOnline(player, server);
         }
 
         long period = TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS);
