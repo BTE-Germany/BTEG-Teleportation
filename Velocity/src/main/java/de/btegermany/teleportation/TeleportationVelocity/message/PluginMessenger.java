@@ -104,9 +104,12 @@ public class PluginMessenger {
         }
         RegisteredServer currentServer = serverConnectionOptional.get().getServer();
 
-        if (!currentServer.equals(server)) {
-            Utils.connectIfOnline(player, server);
+        if (currentServer.equals(server)) {
+            server.sendPluginMessage(TeleportationVelocity.PLUGIN_CHANNEL, pluginMessage.getBytes());
+            return;
         }
+
+        Utils.connectIfOnline(player, server);
 
         long period = TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS);
         long timeout = TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS);
