@@ -76,8 +76,6 @@ public class TpCommand {
 
                             // will teleport player to target player if target player exists
                             proxyServer.getPlayer(targetName).ifPresentOrElse(target -> {
-                                sendMessage(player, Component.text("Du wirst teleportiert...", NamedTextColor.GOLD));
-
                                 RequestLastLocationMessage requestLastLocationMessage = new RequestLastLocationMessage(player, registriesProvider, () -> {
                                     utils.teleport(player, target);
                                 });
