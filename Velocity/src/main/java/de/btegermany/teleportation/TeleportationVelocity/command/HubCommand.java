@@ -40,7 +40,9 @@ public class HubCommand {
                     }
                     RegisteredServer lobbyServer = lobbyServerOptional.get();
 
-                    Utils.connectIfOnline(player, lobbyServer, "Verbinde zur Lobby.");
+                    sendMessage(player, Component.text("Verbinde zur Lobby.", NamedTextColor.GOLD));
+
+                    Utils.connectIfOnline(player, lobbyServer);
 
                     return Command.SINGLE_SUCCESS;
                 })

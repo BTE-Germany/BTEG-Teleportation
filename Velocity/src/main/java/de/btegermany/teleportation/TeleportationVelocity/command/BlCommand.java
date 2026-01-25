@@ -68,7 +68,9 @@ public class BlCommand {
                                 return Command.SINGLE_SUCCESS;
                             }
 
-                            Utils.connectIfOnline(player, stateServer, "Verbinde zum richtigen Server.");
+                            sendMessage(player, Component.text("Verbinde zum richtigen Server.", NamedTextColor.GOLD));
+
+                            Utils.connectIfOnline(player, stateServer);
 
                             return Command.SINGLE_SUCCESS;
                         })

@@ -2,6 +2,7 @@ package de.btegermany.teleportation.TeleportationVelocity.util;
 
 import static de.btegermany.teleportation.TeleportationVelocity.TeleportationVelocity.sendMessage;
 
+import com.velocitypowered.api.proxy.ConnectionRequestBuilder;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -47,30 +48,35 @@ public class Utils {
     }
 
     public static void connectIfOnline(Player player, RegisteredServer server) {
-        connectIfOnline(player, server, null, null);
+        connectIfOnline(player, server, null);
     }
 
-    public static void connectIfOnline(Player player, RegisteredServer server, String messageOk) {
-        connectIfOnline(player, server, messageOk, null);
-    }
+    public static void connectIfOnline(Player player, RegisteredServer server, String messageError) {
+        Runnable sendErrorMessage = () -> sendMessage(player, Component.text(messageError == null ? "Server %s is offline.".formatted(server.getServerInfo().getName()) : messageError, NamedTextColor.RED));
 
-    public static void connectIfOnline(Player player, RegisteredServer server, String messageOk, String messageTimeout) {
-            server.ping().orTimeout(3, TimeUnit.SECONDS)
-                    .exceptionally(throwable -> {
-                        sendMessage(player, Component.text(messageTimeout == null ? "Server %s is offline.".formatted(server.getServerInfo().getName()) : messageTimeout, NamedTextColor.RED));
-                        return null;
-                    })
-                    .thenAccept(pingResult -> {
-                        if (pingResult == null) {
-                            return;
-                        }
+        // without ping the player would "join" again and e.g. the maintenances notice will be sent again
+        server.ping().orTimeout(3, TimeUnit.SECONDS)
+                .exceptionally(throwable -> {
+                    sendErrorMessage.run();
+                    return null;
+                })
+                .thenAccept(pingResult -> {
+                    if (pingResult == null) {
+                        return;
+                    }
 
-                        if (messageOk != null) {
-                            sendMessage(player, Component.text(messageOk, NamedTextColor.GOLD));
-                        }
-
-                        player.createConnectionRequest(server).connect();
-                    });
+                    player.createConnectionRequest(server).connect()
+                            .exceptionally(throwable -> {
+                                sendErrorMessage.run();
+                                return null;
+                            })
+                            .thenAccept(result -> {
+                                if (result.isSuccessful() || result.getStatus() == ConnectionRequestBuilder.Status.CONNECTION_CANCELLED) {
+                                    return;
+                                }
+                                sendErrorMessage.run();
+                            });
+                });
     }
 
 }
