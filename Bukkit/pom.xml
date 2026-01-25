@@ -59,10 +59,6 @@
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
         <repository>
-            <id>pagedinventories-repo</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-        <repository>
             <id>minecraft-repo</id>
             <url>https://libraries.minecraft.net/</url>
         </repository>
@@ -76,6 +72,10 @@
             <id>alpsbte-repo</id>
             <url>https://mvn.alps-bte.com/repository/alps-bte/</url>
         </repository>
+        <repository>
+            <id>btegermany</id>
+            <url>https://repo.dachstein.cloud/nexus/content/repositories/btegermany</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.4-R0.1-SNAPSHOT</version>
+            <version>1.21.10-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
