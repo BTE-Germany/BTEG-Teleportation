@@ -1,2 +1,9 @@
 # BTEG Teleportation
-This plugin covers most teleportation functions across the network.
+
+[![Quality Gate Status](https://sonarqube.app.k8s.bteger.dev/api/project_badges/measure?project=BTE-Germany_BTEG-Teleportation_ff066355-619d-48f8-a781-165590e97c9c&metric=alert_status&token=sqb_47ad9c80444685c1711a99f5e9a1bd300b421838)](https://sonarqube.app.k8s.bteger.dev/dashboard?id=BTE-Germany_BTEG-Teleportation_ff066355-619d-48f8-a781-165590e97c9c)
+[![Maintainability Rating](https://sonarqube.app.k8s.bteger.dev/api/project_badges/measure?project=BTE-Germany_BTEG-Teleportation_ff066355-619d-48f8-a781-165590e97c9c&metric=software_quality_maintainability_rating&token=sqb_47ad9c80444685c1711a99f5e9a1bd300b421838)](https://sonarqube.app.k8s.bteger.dev/dashboard?id=BTE-Germany_BTEG-Teleportation_ff066355-619d-48f8-a781-165590e97c9c)
+[![Reliability Rating](https://sonarqube.app.k8s.bteger.dev/api/project_badges/measure?project=BTE-Germany_BTEG-Teleportation_ff066355-619d-48f8-a781-165590e97c9c&metric=software_quality_reliability_rating&token=sqb_47ad9c80444685c1711a99f5e9a1bd300b421838)](https://sonarqube.app.k8s.bteger.dev/dashboard?id=BTE-Germany_BTEG-Teleportation_ff066355-619d-48f8-a781-165590e97c9c)
+[![Technical Debt](https://sonarqube.app.k8s.bteger.dev/api/project_badges/measure?project=BTE-Germany_BTEG-Teleportation_ff066355-619d-48f8-a781-165590e97c9c&metric=software_quality_maintainability_remediation_effort&token=sqb_47ad9c80444685c1711a99f5e9a1bd300b421838)](https://sonarqube.app.k8s.bteger.dev/dashboard?id=BTE-Germany_BTEG-Teleportation_ff066355-619d-48f8-a781-165590e97c9c)
+
+This plugin covers most teleportation functions across the bte germany network.#
+It's actively deveoped for Paper & Velocity & works for Area Splitted Servers.
