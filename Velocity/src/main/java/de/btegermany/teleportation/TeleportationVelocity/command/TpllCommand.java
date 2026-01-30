@@ -5,9 +5,7 @@ import static de.btegermany.teleportation.TeleportationVelocity.TeleportationVel
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import de.btegermany.teleportation.TeleportationVelocity.TeleportationVelocity;
 import de.btegermany.teleportation.TeleportationVelocity.geo.CoordinateFormatConverter;
 import de.btegermany.teleportation.TeleportationVelocity.geo.CoordinateFormats;
 import de.btegermany.teleportation.TeleportationVelocity.geo.GeoData;
@@ -59,18 +57,28 @@ public class TpllCommand implements SimpleCommand {
             return;
         }
 
-        // check args length
+        String latArg;
+        String lonArg;
+
+        // check args length (only one required when lat is directly followed by comma and lon)
         if (args.length < 2) {
-            sendMessage(player, Component.text("Usage: /tpll <latitude> <longitude>", NamedTextColor.RED));
-            return;
+            if (!(args[0].contains(",") && !args[0].substring(args[0].indexOf(",") + 1).isEmpty())) {
+                sendMessage(player, Component.text("Usage: /tpll <latitude> <longitude>", NamedTextColor.RED));
+                return;
+            }
+            latArg = args[0].substring(0, args[0].indexOf(","));
+            lonArg = args[0].substring(args[0].indexOf(",") + 1);
+        } else {
+            latArg = args[0];
+            lonArg = args[1];
         }
 
         // if copied from Google Earth web
-        args[0] = args[0].replace("\u2066", "").replace("\u2069", "");
-        args[1] = args[1].replace("\u2066", "").replace("\u2069", "");
+        latArg = latArg.replace("\u2066", "").replace("\u2069", "");
+        lonArg = lonArg.replace("\u2066", "").replace("\u2069", "");
 
         // check format of coordinates because of inaccuracy
-        if (CoordinateFormats.isDegreesMinutes(args[0] + " " + args[1]) || CoordinateFormats.isDegreesMinutesSeconds(args[0] + " " + args[1])) {
+        if (CoordinateFormats.isDegreesMinutes(latArg + " " + lonArg) || CoordinateFormats.isDegreesMinutesSeconds(latArg + " " + lonArg)) {
             sendMessage(player, Component.text("Achtung: ", NamedTextColor.RED),
                                 Component.text("Du verwendest ein ungenaues Koordinatenformat. ", NamedTextColor.GOLD),
                                 Component.text("Falls du gerade etwas baust, nutze bitte ausschließlich Dezimalkoordinaten ", NamedTextColor.RED),
@@ -78,7 +86,7 @@ public class TpllCommand implements SimpleCommand {
         }
 
         // convert input coordinates to degrees format
-        double[] coordinates = CoordinateFormatConverter.toDegrees(args[0] + " " + args[1]);
+        double[] coordinates = CoordinateFormatConverter.toDegrees(latArg + " " + lonArg);
         if (coordinates == null) {
             sendMessage(player, Component.text("Bitte überprüfe deine Koordinaten.", NamedTextColor.RED));
             return;
