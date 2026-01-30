@@ -16,7 +16,7 @@ public class PlayerJoinListener implements Listener {
 	private final TeleportationBukkit plugin;
 	private final TeleportationHandler teleportationHandler;
 
-	public PlayerJoinListener(TeleportationBukkit plugin, TeleportationHandler teleportationHandler, PluginMessenger pluginMessenger) {
+	public PlayerJoinListener(TeleportationBukkit plugin, TeleportationHandler teleportationHandler) {
 		this.plugin = plugin;
 		this.teleportationHandler = teleportationHandler;
 	}
