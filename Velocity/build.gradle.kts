@@ -20,6 +20,7 @@ dependencies {
     implementation(libs.com.google.code.gson.gson)
     testImplementation(libs.junit.junit)
     compileOnly(libs.com.velocitypowered.velocity.api)
+    annotationProcessor(libs.com.velocitypowered.velocity.api)
 }
 
 description = "Teleportation.velocity"
