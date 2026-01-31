@@ -62,7 +62,7 @@ public class TpllCommand implements SimpleCommand {
 
         // check args length (only one required when lat is directly followed by comma and lon)
         if (args.length < 2) {
-            if (!(args[0].contains(",") && !args[0].substring(args[0].indexOf(",") + 1).isEmpty())) {
+            if (args.length == 0 || !(args[0].contains(",") && !args[0].substring(args[0].indexOf(",") + 1).isEmpty())) {
                 sendMessage(player, Component.text("Usage: /tpll <latitude> <longitude>", NamedTextColor.RED));
                 return;
             }
