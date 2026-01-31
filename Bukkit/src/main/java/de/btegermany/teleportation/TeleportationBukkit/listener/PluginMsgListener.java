@@ -21,16 +21,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public class PluginMsgListener implements PluginMessageListener {
 
+	private static final List<String> ALLOWED_COMMANDS_TO_EXECUTE = List.of("tpll", "tpc");
+
+	private final TeleportationBukkit plugin;
 	private final TeleportationHandler teleportationHandler;
 	private final PluginMessenger pluginMessenger;
 	private final RegistriesProvider registriesProvider;
 
-	public PluginMsgListener(TeleportationHandler teleportationHandler, PluginMessenger pluginMessenger, RegistriesProvider registriesProvider) {
+	public PluginMsgListener(TeleportationBukkit plugin, TeleportationHandler teleportationHandler, PluginMessenger pluginMessenger, RegistriesProvider registriesProvider) {
+		this.plugin = plugin;
 		this.teleportationHandler = teleportationHandler;
 		this.pluginMessenger = pluginMessenger;
 		this.registriesProvider = registriesProvider;
@@ -184,6 +189,13 @@ public class PluginMsgListener implements PluginMessageListener {
 				String command = dataInput.readUTF();
 				Player targetPlayer = Bukkit.getPlayer(playerUUID);
 				if (targetPlayer == null || !targetPlayer.isOnline()) return;
+
+				int spaceIndex = !command.contains(" ") ? 0 : command.indexOf(" ");
+				String baseCommand = command.substring(0, spaceIndex);
+				if (!ALLOWED_COMMANDS_TO_EXECUTE.contains(baseCommand)) {
+					this.plugin.getLogger().severe("Not allowed to remotely perform command '%s'".formatted(baseCommand));
+					return;
+				}
 
 				targetPlayer.performCommand(command);
 			}

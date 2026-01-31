@@ -28,9 +28,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -38,6 +35,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class PluginMsgListener {
+
+    private static final List<String> ALLOWED_COMMANDS_TO_EXECUTE = List.of("tpll", "tp");
 
     private final PluginMessenger pluginMessenger;
     private final Database database;
@@ -263,6 +262,13 @@ public class PluginMsgListener {
             case "execute_command" -> {
                 UUID playerUUID = UUID.fromString(dataInput.readUTF());
                 String command = dataInput.readUTF();
+
+                int spaceIndex = !command.contains(" ") ? 0 : command.indexOf(" ");
+                String baseCommand = command.substring(0, spaceIndex);
+                if (!ALLOWED_COMMANDS_TO_EXECUTE.contains(baseCommand)) {
+                    this.logger.error("Not allowed to remotely execute command '{}'", baseCommand);
+                    return;
+                }
 
                 this.proxyServer.getPlayer(playerUUID).ifPresent(player -> this.proxyServer.getCommandManager().executeAsync(player, command));
             }

@@ -48,7 +48,7 @@ public class TeleportationBukkit extends JavaPlugin {
 		//LanguageUtil languageUtil = new LanguageUtil(this);
 
 		//register plugin channel
-		this.getServer().getMessenger().registerIncomingPluginChannel(this, PLUGIN_CHANNEL, new PluginMsgListener(teleportationHandler, this.pluginMessenger, registriesProvider));
+		this.getServer().getMessenger().registerIncomingPluginChannel(this, PLUGIN_CHANNEL, new PluginMsgListener(this, teleportationHandler, this.pluginMessenger, registriesProvider));
 		this.getServer().getMessenger().registerOutgoingPluginChannel(this, PLUGIN_CHANNEL);
 
 		// register listeners
