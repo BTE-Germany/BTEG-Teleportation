@@ -8,9 +8,11 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.btegermany.teleportation.TeleportationVelocity.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationVelocity.registry.RegistriesProvider;
+import de.btegermany.teleportation.TeleportationVelocity.registry.TpasRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class Utils {
@@ -35,16 +37,16 @@ public class Utils {
 
     // cancels the tpa the player sent
     public void cancelTpa(Player player) {
-        if(!this.registriesProvider.getTpasRegistry().isRegistered(player)) {
+        TpasRegistry tpasRegistry = this.registriesProvider.getTpasRegistry();
+        if(!tpasRegistry.isRegistered(player)) {
             sendMessage(player, Component.text("Du hast keine Anfrage gestellt!", NamedTextColor.GOLD));
             return;
         }
 
-        registriesProvider.getTpasRegistry().unregister(player);
+        UUID targetUUID = tpasRegistry.getTpa(player);
+        tpasRegistry.unregister(player);
         sendMessage(player, Component.text("Die Anfrage wurde abgebrochen.", NamedTextColor.GOLD));
-        this.proxyServer.getPlayer(this.registriesProvider.getTpasRegistry().getTpa(player)).ifPresent(target -> {
-            sendMessage(target, Component.text(player.getUsername() + " hat die Anfrage abgebrochen!", NamedTextColor.GOLD));
-        });
+        this.proxyServer.getPlayer(targetUUID).ifPresent(target -> sendMessage(target, Component.text(player.getUsername() + " hat die Anfrage abgebrochen!", NamedTextColor.GOLD)));
     }
 
     public static void connectIfOnline(Player player, RegisteredServer server) {
