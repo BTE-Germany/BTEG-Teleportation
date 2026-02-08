@@ -6,7 +6,6 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import de.btegermany.teleportation.TeleportationVelocity.geo.CoordinateFormatConverter;
 import de.btegermany.teleportation.TeleportationVelocity.geo.CoordinateFormats;
 import de.btegermany.teleportation.TeleportationVelocity.geo.GeoData;
 import de.btegermany.teleportation.TeleportationVelocity.geo.GeoServer;
@@ -18,6 +17,8 @@ import net.buildtheearth.terraminusminus.dataset.IScalarDataset;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorPipelines;
 import net.buildtheearth.terraminusminus.generator.GeneratorDatasets;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
+import net.buildtheearth.terraminusminus.util.geo.CoordinateParseUtils;
+import net.buildtheearth.terraminusminus.util.geo.LatLng;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -86,7 +87,7 @@ public class TpllCommand implements SimpleCommand {
         }
 
         // convert input coordinates to degrees format
-        double[] coordinates = CoordinateFormatConverter.toDegrees(latArg + " " + lonArg);
+        LatLng coordinates = CoordinateParseUtils.parseVerbatimCoordinates(latArg + " " + lonArg);
         if (coordinates == null) {
             sendMessage(player, Component.text("Bitte überprüfe deine Koordinaten.", NamedTextColor.RED));
             return;
@@ -118,7 +119,7 @@ public class TpllCommand implements SimpleCommand {
         // convert in-game coordinates to real life coordinates
         double[] mcCoordinates;
         try {
-            mcCoordinates = GeoData.BTE_GENERATOR_SETTINGS.projection().fromGeo(coordinates[1], coordinates[0]);
+            mcCoordinates = GeoData.BTE_GENERATOR_SETTINGS.projection().fromGeo(coordinates.getLng(), coordinates.getLat());
         } catch (OutOfProjectionBoundsException e) {
             sendMessage(player, Component.text("Error: OutOfProjectionBoundsException", NamedTextColor.RED));
             return;
@@ -129,7 +130,7 @@ public class TpllCommand implements SimpleCommand {
         double mcCoordinatesY = heightRaw != null ? Double.parseDouble(heightRaw) : Double.NaN; //this.getHeight((int) mcCoordinates[1], (int) mcCoordinates[0]).join();
 
         // get the server the location is on
-        Optional<RegisteredServer> targetServerOptional = this.geoData.getServerFromLocation(coordinates[0], coordinates[1]);
+        Optional<RegisteredServer> targetServerOptional = this.geoData.getServerFromLocation(coordinates.getLat(), coordinates.getLng());
         if (targetServerOptional.isEmpty()) {
             sendMessage(player, Component.text("Location could not be found!", NamedTextColor.RED));
             return;
@@ -138,7 +139,7 @@ public class TpllCommand implements SimpleCommand {
 
         // send teleport data and the player to the target server
         RequestLastLocationMessage requestLastLocationMessage = new RequestLastLocationMessage(player, this.registriesProvider, () -> {
-            sendMessage(player, Component.text("Teleporting to " + coordinates[0] + ", " + coordinates[1] + ".", NamedTextColor.GOLD));
+            sendMessage(player, Component.text("Teleporting to " + coordinates.getLat() + ", " + coordinates.getLng() + ".", NamedTextColor.GOLD));
             this.pluginMessenger.teleportToCoords(player, targetServer, mcCoordinatesFinal[0], mcCoordinatesY, mcCoordinatesFinal[1], yawFinal, pitchFinal, worldFinal);
         });
         if (player.getCurrentServer().isEmpty()) {
