@@ -1,5 +1,5 @@
 name: BTEGTeleportation
-version: '${project.version}'
+version: '${version}'
 api-version: '1.20'
 main: de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit
 author: JaskerX

@@ -1,0 +1,12 @@
+{
+  "id": "bteg-teleportation-velocity",
+  "name": "BTEG Teleportation Velocity",
+  "version": "${version}",
+  "main": "de.btegermany.teleportation.TeleportationVelocity.TeleportationVelocity",
+  "url": "bte-germany.de",
+  "description": "This plugin covers most teleportation functions across the network.",
+  "authors": [
+    "Leander",
+    "JaskerX"
+  ]
+}

@@ -36,7 +36,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-@Plugin(id = "bteg-teleportation-velocity", name = "BTEG Teleportation Velocity", version = "2.0.0", url = "bte-germany.de", description = "This plugin covers most teleportation functions across the network.", authors = {"Leander", "JaskerX"})
 public class TeleportationVelocity {
 
     private final ProxyServer proxyServer;

@@ -35,3 +35,26 @@ tasks.jar {
     archiveClassifier = "UNSHADED"
     enabled = false // Disable the default jar task since we are using shadowJar
 }
+
+// seperate block because of version serialization
+if (true) {
+    val globalVersion = "1.0.0"
+    version = globalVersion
+
+    val processPluginYml by tasks.registering {
+        val inputFile = file("src/main/resources/plugin.yml.template")
+        val outputFile = file("src/main/resources/plugin.yml")
+
+        inputs.file(inputFile)
+        outputs.file(outputFile)
+
+        doLast {
+            val content = inputFile.readText().replace("\${version}", globalVersion)
+            outputFile.writeText(content)
+        }
+    }
+
+    tasks.named("processResources") {
+        dependsOn(processPluginYml)
+    }
+}
