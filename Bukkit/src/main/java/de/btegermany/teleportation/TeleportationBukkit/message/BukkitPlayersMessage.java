@@ -22,10 +22,8 @@ public class BukkitPlayersMessage extends PluginMessage {
             playerObject.put("z", player.getLocation().getZ());
             playerObject.put("yaw", Double.parseDouble(String.valueOf(player.getLocation().getYaw())));
             playerObject.put("pitch", Double.parseDouble(String.valueOf(player.getLocation().getPitch())));
-            playerObject.put("gamemode", player.getGameMode().toString());
             jsonArray.put(playerObject);
         });
-        super.content.add(Bukkit.getServer().getIp() + ":" + Bukkit.getPort());
         super.content.add(jsonArray.toString());
     }
 

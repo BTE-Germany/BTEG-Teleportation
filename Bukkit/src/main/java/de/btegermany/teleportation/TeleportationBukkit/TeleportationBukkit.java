@@ -90,7 +90,7 @@ public class TeleportationBukkit extends JavaPlugin {
 		this.scheduledExecutorServiceProxyPlayerSynchronization = Executors.newSingleThreadScheduledExecutor();
 		this.scheduledExecutorServiceProxyPlayerSynchronization.scheduleAtFixedRate(() -> {
 			this.pluginMessenger.send(new BukkitPlayersMessage(this.getServer().getOnlinePlayers()));
-		}, 0, 1000, TimeUnit.MILLISECONDS);
+		}, 0, 3, TimeUnit.SECONDS);
 	}
 
 	public static PagedInventoryAPI getPagedInventoryAPI() {

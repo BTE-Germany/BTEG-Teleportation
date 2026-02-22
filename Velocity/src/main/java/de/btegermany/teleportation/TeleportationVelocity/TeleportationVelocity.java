@@ -7,27 +7,22 @@ import com.velocitypowered.api.event.EventManager;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
-import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
-import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.btegermany.teleportation.TeleportationVelocity.command.*;
 import de.btegermany.teleportation.TeleportationVelocity.data.ConfigHandler;
 import de.btegermany.teleportation.TeleportationVelocity.data.Database;
 import de.btegermany.teleportation.TeleportationVelocity.geo.GeoData;
 import de.btegermany.teleportation.TeleportationVelocity.listener.PluginMsgListener;
-import de.btegermany.teleportation.TeleportationVelocity.listener.ServerLeaveListener;
 import de.btegermany.teleportation.TeleportationVelocity.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationVelocity.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationVelocity.util.Utils;
 import de.btegermany.teleportation.TeleportationVelocity.util.Warp;
 import de.btegermany.teleportation.TeleportationVelocity.util.WarpIdsManager;
 import lombok.Getter;
-import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -52,7 +47,6 @@ public class TeleportationVelocity {
     private GeoData geoData;
     private PluginMessenger pluginMessenger;
     private ConfigHandler configHandler;
-    private ScheduledExecutorService scheduledExecutorServiceCheckStateBorders;
     private ScheduledExecutorService scheduledExecutorServiceSendWarpCities;
     private ScheduledExecutorService scheduledExecutorServiceSendWarpTags;
     @Getter
@@ -105,11 +99,7 @@ public class TeleportationVelocity {
 
         // register listeners
         EventManager eventManager = this.proxyServer.getEventManager();
-        eventManager.register(this, new PluginMsgListener(this.pluginMessenger, this.database, this.registriesProvider, this.proxyServer, this.logger, this.warpIdsManager));
-        eventManager.register(this, new ServerLeaveListener(this.registriesProvider));
-
-        // schedule task to check if the players are on the right server. If not they will be teleported to the right server
-        this.startStateBorderCheck();
+        eventManager.register(this, new PluginMsgListener(this.pluginMessenger, this.database, this.registriesProvider, this.proxyServer, this.logger, this.warpIdsManager, this.geoData));
 
         // schedule task to send cities warps are located in and warp tags to all servers
         this.scheduleSendWarpCities();
@@ -120,26 +110,8 @@ public class TeleportationVelocity {
     public void onProxyShutdown(ProxyShutdownEvent event) {
         this.database.disconnect();
 
-        this.scheduledExecutorServiceCheckStateBorders.shutdownNow();
         this.scheduledExecutorServiceSendWarpCities.shutdownNow();
         this.scheduledExecutorServiceSendWarpTags.shutdownNow();
-    }
-
-    private void startStateBorderCheck() {
-        this.scheduledExecutorServiceCheckStateBorders = Executors.newSingleThreadScheduledExecutor();
-        this.scheduledExecutorServiceCheckStateBorders.scheduleAtFixedRate(() ->
-                this.registriesProvider.getBukkitPlayersRegistry().getBukkitPlayers().forEach((uuid, bukkitPlayer) -> {
-                    try {
-                        double[] coords = GeoData.BTE_GENERATOR_SETTINGS.projection().toGeo(bukkitPlayer.getX(), bukkitPlayer.getZ());
-                        RegisteredServer server = this.geoData.getServerFromLocationCheck(coords[1], coords[0], bukkitPlayer.getProxiedPlayer()).orElse(null);
-                        if (!bukkitPlayer.getServer().equals(server) && this.geoData.getGeoServers().stream().anyMatch(geoServer -> geoServer.server().equals(server) && geoServer.isEarthServer()) && this.geoData.getGeoServers().stream().anyMatch(geoServer -> geoServer.server().equals(bukkitPlayer.getServer()) && geoServer.isEarthServer())) {
-                            sendMessage(bukkitPlayer.getProxiedPlayer(), Component.text("Dieses Bundesland liegt auf einem anderen Server, du wirst daher auf den richtigen Server gesendet!", NamedTextColor.GOLD));
-                            this.proxyServer.getCommandManager().executeAsync(bukkitPlayer.getProxiedPlayer(), "tpll " + coords[1] + " " + coords[0] + " yaw=" + bukkitPlayer.getYaw() + " pitch=" + bukkitPlayer.getPitch());
-                        }
-                    } catch (OutOfProjectionBoundsException e) {
-                        e.printStackTrace();
-                    }
-                }), 0, 3, TimeUnit.SECONDS);
     }
 
     private void scheduleSendWarpCities() {

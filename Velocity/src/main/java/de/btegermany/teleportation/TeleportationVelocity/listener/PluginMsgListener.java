@@ -6,6 +6,7 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -16,7 +17,7 @@ import de.btegermany.teleportation.TeleportationVelocity.data.Database;
 import de.btegermany.teleportation.TeleportationVelocity.geo.GeoData;
 import de.btegermany.teleportation.TeleportationVelocity.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationVelocity.registry.RegistriesProvider;
-import de.btegermany.teleportation.TeleportationVelocity.util.BukkitPlayer;
+import de.btegermany.teleportation.TeleportationVelocity.util.Utils;
 import de.btegermany.teleportation.TeleportationVelocity.util.Warp;
 import de.btegermany.teleportation.TeleportationVelocity.util.WarpIdsManager;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
@@ -32,6 +33,7 @@ import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class PluginMsgListener {
@@ -44,15 +46,17 @@ public class PluginMsgListener {
     private final ProxyServer proxyServer;
     private final Logger logger;
     private final WarpIdsManager warpIdsManager;
+    private final GeoData geoData;
     private final Map<UUID, Map<Integer, List<JSONObject>>> cachedGuiData;
 
-    public PluginMsgListener(PluginMessenger pluginMessenger, Database database, RegistriesProvider registriesProvider, ProxyServer proxyServer, Logger logger, WarpIdsManager warpIdsManager) {
+    public PluginMsgListener(PluginMessenger pluginMessenger, Database database, RegistriesProvider registriesProvider, ProxyServer proxyServer, Logger logger, WarpIdsManager warpIdsManager, GeoData geoData) {
         this.pluginMessenger = pluginMessenger;
         this.database = database;
         this.registriesProvider = registriesProvider;
         this.proxyServer = proxyServer;
         this.logger = logger;
         this.warpIdsManager = warpIdsManager;
+        this.geoData = geoData;
         this.cachedGuiData = new HashMap<>();
     }
 
@@ -421,20 +425,15 @@ public class PluginMsgListener {
             }
 
             case "players_online" -> {
-                String serverAddress = dataInput.readUTF();
-                Optional<RegisteredServer> optionalServer = this.proxyServer.getAllServers().stream().filter(server -> server.getServerInfo().getAddress().toString().contains(serverAddress)).findFirst();
-                if (optionalServer.isEmpty()) {
-                    return;
-                }
-                RegisteredServer server = optionalServer.get();
                 JSONArray jsonArray = new JSONArray(dataInput.readUTF());
 
-                if (jsonArray.isEmpty()) {
-                    List<BukkitPlayer> unregister = registriesProvider.getBukkitPlayersRegistry().getBukkitPlayers().values().stream().filter(bukkitPlayer -> bukkitPlayer.getServer().equals(server)).toList();
-                    for (BukkitPlayer bukkitPlayer : unregister) {
-                        registriesProvider.getBukkitPlayersRegistry().unregister(bukkitPlayer.getProxiedPlayer());
+                Consumer<Player> sendToLobby = player -> {
+                    Optional<RegisteredServer> lobbyServerOptional = proxyServer.getServer("Lobby-1");
+                    if (lobbyServerOptional.isPresent()) {
+                        sendMessage(player, Component.text("You are outside the countries of our build teams. You will be redirected to the lobby.", NamedTextColor.GOLD));
+                        Utils.connectIfOnline(player, lobbyServerOptional.get());
                     }
-                }
+                };
 
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject playerObject = jsonArray.getJSONObject(i);
@@ -442,17 +441,34 @@ public class PluginMsgListener {
 
                     this.proxyServer.getPlayer(playerUUID).ifPresent(player -> {
                         double x = playerObject.getDouble("x");
-                        double y = playerObject.getDouble("y");
                         double z = playerObject.getDouble("z");
                         float yaw = playerObject.getFloat("yaw");
                         float pitch = playerObject.getFloat("pitch");
-                        String gameMode = playerObject.getString("gamemode").toLowerCase();
-                        BukkitPlayer bukkitPlayer = new BukkitPlayer(player, server, x, y, z, yaw, pitch, gameMode);
-                        if (registriesProvider.getBukkitPlayersRegistry().isRegistered(bukkitPlayer.getProxiedPlayer())) {
-                            registriesProvider.getBukkitPlayersRegistry().replace(bukkitPlayer);
+
+                        Optional<ServerConnection> currentServer = player.getCurrentServer();
+                        // make sure coordinates on e.g. plot server don't make player switch to the coordinates' terra server
+                        if (!(currentServer.isPresent() && this.geoData.getGeoServers().stream().anyMatch(geoServer -> currentServer.get().getServer().equals(geoServer.server()) && geoServer.isEarthServer()))) {
                             return;
                         }
-                        registriesProvider.getBukkitPlayersRegistry().register(bukkitPlayer);
+
+                        try {
+                            double[] coords = GeoData.BTE_GENERATOR_SETTINGS.projection().toGeo(x, z);
+                            Optional<RegisteredServer> expectedServerOptional = this.geoData.getServerFromLocationCheck(coords[1], coords[0], player);
+
+                            if (expectedServerOptional.isEmpty()) {
+                                sendToLobby.accept(player);
+                                return;
+                            }
+
+                            if (currentServer.get().getServer().equals(expectedServerOptional.get())) {
+                                return;
+                            }
+
+                            sendMessage(player, Component.text("Diese Region liegt auf einem anderen Server, du wirst daher mit dem richtigen Server verbunden.", NamedTextColor.GOLD));
+                            this.proxyServer.getCommandManager().executeAsync(player, "tpll %f %f yaw=%f pitch=%f".formatted(coords[1], coords[0], yaw, pitch));
+                        } catch (OutOfProjectionBoundsException ignored) {
+                            sendToLobby.accept(player);
+                        }
                     });
                 }
             }
