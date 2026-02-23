@@ -444,10 +444,14 @@ public class PluginMsgListener {
                         double z = playerObject.getDouble("z");
                         float yaw = playerObject.getFloat("yaw");
                         float pitch = playerObject.getFloat("pitch");
+                        String world = playerObject.getString("world");
 
                         Optional<ServerConnection> currentServer = player.getCurrentServer();
-                        // make sure coordinates on e.g. plot server don't make player switch to the coordinates' terra server
-                        if (!(currentServer.isPresent() && this.geoData.getGeoServers().stream().anyMatch(geoServer -> currentServer.get().getServer().equals(geoServer.server()) && geoServer.isEarthServer()))) {
+                        // make sure coordinates on e.g. plot server or normen don't make player switch to the coordinates' terra server
+                        boolean isEarthServer = currentServer.isPresent() && this.geoData.getGeoServers().stream().anyMatch(geoServer -> currentServer.get().getServer().equals(geoServer.server()) && geoServer.isEarthServer());
+                        boolean isInTerraWorld = world.equals(Utils.WORLD_TERRA);
+                        boolean hasAutoSwitchPerm = player.hasPermission("teleportation.autoserverswitch");
+                        if (!isEarthServer || !isInTerraWorld || !hasAutoSwitchPerm) {
                             return;
                         }
 
