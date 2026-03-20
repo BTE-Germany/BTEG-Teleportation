@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class LastLocationsRegistry implements PlayerRegistry {
 
-    Map<UUID, LastLocation> lastLocations;
+    private final Map<UUID, LastLocation> lastLocations;
 
     public LastLocationsRegistry() {
         this.lastLocations = new HashMap<>();

@@ -1,6 +1,8 @@
 package de.btegermany.teleportation.TeleportationBukkit.commands;
 
-import de.btegermany.teleportation.TeleportationBukkit.message.withresponse.GetGuiDataMessage;
+import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
+import de.btegermany.teleportation.TeleportationBukkit.gui.lobbywarp.LobbyWarpGui;
+import de.btegermany.teleportation.TeleportationBukkit.gui.PagedGuiHandler;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBukkit.util.LobbyCity;
@@ -22,12 +24,17 @@ import static de.btegermany.teleportation.TeleportationBukkit.TeleportationBukki
 public class LobbyWarpCommand implements CommandExecutor, TabExecutorEnhanced {
 
     private static final int CITY_INDEX = 4;
+
     private final PluginMessenger pluginMessenger;
     private final RegistriesProvider registriesProvider;
+    private final PagedGuiHandler pagedGuiHandler;
+    private final TeleportationBukkit plugin;
 
-    public LobbyWarpCommand(PluginMessenger pluginMessenger, RegistriesProvider registriesProvider) {
+    public LobbyWarpCommand(PluginMessenger pluginMessenger, RegistriesProvider registriesProvider, PagedGuiHandler pagedGuiHandler, TeleportationBukkit plugin) {
         this.pluginMessenger = pluginMessenger;
         this.registriesProvider = registriesProvider;
+        this.pagedGuiHandler = pagedGuiHandler;
+        this.plugin = plugin;
     }
 
     @Override
@@ -110,7 +117,7 @@ public class LobbyWarpCommand implements CommandExecutor, TabExecutorEnhanced {
 
         // get gui data for city
         String city = this.getCityFromArgs(0, args);
-        this.pluginMessenger.send(new GetGuiDataMessage(this.registriesProvider, this.pluginMessenger, player.getUniqueId().toString(), String.format("lobbywarp_%s", city), 0, 1));
+        new LobbyWarpGui(city, player, this.pagedGuiHandler, this.pluginMessenger, this.registriesProvider.getLobbyCitiesRegistry(), this.plugin);
         return true;
     }
 

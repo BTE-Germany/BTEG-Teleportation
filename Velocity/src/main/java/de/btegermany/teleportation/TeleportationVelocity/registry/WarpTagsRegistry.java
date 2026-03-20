@@ -7,6 +7,7 @@ import de.btegermany.teleportation.TeleportationVelocity.data.Database;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.slf4j.Logger;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -16,23 +17,25 @@ import java.util.Set;
 public class WarpTagsRegistry {
 
     private final Database database;
+    private final Logger logger;
     @Getter
     private final Set<String> tags;
 
-    public WarpTagsRegistry(Database database) {
+    public WarpTagsRegistry(Database database, Logger logger) {
         this.database = database;
+        this.logger = logger;
         this.tags = new HashSet<>();
     }
 
-    public void register(String tag) {
+    public synchronized void register(String tag) {
         this.tags.add(tag);
     }
 
-    public void unregister(String tag) {
+    public synchronized void unregister(String tag) {
         this.tags.removeIf(existingTag -> existingTag.equalsIgnoreCase(tag));
     }
 
-    public void editTag(Player player, String tagOld, String tagNew, WarpsRegistry warpsRegistry) {
+    public synchronized void editTag(Player player, String tagOld, String tagNew, WarpsRegistry warpsRegistry) {
         try (PreparedStatement preparedStatement = this.database.getConnection().prepareStatement("UPDATE tags_warps SET tag = ? WHERE tag = ?")) {
             preparedStatement.setString(1, tagNew);
             preparedStatement.setString(2, tagOld);
@@ -44,7 +47,7 @@ public class WarpTagsRegistry {
             });
         } catch (SQLException e) {
             sendMessage(player, Component.text("Ein Fehler ist aufgetreten: " + e.getMessage(), NamedTextColor.RED));
-            e.printStackTrace();
+            this.logger.error("Failed to edit tag {} -> {}", tagOld, tagNew, e);
         }
     }
 

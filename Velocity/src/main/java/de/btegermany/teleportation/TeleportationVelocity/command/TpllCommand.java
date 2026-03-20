@@ -13,9 +13,6 @@ import de.btegermany.teleportation.TeleportationVelocity.message.PluginMessenger
 import de.btegermany.teleportation.TeleportationVelocity.message.withresponse.RequestLastLocationMessage;
 import de.btegermany.teleportation.TeleportationVelocity.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationVelocity.util.Utils;
-import net.buildtheearth.terraminusminus.dataset.IScalarDataset;
-import net.buildtheearth.terraminusminus.generator.EarthGeneratorPipelines;
-import net.buildtheearth.terraminusminus.generator.GeneratorDatasets;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terraminusminus.util.geo.CoordinateParseUtils;
 import net.buildtheearth.terraminusminus.util.geo.LatLng;
@@ -23,7 +20,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 public class TpllCommand implements SimpleCommand {
@@ -75,8 +71,8 @@ public class TpllCommand implements SimpleCommand {
         }
 
         // if copied from Google Earth web
-        latArg = latArg.replace("\u2066", "").replace("\u2069", "");
-        lonArg = lonArg.replace("\u2066", "").replace("\u2069", "");
+        latArg = latArg.replace("[\u2066\u2069]", "");
+        lonArg = lonArg.replace("[\u2066\u2069]", "");
 
         // check format of coordinates because of inaccuracy
         if (CoordinateFormats.isDegreesMinutes(latArg + " " + lonArg) || CoordinateFormats.isDegreesMinutesSeconds(latArg + " " + lonArg)) {
@@ -152,20 +148,6 @@ public class TpllCommand implements SimpleCommand {
     public boolean hasPermission(Invocation invocation) {
         CommandSource source = invocation.source();
         return (source instanceof Player) && source.hasPermission("bteg.tpll");
-    }
-
-    public CompletableFuture<Double> getHeight(double adjustedLon, double adjustedLat) {
-        CompletableFuture<Double> altFuture;
-        try {
-            GeneratorDatasets datasets = new GeneratorDatasets(GeoData.BTE_GENERATOR_SETTINGS);
-
-            altFuture = datasets.<IScalarDataset>getCustom(EarthGeneratorPipelines.KEY_DATASET_HEIGHTS)
-                    .getAsync(adjustedLon, adjustedLat)
-                    .thenApply(a -> a + 1.0d);
-        } catch (OutOfProjectionBoundsException e) {
-            altFuture = CompletableFuture.completedFuture(0.0);
-        }
-        return altFuture;
     }
 
 }

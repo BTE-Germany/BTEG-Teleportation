@@ -18,7 +18,7 @@ public class RegistriesProvider {
     public RegistriesProvider(Database database, Logger logger, WarpIdsManager warpIdsManager) {
         this.lastLocationsRegistry = new LastLocationsRegistry();
         this.tpasRegistry = new TpasRegistry();
-        this.warpTagsRegistry = new WarpTagsRegistry(database);
+        this.warpTagsRegistry = new WarpTagsRegistry(database, logger);
         this.warpsRegistry = new WarpsRegistry(logger, database, warpIdsManager, this.warpTagsRegistry);
         this.pluginMessagesWithResponseRegistry = new PluginMessagesWithResponseRegistry();
     }

@@ -3,47 +3,44 @@ package de.btegermany.teleportation.TeleportationBukkit.listener;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import de.btegermany.teleportation.TeleportationAPI.message.PluginMessage;
-import de.btegermany.teleportation.TeleportationBukkit.message.response.LastLocationResponseMessage;
+import de.btegermany.teleportation.TeleportationAPI.message.executor.PluginMessageExecutor;
+import de.btegermany.teleportation.TeleportationBukkit.message.executor.CommandPerformExecutor;
+import de.btegermany.teleportation.TeleportationBukkit.message.executor.ListExecutor;
+import de.btegermany.teleportation.TeleportationBukkit.message.executor.RequestExecutor;
+import de.btegermany.teleportation.TeleportationBukkit.message.executor.TeleportExecutor;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
-import de.btegermany.teleportation.TeleportationBukkit.message.response.PlayerWorldResponseMessage;
-import de.btegermany.teleportation.TeleportationBukkit.registry.CitiesRegistry;
-import de.btegermany.teleportation.TeleportationBukkit.registry.WarpTagsRegistry;
-import de.btegermany.teleportation.TeleportationBukkit.tp.PendingTpNormen;
-import de.btegermany.teleportation.TeleportationBukkit.tp.PendingTpPlayer;
 import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
 import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
-import de.btegermany.teleportation.TeleportationBukkit.tp.PendingTpLocation;
 import de.btegermany.teleportation.TeleportationBukkit.tp.TeleportationHandler;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.*;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
 import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class PluginMsgListener implements PluginMessageListener {
 
-	private static final List<String> ALLOWED_COMMANDS_TO_EXECUTE = List.of("tpll", "tpc");
-
-	private final TeleportationBukkit plugin;
-	private final TeleportationHandler teleportationHandler;
-	private final PluginMessenger pluginMessenger;
 	private final RegistriesProvider registriesProvider;
+	private final Map<String, PluginMessageExecutor> messageExecutors;
 
 	public PluginMsgListener(TeleportationBukkit plugin, TeleportationHandler teleportationHandler, PluginMessenger pluginMessenger, RegistriesProvider registriesProvider) {
-		this.plugin = plugin;
-		this.teleportationHandler = teleportationHandler;
-		this.pluginMessenger = pluginMessenger;
 		this.registriesProvider = registriesProvider;
+
+		this.messageExecutors = Map.of(
+				"teleport_player", new TeleportExecutor.PlayerExecutor(teleportationHandler, plugin),
+				"teleport_coords", new TeleportExecutor.CoordsExecutor(teleportationHandler, plugin),
+				"teleport_normen", new TeleportExecutor.NormenExecutor(teleportationHandler, plugin),
+				"command_perform", new CommandPerformExecutor(plugin.getLogger()),
+				"list_cities", new ListExecutor.CitiesExecutor(registriesProvider.getCitiesRegistry()),
+				"list_tags", new ListExecutor.TagsExecutor(registriesProvider.getWarpTagsRegistry()),
+				"last_location_request", new RequestExecutor.LastLocationExecutor(pluginMessenger),
+				"player_world_request", new RequestExecutor.PlayerWorldExecutor(pluginMessenger)
+		);
 	}
 
 	@Override
 	public void onPluginMessageReceived(@Nonnull String channel, @Nonnull Player player, @Nonnull byte[] message) {
-
 		if(!channel.equals(TeleportationBukkit.PLUGIN_CHANNEL)) {
 			return;
 		}
@@ -51,191 +48,20 @@ public class PluginMsgListener implements PluginMessageListener {
 		ByteArrayDataInput dataInput = ByteStreams.newDataInput(message);
 
 		PluginMessage.MessageType messageType = PluginMessage.MessageType.valueOf(dataInput.readUTF());
-		int requestId = -1;
-		if(messageType == PluginMessage.MessageType.WITH_RESPONSE || messageType == PluginMessage.MessageType.RESPONSE) {
-			requestId = Integer.parseInt(dataInput.readUTF());
-		}
-		String tag = dataInput.readUTF();
+		Integer requestId = (messageType == PluginMessage.MessageType.NORMAL) ? null : Integer.parseInt(dataInput.readUTF());
 
-		switch (tag) {
+		String messageLabel = dataInput.readUTF();
 
-			case "teleport_player" -> {
-				UUID playerUUID = UUID.fromString(dataInput.readUTF());
-				UUID targetUUID = UUID.fromString(dataInput.readUTF());
-				String originServerName = dataInput.readUTF();
+		CompletableFuture.runAsync(() -> {
+			switch (messageType) {
+				case NORMAL, WITH_RESPONSE -> this.messageExecutors.get(messageLabel).execute(dataInput, requestId);
 
-				teleportationHandler.handle(new PendingTpPlayer(playerUUID, targetUUID, originServerName));
-			}
-
-			case "teleport_coords" -> {
-				UUID playerUUID = UUID.fromString(dataInput.readUTF());
-				String[] coords = dataInput.readUTF().split(",");
-				double x = Double.parseDouble(coords[0]);
-				double y = Double.parseDouble(coords[1]);
-				double z = Double.parseDouble(coords[2]);
-				// default value null. Otherwise, use the set float value
-				Float yaw = Optional.of(dataInput.readUTF()).filter(str -> !str.equals("null")).map(Float::parseFloat).orElse(null);
-				Float pitch = Optional.of(dataInput.readUTF()).filter(str -> !str.equals("null")).map(Float::parseFloat).orElse(null);
-				String worldName = Optional.of(dataInput.readUTF()).filter(str -> !str.equals("null")).orElse(null);
-				String originServerName = dataInput.readUTF();
-
-				teleportationHandler.handle(new PendingTpLocation(playerUUID, x, y, z, yaw, pitch, worldName, originServerName));
-			}
-
-			case "teleport_normen" -> {
-				UUID playerUUID = UUID.fromString(dataInput.readUTF());
-				String normenWorld = dataInput.readUTF();
-				float yaw = Float.parseFloat(dataInput.readUTF());
-				float pitch = Float.parseFloat(dataInput.readUTF());
-				String originServerName = dataInput.readUTF();
-
-				teleportationHandler.handle(new PendingTpNormen(playerUUID, normenWorld, originServerName, yaw, pitch));
-			}
-
-			case "gui_data" -> {
-				this.registriesProvider.getPluginMessagesWithResponseRegistry().getPluginMessageWithResponse(requestId).accept(dataInput);
-			}
-
-			case "warp_info" -> {
-				UUID playerUUID = UUID.fromString(dataInput.readUTF());
-				int responseNumber = Integer.parseInt(dataInput.readUTF());
-				int id = Integer.parseInt(dataInput.readUTF());
-				String name = dataInput.readUTF();
-				String city = dataInput.readUTF();
-				String state = dataInput.readUTF();
-				double latitude = Double.parseDouble(dataInput.readUTF());
-				double longitude = Double.parseDouble(dataInput.readUTF());
-				String headId = dataInput.readUTF();
-				if (headId.equals("null")) {
-					headId = null;
-				}
-				float yaw = Float.parseFloat(dataInput.readUTF());
-				float pitch = Float.parseFloat(dataInput.readUTF());
-				double height = Double.parseDouble(dataInput.readUTF());
-				String world = dataInput.readUTF();
-				Player targetPlayer = Bukkit.getPlayer(playerUUID);
-				if (targetPlayer == null || !targetPlayer.isOnline()) return;
-
-				switch (responseNumber) {
-					case 0 -> {
-						targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Bist du sicher, dass du folgenden Warp löschen willst?"));
-						targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Id: " + id));
-						targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Name: " + name));
-						targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Stadt: " + city));
-						targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Bundesland: " + state));
-						targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Koordinaten: " + latitude + ", " + longitude));
-						TextComponent yes = new TextComponent("Bestätigen");
-						yes.setColor(ChatColor.RED);
-						yes.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Der Warp wird entgültig gelöscht").create()));
-						yes.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nwarp delete " + id));
-						targetPlayer.spigot().sendMessage(new TextComponent(TeleportationBukkit.getFormattedMessage("")), yes);
-						registriesProvider.getPlayersEnteringDeleteWarpIdRegistry().unregister(targetPlayer);
-					}
-					case 1 -> {
-						targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Um den folgenden Warp zu ändern, klicke unter dem jeweiligen Wert."));
-						TextComponent changeName = new TextComponent(TeleportationBukkit.getFormattedMessage("§r§cName §cändern"));
-						changeName.setColor(ChatColor.RED);
-						changeName.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nwarp change " + id + " name"));
-						TextComponent changeCity = new TextComponent(TeleportationBukkit.getFormattedMessage("§r§cStadt §cändern"));
-						changeCity.setColor(ChatColor.RED);
-						changeCity.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nwarp change " + id + " city"));
-						TextComponent changeState = new TextComponent(TeleportationBukkit.getFormattedMessage("§r§cBundesland §cändern"));
-						changeState.setColor(ChatColor.RED);
-						changeState.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nwarp change " + id + " state"));
-						TextComponent changeCoords = new TextComponent(TeleportationBukkit.getFormattedMessage("§r§cKoordinaten §cändern"));
-						changeCoords.setColor(ChatColor.RED);
-						changeCoords.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nwarp change " + id + " coordinates"));
-						TextComponent changeHeadId = new TextComponent(TeleportationBukkit.getFormattedMessage("§r§cHeadId §cändern"));
-						changeHeadId.setColor(ChatColor.RED);
-						changeHeadId.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nwarp change " + id + " head_id"));
-						TextComponent changeYaw = new TextComponent(TeleportationBukkit.getFormattedMessage("§r§cYaw §cändern"));
-						changeYaw.setColor(ChatColor.RED);
-						changeYaw.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nwarp change " + id + " yaw"));
-						TextComponent changePitch = new TextComponent(TeleportationBukkit.getFormattedMessage("§r§cPitch §cändern"));
-						changePitch.setColor(ChatColor.RED);
-						changePitch.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nwarp change " + id + " pitch"));
-						TextComponent changeHeight = new TextComponent(TeleportationBukkit.getFormattedMessage("§r§cHöhe §cändern"));
-						changeHeight.setColor(ChatColor.RED);
-						changeHeight.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nwarp change " + id + " height"));
-						TextComponent changeWorld = new TextComponent(TeleportationBukkit.getFormattedMessage("§r§cWelt §cändern"));
-						changeWorld.setColor(ChatColor.RED);
-						changeWorld.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nwarp change " + id + " world"));
-						targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Id: " + id));
-						targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Name: " + name));
-						targetPlayer.spigot().sendMessage(changeName);
-						targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Stadt: " + city));
-						targetPlayer.spigot().sendMessage(changeCity);
-						targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Bundesland: " + state));
-						targetPlayer.spigot().sendMessage(changeState);
-						targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Koordinaten: " + latitude + ", " + longitude));
-						targetPlayer.spigot().sendMessage(changeCoords);
-						targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("HeadId: " + headId));
-						targetPlayer.spigot().sendMessage(changeHeadId);
-						targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Yaw: " + yaw));
-						targetPlayer.spigot().sendMessage(changeYaw);
-						targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Pitch: " + pitch));
-						targetPlayer.spigot().sendMessage(changePitch);
-						targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Höhe: " + height));
-						targetPlayer.spigot().sendMessage(changeHeight);
-						targetPlayer.sendMessage(TeleportationBukkit.getFormattedMessage("Welt: " + world));
-						targetPlayer.spigot().sendMessage(changeWorld);
-						registriesProvider.getPlayersEnteringChangeWarpIdRegistry().unregister(targetPlayer);
-					}
+				case RESPONSE -> {
+					this.registriesProvider.getPluginMessagesWithResponseRegistry().getPluginMessageWithResponse(requestId).accept(dataInput);
+					this.registriesProvider.getPluginMessagesWithResponseRegistry().unregister(requestId);
 				}
 			}
-
-			case "command_perform" -> {
-				UUID playerUUID = UUID.fromString(dataInput.readUTF());
-				String command = dataInput.readUTF();
-				Player targetPlayer = Bukkit.getPlayer(playerUUID);
-				if (targetPlayer == null || !targetPlayer.isOnline()) return;
-
-				int spaceIndex = !command.contains(" ") ? 0 : command.indexOf(" ");
-				String baseCommand = command.substring(0, spaceIndex);
-				if (!ALLOWED_COMMANDS_TO_EXECUTE.contains(baseCommand)) {
-					this.plugin.getLogger().severe("Not allowed to remotely perform command '%s'".formatted(baseCommand));
-					return;
-				}
-
-				targetPlayer.performCommand(command);
-			}
-
-			case "list_cities" -> {
-				CitiesRegistry citiesRegistry = this.registriesProvider.getCitiesRegistry();
-				citiesRegistry.unregisterAll();
-				while (true) {
-					try {
-						String city = dataInput.readUTF();
-						citiesRegistry.register(city);
-					} catch (IllegalStateException e) {
-						break;
-					}
-				}
-			}
-
-			case "list_tags" -> {
-				WarpTagsRegistry warpTagsRegistry = this.registriesProvider.getWarpTagsRegistry();
-				warpTagsRegistry.unregisterAll();
-				while (true) {
-					try {
-						String warpTag = dataInput.readUTF();
-						warpTagsRegistry.register(warpTag);
-					} catch (IllegalStateException e) {
-						break;
-					}
-				}
-			}
-
-			case "last_location_request" -> {
-				UUID playerUUID = UUID.fromString(dataInput.readUTF());
-				this.pluginMessenger.send(new LastLocationResponseMessage(requestId, playerUUID));
-			}
-
-			case "player_world_request" -> {
-				UUID playerUUID = UUID.fromString(dataInput.readUTF());
-				this.pluginMessenger.send(new PlayerWorldResponseMessage(requestId, playerUUID));
-			}
-		}
+		});
 	}
 
 }

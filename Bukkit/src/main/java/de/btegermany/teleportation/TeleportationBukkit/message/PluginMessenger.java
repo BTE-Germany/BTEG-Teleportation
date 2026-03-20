@@ -27,7 +27,7 @@ public class PluginMessenger {
         if(pluginMessage instanceof PluginMessageWithResponse) {
             this.registriesProvider.getPluginMessagesWithResponseRegistry().register((PluginMessageWithResponse) pluginMessage);
         }
-        onlinePlayers.get(0).sendPluginMessage(plugin, TeleportationBukkit.PLUGIN_CHANNEL, pluginMessage.getBytes());
+        onlinePlayers.getFirst().sendPluginMessage(plugin, TeleportationBukkit.PLUGIN_CHANNEL, pluginMessage.getBytes());
     }
 
 }

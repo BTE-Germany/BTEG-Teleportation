@@ -1,11 +1,11 @@
 package de.btegermany.teleportation.TeleportationBukkit.commands;
 
 import de.btegermany.teleportation.TeleportationBukkit.data.ConfigReader;
-import de.btegermany.teleportation.TeleportationBukkit.gui.WarpGui;
-import de.btegermany.teleportation.TeleportationBukkit.gui.blueprint.GuiArgs;
+import de.btegermany.teleportation.TeleportationBukkit.gui.PagedGuiHandler;
+import de.btegermany.teleportation.TeleportationBukkit.gui.warp.SearchResultsGui;
+import de.btegermany.teleportation.TeleportationBukkit.gui.warp.WarpGui;
 import de.btegermany.teleportation.TeleportationBukkit.message.*;
 import de.btegermany.teleportation.TeleportationAPI.State;
-import de.btegermany.teleportation.TeleportationBukkit.message.withresponse.GetGuiDataMessage;
 import de.btegermany.teleportation.TeleportationBukkit.util.TabExecutorEnhanced;
 import de.btegermany.teleportation.TeleportationBukkit.util.WarpGettingChanged;
 import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
@@ -28,11 +28,15 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
 
     private final PluginMessenger pluginMessenger;
     private final RegistriesProvider registriesProvider;
+    private final PagedGuiHandler pagedGuiHandler;
+    private final TeleportationBukkit plugin;
     private final boolean warpsEnabled;
 
-    public WarpCommand(PluginMessenger pluginMessenger, RegistriesProvider registriesProvider, ConfigReader configReader) {
+    public WarpCommand(PluginMessenger pluginMessenger, RegistriesProvider registriesProvider, ConfigReader configReader, PagedGuiHandler pagedGuiHandler, TeleportationBukkit plugin) {
         this.pluginMessenger = pluginMessenger;
         this.registriesProvider = registriesProvider;
+        this.pagedGuiHandler = pagedGuiHandler;
+        this.plugin = plugin;
         this.warpsEnabled = configReader.readWarpsEnabled();
     }
 
@@ -50,7 +54,7 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
         }
 
         if(args.length == 0) {
-            new WarpGui(new GuiArgs(player, this.pluginMessenger, this.registriesProvider)).open();
+            new WarpGui(player, this.pagedGuiHandler, this.pluginMessenger, this.plugin);
             return true;
         }
 
@@ -166,7 +170,7 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
             searchBuilder.append(args[i]);
         }
         String search = new String(searchBuilder);
-        this.pluginMessenger.send(new GetGuiDataMessage(this.registriesProvider, this.pluginMessenger, player.getUniqueId().toString(), String.format("search_%s", search), 0, 1));
+        new SearchResultsGui(search, player, this.pagedGuiHandler, this.pluginMessenger, this.plugin);
     }
 
     private boolean isHeadIdInvalid(String headId) {

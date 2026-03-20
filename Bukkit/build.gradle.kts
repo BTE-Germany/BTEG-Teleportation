@@ -10,12 +10,18 @@ plugins {
 
 dependencies {
     implementation(project(":bteg-teleportation-api"))
-    implementation(libs.com.tchristofferson.pagedinventories)
     implementation(libs.org.json.json)
     implementation(libs.spotbugs.annotations)
     compileOnly(libs.io.papermc.paper.paper.api)
     compileOnly(libs.com.mojang.authlib)
     compileOnly(libs.li.cinnazeyy.langlibs.api)
+    implementation(libs.dev.triumphteam.triumph.gui) {
+        exclude (group = "org.jetbrains", module = "annotations")
+        exclude (group = "net.kyori", module = "adventure-api")
+        exclude (group = "net.kyori", module = "adventure-platform-bukkit")
+        exclude (group = "net.kyori", module = "adventure-text-serializer-gson")
+        exclude (group = "net.kyori", module = "adventure-text-serializer-legacy")
+    }
 }
 
 description = "Teleportation.bukkit"
@@ -38,7 +44,7 @@ tasks.jar {
 
 // seperate block because of version serialization
 if (true) {
-    val globalVersion = "1.0.0"
+    val globalVersion = "1.1.0"
     version = globalVersion
 
     val processPluginYml by tasks.registering {

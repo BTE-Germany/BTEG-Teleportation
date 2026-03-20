@@ -1,10 +1,10 @@
 package de.btegermany.teleportation.TeleportationBukkit;
 
-import com.tchristofferson.pagedinventories.PagedInventoryAPI;
 import de.btegermany.teleportation.TeleportationBukkit.commands.LobbyWarpCommand;
 import de.btegermany.teleportation.TeleportationBukkit.commands.TpCommand;
 import de.btegermany.teleportation.TeleportationBukkit.commands.WarpCommand;
 import de.btegermany.teleportation.TeleportationBukkit.data.ConfigReader;
+import de.btegermany.teleportation.TeleportationBukkit.gui.PagedGuiHandler;
 import de.btegermany.teleportation.TeleportationBukkit.listener.PlayerInteractListener;
 import de.btegermany.teleportation.TeleportationBukkit.listener.PluginMsgListener;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
@@ -19,6 +19,7 @@ import de.btegermany.teleportation.TeleportationBukkit.tp.TeleportationHandler;
 //import li.cinnazeyy.langlibs.core.language.LanguageUtil;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 public class TeleportationBukkit extends JavaPlugin {
 
 	public static final String PLUGIN_CHANNEL = "bteg:teleportation";
-	private static PagedInventoryAPI pagedInventoryAPI;
 	private PluginMessenger pluginMessenger;
 	private ScheduledExecutorService scheduledExecutorServiceProxyPlayerSynchronization;
 
@@ -39,12 +39,12 @@ public class TeleportationBukkit extends JavaPlugin {
 		});*/
 
 		//initialize objects
-		pagedInventoryAPI = new PagedInventoryAPI(this);
 		ConfigReader configReader = new ConfigReader(this);
 		RegistriesProvider registriesProvider = new RegistriesProvider(this);
 		registriesProvider.getLobbyCitiesRegistry().loadLobbyCities();
 		this.pluginMessenger = new PluginMessenger(this, registriesProvider);
-		TeleportationHandler teleportationHandler = new TeleportationHandler(this.pluginMessenger);
+		TeleportationHandler teleportationHandler = new TeleportationHandler();
+		PagedGuiHandler pagedGuiHandler = new PagedGuiHandler(this.pluginMessenger);
 		//LanguageUtil languageUtil = new LanguageUtil(this);
 
 		//register plugin channel
@@ -56,9 +56,9 @@ public class TeleportationBukkit extends JavaPlugin {
 		this.getServer().getPluginManager().registerEvents(new PlayerInteractListener(registriesProvider), this);
 
 		// register commands
-		this.getCommand("warp").setExecutor(new WarpCommand(this.pluginMessenger, registriesProvider, configReader));
-		this.getCommand("lobbywarp").setExecutor(new LobbyWarpCommand(this.pluginMessenger, registriesProvider));
-		this.getCommand("tp").setExecutor(new TpCommand(this.pluginMessenger));
+		Objects.requireNonNull(this.getCommand("warp")).setExecutor(new WarpCommand(this.pluginMessenger, registriesProvider, configReader, pagedGuiHandler, this));
+		Objects.requireNonNull(this.getCommand("lobbywarp")).setExecutor(new LobbyWarpCommand(this.pluginMessenger, registriesProvider, pagedGuiHandler, this));
+		Objects.requireNonNull(this.getCommand("tp")).setExecutor(new TpCommand(this.pluginMessenger));
 
 		this.startProxyPlayerSynchronization();
 	}
@@ -93,7 +93,4 @@ public class TeleportationBukkit extends JavaPlugin {
 		}, 0, 3, TimeUnit.SECONDS);
 	}
 
-	public static PagedInventoryAPI getPagedInventoryAPI() {
-		return pagedInventoryAPI;
-	}
 }

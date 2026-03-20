@@ -1,5 +1,6 @@
 package de.btegermany.teleportation.TeleportationBukkit.tp;
 
+import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -12,23 +13,26 @@ public class PendingTpNormen extends PendingTeleportationAbstract {
     private final String normenWorld;
     private final float yaw;
     private final float pitch;
+    private final TeleportationBukkit plugin;
 
-    public PendingTpNormen(UUID playerUUID, String normenWorld, String originServerName, float yaw, float pitch) {
+    public PendingTpNormen(UUID playerUUID, String normenWorld, String originServerName, float yaw, float pitch, TeleportationBukkit plugin) {
         super(playerUUID, originServerName);
 
         this.normenWorld = normenWorld;
         this.yaw = yaw;
         this.pitch = pitch;
+        this.plugin = plugin;
     }
 
     @Override
     public boolean canTeleport() {
-        return Bukkit.getPlayer(playerUUID) != null && Bukkit.getPlayer(playerUUID).isOnline();
+        Player player = Bukkit.getPlayer(this.playerUUID);
+        return player != null && player.isOnline();
     }
 
     @Override
-    public boolean teleport() {
-        Player player = Bukkit.getPlayer(playerUUID);
+    public void teleport() {
+        Player player = Bukkit.getPlayer(this.playerUUID);
         assert player != null; // canTeleport() checked
         World world = Bukkit.getWorld(this.normenWorld);
 
@@ -36,7 +40,7 @@ public class PendingTpNormen extends PendingTeleportationAbstract {
         location.setYaw(this.yaw);
         location.setPitch(this.pitch);
 
-        return player.teleport(location);
+        Bukkit.getScheduler().runTask(this.plugin, () -> player.teleport(location));
     }
 
 }

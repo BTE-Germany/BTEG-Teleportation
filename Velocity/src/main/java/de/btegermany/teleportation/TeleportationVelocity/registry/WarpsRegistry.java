@@ -102,7 +102,7 @@ public class WarpsRegistry {
             this.warps.add(warp);
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
+            this.logger.error("Failed to register warp", e);
         }
         return false;
     }
@@ -155,7 +155,7 @@ public class WarpsRegistry {
                     warp.getTags().add(tag);
                     tagsAdded.add(tag);
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    this.logger.error("Failed to add tag {} to warp", tag, e);
                 }
             }
         }).thenRun(() -> {
@@ -189,7 +189,7 @@ public class WarpsRegistry {
                     warp.getTags().remove(tag);
                     tagsRemoved.add(tag);
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    this.logger.error("Failed to remove tag {} from warp", tag, e);
                 }
             }
         }).thenRun(() -> {

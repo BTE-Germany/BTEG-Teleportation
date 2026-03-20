@@ -6,7 +6,6 @@ com-google-code-gson-gson = "2.13.0"
 com-google-guava-guava = "33.4.8-jre"
 com-mojang-authlib = "4.0.43"
 com-mysql-mysql-connector-j = "9.2.0"
-com-tchristofferson-pagedinventories = "2.3-SNAPSHOT"
 com-velocitypowered-velocity-api = "3.3.0-SNAPSHOT"
 commons-io-commons-io = "2.19.0"
 io-netty-netty-buffer = "4.2.0.Final"
@@ -18,13 +17,13 @@ org-json-json = "20250107"
 lombok = "9.2.0" # https://plugins.gradle.org/plugin/io.freefair.lombok
 shadow = "9.3.1" # https://github.com/GradleUp/shadow/releases
 spotbugs-annotations = "4.9.8" # https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
+dev-triumphteam-triumph-gui = "3.1.13"
 
 [libraries]
 com-google-code-gson-gson = { module = "com.google.code.gson:gson", version.ref = "com-google-code-gson-gson" }
 com-google-guava-guava = { module = "com.google.guava:guava", version.ref = "com-google-guava-guava" }
 com-mojang-authlib = { module = "com.mojang:authlib", version.ref = "com-mojang-authlib" }
 com-mysql-mysql-connector-j = { module = "com.mysql:mysql-connector-j", version.ref = "com-mysql-mysql-connector-j" }
-com-tchristofferson-pagedinventories = { module = "com.tchristofferson:PagedInventories", version.ref = "com-tchristofferson-pagedinventories" }
 com-velocitypowered-velocity-api = { module = "com.velocitypowered:velocity-api", version.ref = "com-velocitypowered-velocity-api" }
 commons-io-commons-io = { module = "commons-io:commons-io", version.ref = "commons-io-commons-io" }
 io-netty-netty-buffer = { module = "io.netty:netty-buffer", version.ref = "io-netty-netty-buffer" }
@@ -34,6 +33,7 @@ li-cinnazeyy-langlibs-api = { module = "li.cinnazeyy:LangLibs-API", version.ref 
 net-buildtheearth-terraminusminus-terraminusminus-bukkit = { module = "net.buildtheearth.terraminusminus:terraminusminus-bukkit", version.ref = "net-buildtheearth-terraminusminus-terraminusminus-bukkit" }
 org-json-json = { module = "org.json:json", version.ref = "org-json-json" }
 spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs-annotations" }
+dev-triumphteam-triumph-gui = { module="dev.triumphteam:triumph-gui", version.ref = "dev-triumphteam-triumph-gui" }
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }

@@ -1,14 +1,16 @@
 package de.btegermany.teleportation.TeleportationVelocity.registry;
 
 import com.velocitypowered.api.proxy.Player;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@Getter
 public class TpasRegistry implements PlayerRegistry {
 
-    Map<UUID, UUID> tpas;
+    private final Map<UUID, UUID> tpas;
 
     public TpasRegistry() {
         this.tpas = new HashMap<>();
@@ -38,10 +40,6 @@ public class TpasRegistry implements PlayerRegistry {
 
     public UUID getTpa(UUID playerUUID) {
         return tpas.get(playerUUID);
-    }
-
-    public Map<UUID, UUID> getTpas() {
-        return tpas;
     }
 
 }

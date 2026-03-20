@@ -1,5 +1,7 @@
 package de.btegermany.teleportation.TeleportationVelocity.data;
 
+import lombok.Getter;
+
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.util.List;
@@ -7,6 +9,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class Database {
 
+    @Getter
     private Connection connection;
     private final ConfigHandler configHandler;
 
@@ -72,10 +75,6 @@ public class Database {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public Connection getConnection() {
-        return connection;
     }
 
 }

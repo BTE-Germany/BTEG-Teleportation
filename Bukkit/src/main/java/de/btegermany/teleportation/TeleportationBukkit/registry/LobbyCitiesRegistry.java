@@ -2,7 +2,9 @@ package de.btegermany.teleportation.TeleportationBukkit.registry;
 
 import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
 import de.btegermany.teleportation.TeleportationBukkit.util.LobbyCity;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -16,16 +18,20 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class LobbyCitiesRegistry {
 
     private final TeleportationBukkit plugin;
+    private final Logger logger;
     private final Set<LobbyCity> lobbyCities;
     private final File lobbyCitiesConfigFile;
     private final FileConfiguration lobbyCitiesConfig;
 
-    public LobbyCitiesRegistry(TeleportationBukkit plugin, String configFileName) {
+    public LobbyCitiesRegistry(TeleportationBukkit plugin, String configFileName, Logger logger) {
         this.plugin = plugin;
+        this.logger = logger;
         this.lobbyCities = new HashSet<>();
 
         this.lobbyCitiesConfigFile = new File(this.plugin.getDataFolder(), configFileName);
@@ -37,11 +43,11 @@ public class LobbyCitiesRegistry {
         try {
             this.lobbyCitiesConfig.load(this.lobbyCitiesConfigFile);
         } catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Loading LobbyCities config at %s failed".formatted(this.lobbyCitiesConfigFile.getAbsolutePath()), e);
         }
     }
 
-    public void loadLobbyCities() {
+    public synchronized void loadLobbyCities() {
         for(String city : lobbyCitiesConfig.getKeys(false)) {
             LobbyCity lobbyCity = new LobbyCity.LobbyCityBuilder()
                     .setCity(city)
@@ -71,13 +77,13 @@ public class LobbyCitiesRegistry {
             armorStand.setCanPickupItems(false);
             armorStand.setCustomNameVisible(true);
             armorStand.setVisible(false);
-            armorStand.setCustomName(ChatColor.GOLD + "" + ChatColor.BOLD + city);
+            armorStand.customName(Component.text(city, NamedTextColor.GOLD, TextDecoration.BOLD));
 
             armorStandLocation.getChunk().removePluginChunkTicket(this.plugin);
         }
     }
 
-    public void register(LobbyCity lobbyCity) {
+    public synchronized void register(LobbyCity lobbyCity) {
         this.lobbyCitiesConfig.set(lobbyCity.getCity() + ".center-latitude", lobbyCity.getCenterLat());
         this.lobbyCitiesConfig.set(lobbyCity.getCity() + ".center-longitude", lobbyCity.getCenterLon());
         this.lobbyCitiesConfig.set(lobbyCity.getCity() + ".radius-km", lobbyCity.getRadius());
@@ -96,13 +102,13 @@ public class LobbyCitiesRegistry {
             armorStand.setCanPickupItems(false);
             armorStand.setCustomNameVisible(true);
             armorStand.setVisible(false);
-            armorStand.setCustomName(ChatColor.GOLD + "" + ChatColor.BOLD + lobbyCity.getCity());
+            armorStand.customName(Component.text(lobbyCity.getCity(), NamedTextColor.GOLD, TextDecoration.BOLD));
         } catch (IOException e) {
-            e.printStackTrace();
+            this.logger.log(Level.SEVERE, "Registering LobbyCity failed", e);
         }
     }
 
-    public void unregister(LobbyCity lobbyCity) {
+    public synchronized void unregister(LobbyCity lobbyCity) {
         this.lobbyCitiesConfig.set(lobbyCity.getCity(), null);
         try {
             this.lobbyCitiesConfig.save(this.lobbyCitiesConfigFile);
@@ -116,15 +122,15 @@ public class LobbyCitiesRegistry {
                     .filter(entity -> entity instanceof ArmorStand)
                     .forEach(Entity::remove);
         } catch (IOException e) {
-            e.printStackTrace();
+            this.logger.log(Level.SEVERE, "Unregistering LobbyCity failed", e);
         }
     }
 
-    public boolean doesExist(String city) {
+    public synchronized boolean doesExist(String city) {
         return this.lobbyCitiesConfig.getKeys(false).contains(city);
     }
 
-    public Set<LobbyCity> getLobbyCities() {
+    public synchronized Set<LobbyCity> getLobbyCities() {
         return lobbyCities;
     }
 

@@ -17,8 +17,9 @@ public class PendingTpLocation extends PendingTeleportationAbstract {
     private final Float yaw;
     private final Float pitch;
     private final String worldName;
+    private final TeleportationBukkit plugin;
 
-    public PendingTpLocation(UUID playerUUID, double x, double y, double z, Float yaw, Float pitch, String worldName, String originServerName) {
+    public PendingTpLocation(UUID playerUUID, double x, double y, double z, Float yaw, Float pitch, String worldName, String originServerName, TeleportationBukkit plugin) {
         super(playerUUID, originServerName);
         this.x = x;
         this.y = y;
@@ -26,16 +27,19 @@ public class PendingTpLocation extends PendingTeleportationAbstract {
         this.yaw = yaw;
         this.pitch = pitch;
         this.worldName = worldName;
+        this.plugin = plugin;
     }
 
     @Override
     public boolean canTeleport() {
-        return Bukkit.getPlayer(super.playerUUID) != null && Bukkit.getPlayer(super.playerUUID).isOnline();
+        Player player = Bukkit.getPlayer(this.playerUUID);
+        return player != null && player.isOnline();
     }
 
     @Override
-    public boolean teleport() {
-        Player player = Bukkit.getPlayer(super.playerUUID);
+    public void teleport() {
+        Player player = Bukkit.getPlayer(this.playerUUID);
+        assert player != null; // canTeleport() checked
         World world = (worldName == null) ? player.getWorld() : Bukkit.getWorld(worldName);
         if (world == null) {
             world = Bukkit.getWorld("world");
@@ -49,7 +53,7 @@ public class PendingTpLocation extends PendingTeleportationAbstract {
         location.setYaw(yaw != null ? yaw : player.getLocation().getYaw());
         location.setPitch(pitch != null ? pitch : player.getLocation().getPitch());
 
-        return player.teleport(location);
+        Bukkit.getScheduler().runTask(this.plugin, () -> player.teleport(location));
     }
 
 }

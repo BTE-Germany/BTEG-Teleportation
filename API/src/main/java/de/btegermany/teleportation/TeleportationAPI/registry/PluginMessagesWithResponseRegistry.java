@@ -14,7 +14,7 @@ public class PluginMessagesWithResponseRegistry {
         this.pluginMessagesWithResponse = new HashMap<>();
     }
 
-    public void register(PluginMessageWithResponse pluginMessageWithResponse) {
+    public synchronized void register(PluginMessageWithResponse pluginMessageWithResponse) {
         int id;
         while(true) {
             if (!this.pluginMessagesWithResponse.containsKey(id = ThreadLocalRandom.current().nextInt())) {
@@ -25,11 +25,11 @@ public class PluginMessagesWithResponseRegistry {
         this.pluginMessagesWithResponse.put(id, pluginMessageWithResponse);
     }
 
-    public void unregister(int id) {
+    public synchronized void unregister(int id) {
         this.pluginMessagesWithResponse.remove(id);
     }
 
-    public PluginMessageWithResponse getPluginMessageWithResponse(int id) {
+    public synchronized PluginMessageWithResponse getPluginMessageWithResponse(int id) {
         return this.pluginMessagesWithResponse.get(id);
     }
 

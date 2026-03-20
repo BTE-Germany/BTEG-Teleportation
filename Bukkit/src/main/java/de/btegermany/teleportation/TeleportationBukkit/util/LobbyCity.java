@@ -3,20 +3,10 @@ package de.btegermany.teleportation.TeleportationBukkit.util;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
-public class LobbyCity {
-
-    private final String city;
-    private final double centerLat;
-    private final double centerLon;
-    private final int radius;
-    private final Block block;
+public record LobbyCity (String city, double centerLat, double centerLon, int radius, Block block) {
 
     private LobbyCity(String city, double centerLat, double centerLon, int radius, World world, int x, int y, int z) {
-        this.city = city;
-        this.centerLat = centerLat;
-        this.centerLon = centerLon;
-        this.radius = radius;
-        this.block = world.getBlockAt(x, y, z);
+        this(city, centerLat, centerLon, radius, world.getBlockAt(x, y, z));
     }
 
     public static class LobbyCityBuilder {

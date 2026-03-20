@@ -21,6 +21,10 @@ import java.util.concurrent.TimeUnit;
 
 public class PluginMessenger {
 
+    private static final long SEND_PERIOD = TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS);
+    private static final long SEND_TIMEOUT = TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS);
+    private static final long SEND_SLEEP = 500;
+
     private final ProxyServer proxyServer;
     private final RegistriesProvider registriesProvider;
 
@@ -89,11 +93,11 @@ public class PluginMessenger {
     }
 
     // sends gui data (JSON format) consisting of data for the requested pages
-    public void sendGuiData(int requestId, Player player, String title, JSONArray pagesData) {
+    public void sendGuiData(int requestId, Player player, JSONArray pagesData) {
         if (player.getCurrentServer().isEmpty()) {
             return;
         }
-        this.sendMessageToServers(new GuiDataResponseMessage(requestId, player, title, pagesData), player.getCurrentServer().get().getServer());
+        this.sendMessageToServers(new GuiDataResponseMessage(requestId, player, pagesData), player.getCurrentServer().get().getServer());
     }
 
     // connects the player to the server if needed and sends a Plugin Message with the teleportation data to the specified server (with timeout)
@@ -111,8 +115,7 @@ public class PluginMessenger {
 
         Utils.connectIfOnline(player, server);
 
-        long period = TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS);
-        long timeout = TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS);
+
         Timer timer = new Timer();
 
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -120,7 +123,7 @@ public class PluginMessenger {
 
             @Override
             public void run() {
-                if ((periodSum += period) >= timeout) {
+                if ((periodSum += SEND_PERIOD) >= SEND_TIMEOUT) {
                     timer.cancel();
                 }
 
@@ -129,14 +132,14 @@ public class PluginMessenger {
                 }
 
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(SEND_SLEEP);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
                 server.sendPluginMessage(TeleportationVelocity.PLUGIN_CHANNEL, pluginMessage.getBytes());
                 timer.cancel();
             }
-        }, 0, period);
+        }, 0, SEND_PERIOD);
     }
 
 }

@@ -1,7 +1,6 @@
 package de.btegermany.teleportation.TeleportationBukkit.listener;
 
 import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
-import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.tp.PendingTeleportationAbstract;
 import de.btegermany.teleportation.TeleportationBukkit.tp.TeleportationHandler;
 import org.bukkit.Bukkit;
@@ -45,12 +44,7 @@ public class PlayerJoinListener implements Listener {
 			return;
 		}
 		if(teleportation.isValid()) {
-			Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
-				boolean success = teleportation.teleport();
-				if (!success) {
-					this.plugin.getLogger().severe("Teleporting player %s from server %s failed".formatted(player.getName(), teleportation.getOriginServerName()));
-				}
-			}, 3);
+			Bukkit.getScheduler().runTaskLater(this.plugin, teleportation::teleport, 3);
 		}
 		this.teleportationHandler.getPendingTps().remove(teleportation.getPlayerUUID());
 	}
