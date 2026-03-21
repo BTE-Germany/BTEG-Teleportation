@@ -35,6 +35,7 @@ public class GuiItems {
         ItemStack item = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta meta = item.getItemMeta();
         meta.customName(Component.text(""));
+        item.setItemMeta(meta);
         return new GuiItem(item);
     }
 
