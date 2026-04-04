@@ -115,18 +115,18 @@ public class GuiData {
 
             case SEARCH_RESULTS -> {
                 String searchInput = args[0];
-                List<Warp> warpsSearch1 = new ArrayList<>(this.registriesProvider.getWarpsRegistry().getWarps().stream()
+                Set<Warp> warpsSearch1 = this.registriesProvider.getWarpsRegistry().getWarps().stream()
                         .filter(warp -> warp.getName().equalsIgnoreCase(searchInput))
-                        .toList());
+                        .collect(Collectors.toSet());
                 if (warpsSearch1.size() == 1) {
-                    Warp warp = warpsSearch1.getFirst();
+                    Warp warp = warpsSearch1.stream().findFirst().get();
                     this.proxyServer.getCommandManager().executeAsync(player, warp.getTpllCommand());
                     yield null;
                 }
 
-                List<Warp> warpsSearch2 = this.registriesProvider.getWarpsRegistry().getWarps().stream()
+                Set<Warp> warpsSearch2 = this.registriesProvider.getWarpsRegistry().getWarps().stream()
                         .filter(warp -> warp.getCity().equalsIgnoreCase(searchInput))
-                        .toList();
+                        .collect(Collectors.toSet());
 
                 if (warpsSearch1.isEmpty() && warpsSearch2.isEmpty()) {
                     sendMessage(player, Component.text("Leider wurden keine Warps gefunden!", NamedTextColor.GOLD));

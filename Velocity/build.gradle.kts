@@ -43,7 +43,7 @@ tasks.jar {
 
 // seperate block because of version serialization
 if (true) {
-    val globalVersion = "2.1.0"
+    val globalVersion = "2.1.1"
     version = globalVersion
 
     val processPluginYml by tasks.registering {
