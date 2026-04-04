@@ -10,25 +10,27 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.components.CustomModelDataComponent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class GuiItems {
 
     public static GuiItem closeItem(CustomGui gui) {
-        return emptyItem("Schließen", gui::close);
+        return emptyItem("Schließen", NamedTextColor.DARK_RED, gui::close);
     }
 
     public static GuiItem blankItem() {
-        return new GuiItem(customModelItemStack("", "blank"));
+        return new GuiItem(customModelItemStack("", null, "blank"));
     }
 
-    public static GuiItem emptyItem(String name, Runnable onClick) {
-        return new GuiItem(customModelItemStack(name, "empty"), event -> onClick.run());
+    public static GuiItem emptyItem(String name, TextColor textColor, Runnable onClick) {
+        return new GuiItem(customModelItemStack(name, textColor, "empty"), event -> onClick.run());
     }
 
     public static GuiItem fillerItem() {
@@ -39,11 +41,11 @@ public class GuiItems {
         return new GuiItem(item);
     }
 
-    public static ItemStack customModelItemStack(String name, String customModelData) {
+    public static ItemStack customModelItemStack(String name, @Nullable TextColor textColor, String customModelData) {
         ItemStack item = new ItemStack(Material.PAPER);
         ItemMeta meta = item.getItemMeta();
 
-        meta.customName(Component.text(name));
+        meta.customName(Component.text(name, textColor));
         CustomModelDataComponent modelDataComponent = meta.getCustomModelDataComponent();
         modelDataComponent.setStrings(List.of(customModelData));
         meta.setCustomModelDataComponent(modelDataComponent);
@@ -58,7 +60,7 @@ public class GuiItems {
     public static class Warps {
 
         public static GuiItem randomWarpItem(CustomGui gui) {
-            return emptyItem("Zufälliger Warp", () -> {
+            return emptyItem("Zufälliger Warp", NamedTextColor.GOLD, () -> {
                 gui.close();
                 gui.getPlayer().performCommand("nwarp random");
             });
@@ -73,14 +75,14 @@ public class GuiItems {
                     .append(button)
                     .append(Component.text("und gib dahinter den Namen eines Warps oder der Stadt, die du suchst, ein.", NamedTextColor.GOLD));
 
-            return emptyItem("Suchen", () -> {
+            return emptyItem("Suchen", NamedTextColor.GOLD, () -> {
                 gui.close();
                 gui.getPlayer().sendMessage(message);
             });
         }
 
         public static GuiItem homeItem(CustomGui gui, PagedGuiHandler pagedGuiHandler, PluginMessenger pluginMessenger, TeleportationBukkit plugin) {
-            return emptyItem("Startseite", () -> new WarpGui(gui.getPlayer(), pagedGuiHandler, pluginMessenger, plugin));
+            return emptyItem("Startseite", NamedTextColor.GOLD, () -> new WarpGui(gui.getPlayer(), pagedGuiHandler, pluginMessenger, plugin));
         }
 
     }

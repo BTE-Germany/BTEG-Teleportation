@@ -12,6 +12,7 @@ import de.btegermany.teleportation.TeleportationBukkit.registry.LobbyCitiesRegis
 import de.btegermany.teleportation.TeleportationBukkit.util.LobbyCity;
 import de.btegermany.teleportation.TeleportationBukkit.util.Skulls;
 import dev.triumphteam.gui.guis.GuiItem;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 public class LobbyWarpAroundGui extends PagedCustomGui {
@@ -22,7 +23,7 @@ public class LobbyWarpAroundGui extends PagedCustomGui {
         super("Umkreis: %s".formatted(lobbyCity.getCity()), PagedGuiType.LOBBY_WARP_AROUND, Skulls.Skin.WARP_HOUSE, player, pagedGuiHandler, plugin, getArgs(lobbyCity));
         this.pluginMessenger = pluginMessenger;
 
-        this.gui.setItem(4, new GuiItem(GuiItems.customModelItemStack("Zurück", "back"), event -> new LobbyWarpGui(lobbyCity.getCity(), player, pagedGuiHandler, pluginMessenger, registry, plugin)));
+        this.gui.setItem(4, new GuiItem(GuiItems.customModelItemStack("Zurück", NamedTextColor.GOLD, "back"), event -> new LobbyWarpGui(lobbyCity.getCity(), player, pagedGuiHandler, pluginMessenger, registry, plugin)));
 
         this.open();
     }

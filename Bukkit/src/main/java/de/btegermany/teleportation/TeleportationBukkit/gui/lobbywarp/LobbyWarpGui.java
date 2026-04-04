@@ -12,6 +12,7 @@ import de.btegermany.teleportation.TeleportationBukkit.registry.LobbyCitiesRegis
 import de.btegermany.teleportation.TeleportationBukkit.util.LobbyCity;
 import de.btegermany.teleportation.TeleportationBukkit.util.Skulls;
 import dev.triumphteam.gui.guis.GuiItem;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
@@ -29,7 +30,7 @@ public class LobbyWarpGui  extends PagedCustomGui {
         this.pluginMessenger = pluginMessenger;
         this.registry = registry;
 
-        this.gui.setItem(4, new GuiItem(GuiItems.customModelItemStack("Warps im Umkreis", "map"), event -> {
+        this.gui.setItem(4, new GuiItem(GuiItems.customModelItemStack("Warps im Umkreis", NamedTextColor.GOLD, "map"), event -> {
             Optional<LobbyCity> lobbyCityOptional = this.registry.getLobbyCities().stream().filter(lobbyCity1 -> lobbyCity1.getCity().equalsIgnoreCase(this.city)).findFirst();
             if (lobbyCityOptional.isEmpty()) {
                 this.close();

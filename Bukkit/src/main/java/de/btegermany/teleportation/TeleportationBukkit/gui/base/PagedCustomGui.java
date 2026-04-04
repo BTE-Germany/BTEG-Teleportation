@@ -10,6 +10,7 @@ import de.btegermany.teleportation.TeleportationBukkit.util.Skulls;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import dev.triumphteam.gui.guis.PaginatedGui;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.json.JSONArray;
@@ -57,11 +58,11 @@ public abstract class PagedCustomGui extends CustomGui {
     }
 
     private GuiItem previousPageItem() {
-        return GuiItems.emptyItem("Vorherige Seite", this::previousPage);
+        return GuiItems.emptyItem("Vorherige Seite", NamedTextColor.GOLD, this::previousPage);
     }
 
     private GuiItem nextPageItem() {
-        return GuiItems.emptyItem("Nächste Seite", () -> {
+        return GuiItems.emptyItem("Nächste Seite", NamedTextColor.GOLD, () -> {
             int pagesNum = this.gui.getPagesNum();
             if (this.gui.getCurrentPageNum() == pagesNum - PAGES_TO_LOAD_DATA_BEFORE_LAST) {
                 this.pagedGuiHandler.loadData(this, this.requestArgs, pagesNum + 1);
