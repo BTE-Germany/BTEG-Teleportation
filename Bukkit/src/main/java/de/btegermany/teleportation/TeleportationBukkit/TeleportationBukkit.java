@@ -9,7 +9,6 @@ import de.btegermany.teleportation.TeleportationBukkit.listener.PlayerInteractLi
 import de.btegermany.teleportation.TeleportationBukkit.listener.PluginMsgListener;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import de.btegermany.teleportation.TeleportationBukkit.listener.PlayerJoinListener;
-import de.btegermany.teleportation.TeleportationBukkit.message.BukkitPlayersMessage;
 import de.btegermany.teleportation.TeleportationBukkit.registry.RegistriesProvider;
 import de.btegermany.teleportation.TeleportationBukkit.tp.TeleportationHandler;
 //import li.cinnazeyy.langlibs.core.Language;
@@ -17,18 +16,15 @@ import de.btegermany.teleportation.TeleportationBukkit.tp.TeleportationHandler;
 //import li.cinnazeyy.langlibs.core.file.YamlFileFactory;
 //import li.cinnazeyy.langlibs.core.language.LangLibAPI;
 //import li.cinnazeyy.langlibs.core.language.LanguageUtil;
+import de.btegermany.teleportation.TeleportationBukkit.util.PlayersOnlineSynchronizer;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class TeleportationBukkit extends JavaPlugin {
 
 	public static final String PLUGIN_CHANNEL = "bteg:teleportation";
-	private PluginMessenger pluginMessenger;
-	private ScheduledExecutorService scheduledExecutorServiceProxyPlayerSynchronization;
+	private PlayersOnlineSynchronizer playersOnlineSynchronizer;
 
 	@Override
 	public void onEnable() {
@@ -42,13 +38,13 @@ public class TeleportationBukkit extends JavaPlugin {
 		ConfigReader configReader = new ConfigReader(this);
 		RegistriesProvider registriesProvider = new RegistriesProvider(this);
 		registriesProvider.getLobbyCitiesRegistry().loadLobbyCities();
-		this.pluginMessenger = new PluginMessenger(this, registriesProvider);
+		PluginMessenger pluginMessenger = new PluginMessenger(this, registriesProvider);
 		TeleportationHandler teleportationHandler = new TeleportationHandler();
-		PagedGuiHandler pagedGuiHandler = new PagedGuiHandler(this.pluginMessenger);
+		PagedGuiHandler pagedGuiHandler = new PagedGuiHandler(pluginMessenger);
 		//LanguageUtil languageUtil = new LanguageUtil(this);
 
 		//register plugin channel
-		this.getServer().getMessenger().registerIncomingPluginChannel(this, PLUGIN_CHANNEL, new PluginMsgListener(this, teleportationHandler, this.pluginMessenger, registriesProvider));
+		this.getServer().getMessenger().registerIncomingPluginChannel(this, PLUGIN_CHANNEL, new PluginMsgListener(this, teleportationHandler, pluginMessenger, registriesProvider));
 		this.getServer().getMessenger().registerOutgoingPluginChannel(this, PLUGIN_CHANNEL);
 
 		// register listeners
@@ -56,16 +52,17 @@ public class TeleportationBukkit extends JavaPlugin {
 		this.getServer().getPluginManager().registerEvents(new PlayerInteractListener(registriesProvider), this);
 
 		// register commands
-		Objects.requireNonNull(this.getCommand("warp")).setExecutor(new WarpCommand(this.pluginMessenger, registriesProvider, configReader, pagedGuiHandler, this));
-		Objects.requireNonNull(this.getCommand("lobbywarp")).setExecutor(new LobbyWarpCommand(this.pluginMessenger, registriesProvider, pagedGuiHandler, this));
-		Objects.requireNonNull(this.getCommand("tp")).setExecutor(new TpCommand(this.pluginMessenger));
+		Objects.requireNonNull(this.getCommand("warp")).setExecutor(new WarpCommand(pluginMessenger, registriesProvider, configReader, pagedGuiHandler, this));
+		Objects.requireNonNull(this.getCommand("lobbywarp")).setExecutor(new LobbyWarpCommand(pluginMessenger, registriesProvider, pagedGuiHandler, this));
+		Objects.requireNonNull(this.getCommand("tp")).setExecutor(new TpCommand(pluginMessenger));
 
-		this.startProxyPlayerSynchronization();
+		this.playersOnlineSynchronizer = new PlayersOnlineSynchronizer(pluginMessenger, this);
+		this.playersOnlineSynchronizer.startProxyPlayerSynchronization();
 	}
 
 	@Override
 	public void onDisable() {
-		this.scheduledExecutorServiceProxyPlayerSynchronization.shutdownNow();
+		this.playersOnlineSynchronizer.shutdownNow();
 	}
 
 	public static String getFormattedMessage(String text) {
@@ -84,13 +81,6 @@ public class TeleportationBukkit extends JavaPlugin {
 			builder.append(" §c").append(word);
 		}
 		return new String(builder);
-	}
-
-	public void startProxyPlayerSynchronization() {
-		this.scheduledExecutorServiceProxyPlayerSynchronization = Executors.newSingleThreadScheduledExecutor();
-		this.scheduledExecutorServiceProxyPlayerSynchronization.scheduleAtFixedRate(() -> {
-			this.pluginMessenger.send(new BukkitPlayersMessage(this.getServer().getOnlinePlayers()));
-		}, 0, 3, TimeUnit.SECONDS);
 	}
 
 }
