@@ -18,6 +18,7 @@ lombok = "9.2.0" # https://plugins.gradle.org/plugin/io.freefair.lombok
 shadow = "9.3.1" # https://github.com/GradleUp/shadow/releases
 spotbugs-annotations = "4.9.8" # https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
 dev-triumphteam-triumph-gui = "3.1.13"
+net-wesjd-anvilgui = "1.10.11-SNAPSHOT"
 
 [libraries]
 com-google-code-gson-gson = { module = "com.google.code.gson:gson", version.ref = "com-google-code-gson-gson" }
@@ -33,7 +34,8 @@ li-cinnazeyy-langlibs-api = { module = "li.cinnazeyy:LangLibs-API", version.ref 
 net-buildtheearth-terraminusminus-terraminusminus-bukkit = { module = "net.buildtheearth.terraminusminus:terraminusminus-bukkit", version.ref = "net-buildtheearth-terraminusminus-terraminusminus-bukkit" }
 org-json-json = { module = "org.json:json", version.ref = "org-json-json" }
 spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs-annotations" }
-dev-triumphteam-triumph-gui = { module="dev.triumphteam:triumph-gui", version.ref = "dev-triumphteam-triumph-gui" }
+dev-triumphteam-triumph-gui = { module = "dev.triumphteam:triumph-gui", version.ref = "dev-triumphteam-triumph-gui" }
+net-wesjd-anvilgui = { module = "net.wesjd:anvilgui", version.ref = "net-wesjd-anvilgui" }
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }

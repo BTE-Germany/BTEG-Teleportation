@@ -22,6 +22,7 @@ dependencies {
         exclude (group = "net.kyori", module = "adventure-text-serializer-gson")
         exclude (group = "net.kyori", module = "adventure-text-serializer-legacy")
     }
+    compileOnly(libs.net.wesjd.anvilgui)
 }
 
 description = "Teleportation.bukkit"
@@ -44,7 +45,7 @@ tasks.jar {
 
 // seperate block because of version serialization
 if (true) {
-    val globalVersion = "1.1.1"
+    val globalVersion = "1.1.2"
     version = globalVersion
 
     val processPluginYml by tasks.registering {

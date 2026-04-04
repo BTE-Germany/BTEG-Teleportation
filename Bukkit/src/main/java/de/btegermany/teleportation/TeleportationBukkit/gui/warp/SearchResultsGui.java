@@ -20,7 +20,7 @@ public class SearchResultsGui extends PagedCustomGui {
         this.pluginMessenger = pluginMessenger;
 
         this.gui.setItem(0, GuiItems.Warps.randomWarpItem(this));
-        this.gui.setItem(1, GuiItems.Warps.searchItem(this));
+        this.gui.setItem(1, GuiItems.Warps.searchItem(this, plugin));
         this.gui.setItem(3, GuiItems.Warps.homeItem(this, pagedGuiHandler, pluginMessenger, plugin));
 
         this.open();

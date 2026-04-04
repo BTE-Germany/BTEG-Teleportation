@@ -6,17 +6,17 @@ import de.btegermany.teleportation.TeleportationBukkit.gui.warp.WarpGui;
 import de.btegermany.teleportation.TeleportationBukkit.message.PluginMessenger;
 import dev.triumphteam.gui.guis.GuiItem;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.wesjd.anvilgui.AnvilGUI;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.components.CustomModelDataComponent;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 
 public class GuiItems {
@@ -66,18 +66,33 @@ public class GuiItems {
             });
         }
 
-        public static GuiItem searchItem(CustomGui gui) {
-            TextComponent button = Component.text(" /nwarp ", NamedTextColor.BLUE)
-                    .clickEvent(ClickEvent.suggestCommand("/nwarp "))
-                    .hoverEvent(HoverEvent.showText(Component.text("Command in der Chatzeile einfügen")));
-            TextComponent message = Component.text("ᾠ ")
-                    .append(Component.text("Nutze den Command", NamedTextColor.GOLD))
-                    .append(button)
-                    .append(Component.text("und gib dahinter den Namen eines Warps oder der Stadt, die du suchst, ein.", NamedTextColor.GOLD));
-
+        public static GuiItem searchItem(CustomGui gui, TeleportationBukkit plugin) {
             return emptyItem("Suchen", NamedTextColor.GOLD, () -> {
                 gui.close();
-                gui.getPlayer().sendMessage(message);
+
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    new AnvilGUI.Builder()
+                            .onClick((slot, stateSnapshot) -> switch (slot) {
+                                case AnvilGUI.Slot.INPUT_RIGHT -> List.of(AnvilGUI.ResponseAction.close());
+
+                                case AnvilGUI.Slot.OUTPUT -> {
+                                    if (stateSnapshot.getText().isEmpty()) {
+                                        yield Collections.emptyList();
+                                    }
+
+                                    gui.getPlayer().performCommand("nwarp %s".formatted(stateSnapshot.getText()));
+                                    yield List.of(AnvilGUI.ResponseAction.close());
+                                }
+
+                                default -> Collections.emptyList();
+                            })
+                            .title("Suchbegriff eingeben")
+                            .itemLeft(GuiItems.blankItem().getItemStack())
+                            .itemRight(GuiItems.customModelItemStack("Schließen", NamedTextColor.DARK_RED, "x"))
+                            .itemOutput(GuiItems.customModelItemStack("", null, "search"))
+                            .plugin(plugin)
+                            .open(gui.getPlayer());
+                }, 5);
             });
         }
 

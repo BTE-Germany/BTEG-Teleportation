@@ -21,7 +21,7 @@ public class WarpGui extends StaticCustomGui {
         super("Warp Kategorien", "च", player, plugin);
 
         this.gui.setItem(0, GuiItems.Warps.randomWarpItem(this));
-        this.gui.setItem(1, GuiItems.Warps.searchItem(this));
+        this.gui.setItem(1, GuiItems.Warps.searchItem(this, plugin));
 
         GuiItem itemCities = GuiItems.emptyItem("Städte", NamedTextColor.AQUA, () -> new CitiesGui(player, pagedGuiHandler, pluginMessenger, plugin));
         this.gui.setItem(FIRST_ROW_CITIES_STATES, FIRST_COL_CITIES, itemCities);
