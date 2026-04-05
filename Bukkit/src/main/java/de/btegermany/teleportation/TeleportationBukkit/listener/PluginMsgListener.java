@@ -31,7 +31,7 @@ public class PluginMsgListener implements PluginMessageListener {
 				"teleport_player", new TeleportExecutor.PlayerExecutor(teleportationHandler, plugin),
 				"teleport_coords", new TeleportExecutor.CoordsExecutor(teleportationHandler, plugin),
 				"teleport_normen", new TeleportExecutor.NormenExecutor(teleportationHandler, plugin),
-				"command_perform", new CommandPerformExecutor(plugin.getLogger()),
+				"command_perform", new CommandPerformExecutor(plugin),
 				"list_cities", new ListExecutor.CitiesExecutor(registriesProvider.getCitiesRegistry()),
 				"list_tags", new ListExecutor.TagsExecutor(registriesProvider.getWarpTagsRegistry()),
 				"last_location_request", new RequestExecutor.LastLocationExecutor(pluginMessenger),

@@ -2,21 +2,21 @@ package de.btegermany.teleportation.TeleportationBukkit.message.executor;
 
 import com.google.common.io.ByteArrayDataInput;
 import de.btegermany.teleportation.TeleportationAPI.message.executor.PluginMessageNormalExecutor;
+import de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 public class CommandPerformExecutor implements PluginMessageNormalExecutor {
 
     private static final List<String> ALLOWED_COMMANDS_TO_EXECUTE = List.of("tpll", "tpc");
 
-    private final Logger logger;
+    private final TeleportationBukkit plugin;
 
-    public CommandPerformExecutor(Logger logger) {
-        this.logger = logger;
+    public CommandPerformExecutor(TeleportationBukkit plugin) {
+        this.plugin = plugin;
     }
 
     @Override
@@ -29,11 +29,11 @@ public class CommandPerformExecutor implements PluginMessageNormalExecutor {
         int spaceIndex = !command.contains(" ") ? 0 : command.indexOf(" ");
         String baseCommand = command.substring(0, spaceIndex);
         if (!ALLOWED_COMMANDS_TO_EXECUTE.contains(baseCommand)) {
-            this.logger.severe("Not allowed to remotely perform command '%s'".formatted(baseCommand));
+            this.plugin.getLogger().severe("Not allowed to remotely perform command '%s'".formatted(baseCommand));
             return;
         }
 
-        targetPlayer.performCommand(command);
+        Bukkit.getScheduler().runTask(this.plugin, () -> targetPlayer.performCommand(command));
     }
 
 }
