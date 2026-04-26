@@ -19,6 +19,9 @@ import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 public class ConfigHandler {
@@ -46,8 +49,18 @@ public class ConfigHandler {
     }
 
     private void loadConfigRoot(Config config) {
+        Path configPath = new File(this.dataDirectory, config.getFileName()).toPath();
+
         final HoconConfigurationLoader configLoader = HoconConfigurationLoader.builder()
-                .path(new File(this.dataDirectory, config.getFileName()).toPath())
+                .path(configPath)
+
+                // fixt /event set BUG-0055 ("values.conf: Device or resource busy")
+                .defaultOptions(opts -> opts.shouldCopyDefaults(true))
+                .emitJsonCompatible(false)
+                .sink(() -> Files.newBufferedWriter(configPath, StandardOpenOption.WRITE,
+                        StandardOpenOption.CREATE,
+                        StandardOpenOption.TRUNCATE_EXISTING))
+
                 .build();
         this.configLoaders.put(config, configLoader);
 
