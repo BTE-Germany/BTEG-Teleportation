@@ -136,7 +136,7 @@ public class TpllCommand implements SimpleCommand {
         // send teleport data and the player to the target server
         RequestLastLocationMessage requestLastLocationMessage = new RequestLastLocationMessage(player, this.registriesProvider, () -> {
             sendMessage(player, Component.text("Teleporting to " + coordinates.getLat() + ", " + coordinates.getLng() + ".", NamedTextColor.GOLD));
-            this.pluginMessenger.teleportToCoords(player, targetServer, mcCoordinatesFinal[0], mcCoordinatesY, mcCoordinatesFinal[1], yawFinal, pitchFinal, worldFinal);
+            this.pluginMessenger.teleportToCoords(player, targetServer, mcCoordinatesFinal[0], mcCoordinatesY, mcCoordinatesFinal[1], yawFinal, pitchFinal, worldFinal, true);
         });
         if (player.getCurrentServer().isEmpty()) {
             return;

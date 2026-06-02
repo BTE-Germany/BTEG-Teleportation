@@ -56,8 +56,14 @@ public class TeleportExecutor {
             Float pitch = Optional.of(dataInput.readUTF()).filter(str -> !str.equals("null")).map(Float::parseFloat).orElse(null);
             String worldName = Optional.of(dataInput.readUTF()).filter(str -> !str.equals("null")).orElse(null);
             String originServerName = dataInput.readUTF();
+            boolean prepareRegion = false;
+            try {
+                prepareRegion = Boolean.parseBoolean(dataInput.readUTF());
+            } catch (IllegalStateException ignored) {
+                // Older Velocity messages do not include the optional preparation flag.
+            }
 
-            this.teleportationHandler.handle(new PendingTpLocation(playerUUID, x, y, z, yaw, pitch, worldName, originServerName, this.plugin));
+            this.teleportationHandler.handle(new PendingTpLocation(playerUUID, x, y, z, yaw, pitch, worldName, originServerName, prepareRegion, this.plugin));
         }
 
     }
