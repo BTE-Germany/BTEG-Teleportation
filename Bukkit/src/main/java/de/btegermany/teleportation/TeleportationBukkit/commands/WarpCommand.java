@@ -20,6 +20,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static de.btegermany.teleportation.TeleportationBukkit.TeleportationBukkit.getFormattedErrorMessage;
@@ -31,6 +32,7 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
     private final PagedGuiHandler pagedGuiHandler;
     private final TeleportationBukkit plugin;
     private final boolean warpsEnabled;
+    private final Consumer<Player> sendNoPermissionErrorMessage = player -> player.sendMessage(TeleportationBukkit.getFormattedErrorMessage("Du bist nicht berechtigt das zu tun."));
 
     public WarpCommand(PluginMessenger pluginMessenger, RegistriesProvider registriesProvider, ConfigReader configReader, PagedGuiHandler pagedGuiHandler, TeleportationBukkit plugin) {
         this.pluginMessenger = pluginMessenger;
@@ -43,7 +45,7 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
     @Override
     public boolean onCommand(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String name, @Nonnull String[] args) {
 
-        if(!(sender instanceof Player player)) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage(getFormattedErrorMessage("Diesen Command können nur Spieler ausführen!"));
             return true;
         }
@@ -53,16 +55,16 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
             return true;
         }
 
-        if(args.length == 0) {
+        if (args.length == 0) {
             new WarpGui(player, this.pagedGuiHandler, this.pluginMessenger, this.plugin);
             return true;
         }
 
-        if(args[0].equalsIgnoreCase("help")) {
+        if (args[0].equalsIgnoreCase("help")) {
             return false;
         }
 
-        if(!args[0].equals("create") && !args[0].equals("delete") && !args[0].equals("change") && !args[0].equals("tag")) {
+        if (!args[0].equals("create") && !args[0].equals("delete") && !args[0].equals("change") && !args[0].equals("tag")) {
             if(args[0].equals("random")) {
                 this.pluginMessenger.send(new TpToRandomWarpMessage(player));
                 return true;
@@ -71,16 +73,17 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
             return true;
         }
 
-        if(args.length < 2) {
+        if (args.length < 2) {
             return false;
-        }
-
-        if(!player.hasPermission("bteg.warps.manage")) {
-            return true;
         }
 
         switch (args[0]) {
             case "create" -> {
+                if (!player.hasPermission("bteg.warps.create")) {
+                    this.sendNoPermissionErrorMessage.accept(player);
+                    return true;
+                }
+
                 String seperatorRegex = ";";
                 String[] inputSeperated = Arrays.stream(String.join(" ", Stream.of(args).skip(1).filter(arg -> !arg.isEmpty()).toArray(String[]::new)).split(seperatorRegex)).map(String::trim).toArray(String[]::new);
                 if (inputSeperated.length < 3) {
@@ -107,10 +110,20 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
                 this.pluginMessenger.send(new CreateWarpMessage(warpInCreation));
             }
             case "delete" -> {
+                if (!player.hasPermission("bteg.warps.delete")) {
+                    this.sendNoPermissionErrorMessage.accept(player);
+                    return true;
+                }
+
                 int id = Integer.parseInt(args[1]);
                 this.pluginMessenger.send(new DeleteWarpMessage(player, id));
             }
             case "change" -> {
+                if (!player.hasPermission("bteg.warps.edit")) {
+                    this.sendNoPermissionErrorMessage.accept(player);
+                    return true;
+                }
+
                 if (args.length < 3) {
                     return false;
                 }
@@ -152,9 +165,27 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
                 String tag = args[1];
 
                 switch (args[2].toLowerCase()) {
-                    case "add" -> this.pluginMessenger.send(new WarpAddTagMessage(player, tag, Integer.parseInt(args[3])));
-                    case "remove" -> this.pluginMessenger.send(new WarpRemoveTagMessage(player, tag, Integer.parseInt(args[3])));
-                    case "edit" -> this.pluginMessenger.send(new WarpEditTagMessage(player, tag, args[3]));
+                    case "add" -> {
+                        if (!player.hasPermission("bteg.warps.create")) {
+                            this.sendNoPermissionErrorMessage.accept(player);
+                            return true;
+                        }
+                        this.pluginMessenger.send(new WarpAddTagMessage(player, tag, Integer.parseInt(args[3])));
+                    }
+                    case "remove" -> {
+                        if (!player.hasPermission("bteg.warps.delete")) {
+                            this.sendNoPermissionErrorMessage.accept(player);
+                            return true;
+                        }
+                        this.pluginMessenger.send(new WarpRemoveTagMessage(player, tag, Integer.parseInt(args[3])));
+                    }
+                    case "edit" -> {
+                        if (!player.hasPermission("bteg.warps.edit")) {
+                            this.sendNoPermissionErrorMessage.accept(player);
+                            return true;
+                        }
+                        this.pluginMessenger.send(new WarpEditTagMessage(player, tag, args[3]));
+                    }
                 }
             }
         }
@@ -163,8 +194,8 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
 
     private void findWarps(Player player, String[] args) {
         StringBuilder searchBuilder = new StringBuilder();
-        for(int i = 0; i < args.length; i++) {
-            if(i >= 1) {
+        for (int i = 0; i < args.length; i++) {
+            if (i >= 1) {
                 searchBuilder.append(" ");
             }
             searchBuilder.append(args[i]);
@@ -181,30 +212,32 @@ public class WarpCommand implements CommandExecutor, TabExecutorEnhanced {
     public List<String> onTabComplete(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String alias, @Nonnull String[] args) {
         List<String> result = new ArrayList<>();
 
+        boolean hasAnyWarpManagePermission = sender.hasPermission("bteg.warps.create") || sender.hasPermission("bteg.warps.delete") || sender.hasPermission("bteg.warps.edit");
+
         switch (args.length) {
             case 1 -> {
                 result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[0], this.registriesProvider.getCitiesRegistry().getCities().toArray(String[]::new)));
-                if(!sender.hasPermission("bteg.warps.manage")) {
+                if (!hasAnyWarpManagePermission) {
                     break;
                 }
                 result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[0], "help", "create", "delete", "change", "tag"));
             }
             case 2 -> {
-                if(!sender.hasPermission("bteg.warps.manage") || !args[0].equalsIgnoreCase("tag")) {
+                if (!hasAnyWarpManagePermission || !args[0].equalsIgnoreCase("tag")) {
                     break;
                 }
                 result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[1], this.registriesProvider.getWarpTagsRegistry().getTags().toArray(String[]::new)));
             }
             case 3 -> {
-                if(!sender.hasPermission("bteg.warps.manage")) {
+                if (!hasAnyWarpManagePermission) {
                     break;
                 }
 
-                if(args[0].equalsIgnoreCase("change")) {
+                if (args[0].equalsIgnoreCase("change")) {
                     result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[2], "name", "city", "state", "coordinates", "headId", "yaw", "pitch", "height", "world"));
                     break;
                 }
-                if(args[0].equalsIgnoreCase("tag")) {
+                if (args[0].equalsIgnoreCase("tag")) {
                     result.addAll(TabExecutorEnhanced.super.getValidSuggestions(args[2], "add", "remove", "edit"));
                 }
             }

@@ -34,7 +34,7 @@ public class PluginMsgListener {
                 "warp_delete", new WarpExecutor.DeleteExecutor(proxyServer, registriesProvider.getWarpsRegistry(), database, logger),
                 "warp_create", new WarpExecutor.CreateExecutor(proxyServer, registriesProvider.getWarpsRegistry(), warpIdsManager),
                 "warp_change", new WarpExecutor.ChangeExecutor(proxyServer, registriesProvider.getWarpsRegistry(), database, logger),
-                "players_online", new PlayersOnlineExecutor(proxyServer, geoData),
+                "players_online", new PlayersOnlineExecutor(proxyServer, geoData, logger),
                 "tp_random_warp", new TpRandomWarpExecutor(proxyServer, registriesProvider.getWarpsRegistry()),
                 "tag_add", new TagExecutor.AddExecutor(proxyServer, registriesProvider),
                 "tag_remove", new TagExecutor.RemoveExecutor(proxyServer, registriesProvider),

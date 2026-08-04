@@ -13,7 +13,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -24,10 +26,12 @@ public class PlayersOnlineExecutor implements PluginMessageNormalExecutor {
 
     private final ProxyServer proxyServer;
     private final GeoData geoData;
+    private final Logger logger;
 
-    public PlayersOnlineExecutor(ProxyServer proxyServer, GeoData geoData) {
+    public PlayersOnlineExecutor(ProxyServer proxyServer, GeoData geoData, Logger logger) {
         this.proxyServer = proxyServer;
         this.geoData = geoData;
+        this.logger = logger;
     }
 
     @Override
@@ -67,6 +71,7 @@ public class PlayersOnlineExecutor implements PluginMessageNormalExecutor {
                     Optional<RegisteredServer> expectedServerOptional = this.geoData.getServerFromLocationCheck(coords[1], coords[0], player);
 
                     if (expectedServerOptional.isEmpty()) {
+                        this.logger.info("autoserverswitch sending player {} to lobby. Reason: NoServerForLocation (x={}, z={}, coords={})", player.getUsername(), x, z, Arrays.toString(coords));
                         sendToLobby.accept(player);
                         return;
                     }
@@ -77,7 +82,8 @@ public class PlayersOnlineExecutor implements PluginMessageNormalExecutor {
 
                     sendMessage(player, Component.text("Diese Region liegt auf einem anderen Server, du wirst daher mit dem richtigen Server verbunden.", NamedTextColor.GOLD));
                     this.proxyServer.getCommandManager().executeAsync(player, "tpll %f %f yaw=%f pitch=%f".formatted(coords[1], coords[0], yaw, pitch));
-                } catch (OutOfProjectionBoundsException ignored) {
+                } catch (OutOfProjectionBoundsException e) {
+                    this.logger.info("autoserverswitch sending player {} to lobby. Reason: OutOfProjectionBoundsException (x={}, z={})", player.getUsername(), x, z, e);
                     sendToLobby.accept(player);
                 }
             });
