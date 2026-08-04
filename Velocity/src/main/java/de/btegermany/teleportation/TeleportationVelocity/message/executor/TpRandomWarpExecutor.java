@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Random;
 import java.util.Set;
@@ -27,7 +28,7 @@ public class TpRandomWarpExecutor implements PluginMessageNormalExecutor {
     }
 
     @Override
-    public void execute(ByteArrayDataInput dataInput) {
+    public void execute(@NonNull ByteArrayDataInput dataInput) {
         UUID playerUUID = UUID.fromString(dataInput.readUTF());
 
         this.proxyServer.getPlayer(playerUUID).ifPresent(player -> {
@@ -40,7 +41,7 @@ public class TpRandomWarpExecutor implements PluginMessageNormalExecutor {
                     .append(Component.text(warp.getCity() + ", " + warp.getState(), NamedTextColor.GREEN))
                     .append(Component.text(".", NamedTextColor.GOLD));
             TextComponent button = Component.text("Klicke hier, um dich zum nächsten Warp zu teleportieren.", NamedTextColor.BLUE)
-                    .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/nwarp random"));
+                    .clickEvent(ClickEvent.runCommand("/nwarp random"));
 
             sendMessage(player, textComponent);
             sendMessage(player, button);

@@ -46,9 +46,9 @@ public class TpaCommand {
                                 registriesProvider.getTpasRegistry().register(player, target);
 
                                 TextComponent textComponent = Component.text("Du hast eine Teleport-Anfrage von " + player.getUsername() + " erhalten. Nutze ", NamedTextColor.GOLD)
-                                        .append(Component.text("/tpaccept " + player.getUsername(), NamedTextColor.GREEN).clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/tpaccept " + player.getUsername())))
+                                        .append(Component.text("/tpaccept " + player.getUsername(), NamedTextColor.GREEN).clickEvent(ClickEvent.runCommand("/tpaccept " + player.getUsername())))
                                         .append(Component.text(" zum Akzeptieren und ", NamedTextColor.GOLD))
-                                        .append(Component.text("/tpadeny " + player.getUsername(), NamedTextColor.RED).clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/tpadeny " + player.getUsername())))
+                                        .append(Component.text("/tpadeny " + player.getUsername(), NamedTextColor.RED).clickEvent(ClickEvent.runCommand("/tpadeny " + player.getUsername())))
                                         .append(Component.text(" zum Ablehnen der Anfrage."));
                                 sendMessage(target, textComponent);
                                 sendMessage(player, Component.text("Die Anfrage wurde gesendet! Um sie abzubrechen, nutze /tpacancel.", NamedTextColor.GOLD));

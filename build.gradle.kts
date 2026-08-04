@@ -11,8 +11,6 @@ sonar {
     }
 }
 
-version = "1.0.0"
-
 subprojects {
     // Apply SonarQube to every module so analysis runs from the root
     apply(plugin = "org.sonarqube")
