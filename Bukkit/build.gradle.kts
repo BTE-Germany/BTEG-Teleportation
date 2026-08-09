@@ -22,7 +22,7 @@ dependencies {
         exclude (group = "net.kyori", module = "adventure-text-serializer-gson")
         exclude (group = "net.kyori", module = "adventure-text-serializer-legacy")
     }
-    compileOnly(libs.net.wesjd.anvilgui)
+    implementation(libs.net.wesjd.anvilgui)
 }
 
 description = "Teleportation.bukkit"
