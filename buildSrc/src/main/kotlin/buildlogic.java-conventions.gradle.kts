@@ -39,6 +39,10 @@ repositories {
     maven {
         url = uri("https://maven.smyler.net/releases/")
     }
+
+    maven {
+        url = uri("https://mvn.wesjd.net/")
+    }
 }
 
 group = "de.btegermany"

@@ -19,7 +19,7 @@ shadow = "9.6.0"
 # https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
 spotbugs-annotations = "4.10.2"
 dev-triumphteam-triumph-gui = "3.1.13"
-net-wesjd-anvilgui = "1.10.11-SNAPSHOT"
+net-wesjd-anvilgui = "1.10.13-SNAPSHOT"
 
 [libraries]
 com-google-code-gson-gson = { module = "com.google.code.gson:gson", version.ref = "com-google-code-gson-gson" }
