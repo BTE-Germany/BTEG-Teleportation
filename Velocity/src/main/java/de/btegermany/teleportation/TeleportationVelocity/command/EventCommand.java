@@ -21,6 +21,8 @@ import java.util.Optional;
 
 public class EventCommand {
 
+    private final static String PERMISSION_EVENT = "bteg.warps.event";
+
     public static BrigadierCommand createEventCommand(final TeleportationVelocity plugin, final RegistriesProvider registriesProvider, final PluginMessenger pluginMessenger, final ProxyServer proxyServer) {
         return new BrigadierCommand(BrigadierCommand.literalArgumentBuilder("event")
                 .requires(source -> source instanceof Player)
@@ -46,7 +48,7 @@ public class EventCommand {
                     return Command.SINGLE_SUCCESS;
                 })
                 .then(BrigadierCommand.requiredArgumentBuilder("action", StringArgumentType.word())
-                        .requires(source -> source.hasPermission("bteg.warps.manage"))
+                        .requires(source -> source.hasPermission(PERMISSION_EVENT))
                         .suggests((context, builder) -> {
                             String actionArg = context.getArguments().containsKey("action") ? StringArgumentType.getString(context, "action") : "";
 
@@ -73,7 +75,7 @@ public class EventCommand {
                             return Command.SINGLE_SUCCESS;
                         })
                         .then(BrigadierCommand.requiredArgumentBuilder("warpId", IntegerArgumentType.integer(0, Integer.MAX_VALUE))
-                                .requires(source -> source.hasPermission("bteg.warps.manage"))
+                                .requires(source -> source.hasPermission(PERMISSION_EVENT))
                                 .executes(context -> {
                                     Player player = (Player) context.getSource();
                                     String action = StringArgumentType.getString(context, "action");

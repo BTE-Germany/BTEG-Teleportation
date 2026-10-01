@@ -23,6 +23,7 @@ import static de.btegermany.teleportation.TeleportationBukkit.TeleportationBukki
 
 public class LobbyWarpCommand implements CommandExecutor, TabExecutorEnhanced {
 
+    private static final String PERMISSION_WARPS_LOBBY= "bteg.warps.lobby";
     private static final int CITY_INDEX = 4;
 
     private final PluginMessenger pluginMessenger;
@@ -58,7 +59,7 @@ public class LobbyWarpCommand implements CommandExecutor, TabExecutorEnhanced {
         // add city
         if(args[0].equalsIgnoreCase("add")) {
             // check permissions
-            if(!player.hasPermission("bteg.warps.manage")) {
+            if(!player.hasPermission(PERMISSION_WARPS_LOBBY)) {
                 return true;
             }
             // check args length
@@ -98,7 +99,7 @@ public class LobbyWarpCommand implements CommandExecutor, TabExecutorEnhanced {
         // remove city
         if(args[0].equalsIgnoreCase("remove")) {
             // check permissions
-            if(!player.hasPermission("bteg.warps.manage")) {
+            if(!player.hasPermission(PERMISSION_WARPS_LOBBY)) {
                 return true;
             }
 
@@ -123,7 +124,7 @@ public class LobbyWarpCommand implements CommandExecutor, TabExecutorEnhanced {
 
     @Override
     public List<String> onTabComplete(@Nonnull CommandSender commandSender, @Nonnull Command command, @Nonnull String s, @Nonnull String[] args) {
-        if (!commandSender.hasPermission("bteg.warps.manage")) {
+        if (!commandSender.hasPermission(PERMISSION_WARPS_LOBBY)) {
             return null;
         }
 

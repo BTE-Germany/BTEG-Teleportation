@@ -87,7 +87,7 @@ public class TeleportationVelocity {
         commandManager.register(commandManager.metaBuilder("tpaDeny").plugin(this).build(), TpaDenyCommand.createTpaDenyCommand(this.proxyServer, this.registriesProvider));
         commandManager.register(commandManager.metaBuilder("tpaCancel").plugin(this).build(), TpaCancelCommand.createTpaCancelCommand(utils));
         commandManager.register(commandManager.metaBuilder("tpHere").plugin(this).build(), TpHereCommand.createTpHereCommand(this.proxyServer, utils, this.registriesProvider, this.pluginMessenger));
-        commandManager.register(commandManager.metaBuilder("tpBack").plugin(this).build(), TpBackCommand.createTpBackCommand(this.registriesProvider, this.pluginMessenger));
+        commandManager.register(commandManager.metaBuilder("tpBack").aliases("back").plugin(this).build(), TpBackCommand.createTpBackCommand(this.registriesProvider, this.pluginMessenger));
         commandManager.register(commandManager.metaBuilder("tpll").aliases("tpl").plugin(this).build(), new TpllCommand(this.geoData, this.pluginMessenger, this.registriesProvider));
         commandManager.register(commandManager.metaBuilder("event").plugin(this).build(), EventCommand.createEventCommand(this, this.registriesProvider, this.pluginMessenger, this.proxyServer));
         commandManager.register(commandManager.metaBuilder("hub").aliases("lobby", "l").plugin(this).build(), HubCommand.createHubCommand(this.proxyServer));
