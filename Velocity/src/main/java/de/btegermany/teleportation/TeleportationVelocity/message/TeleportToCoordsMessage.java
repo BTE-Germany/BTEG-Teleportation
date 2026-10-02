@@ -8,6 +8,10 @@ import java.util.List;
 public class TeleportToCoordsMessage extends PluginMessage {
 
     public TeleportToCoordsMessage(Player player, double x, double y, double z, Float yaw, Float pitch, String world) {
+        this(player, x, y, z, yaw, pitch, world, false);
+    }
+
+    public TeleportToCoordsMessage(Player player, double x, double y, double z, Float yaw, Float pitch, String world, boolean prepareRegion) {
         super("teleport_coords", MessageType.NORMAL);
         if (player.getCurrentServer().isEmpty()) {
             return;
@@ -20,7 +24,8 @@ public class TeleportToCoordsMessage extends PluginMessage {
                 pitch == null ? "null" : pitch.toString(),
                 // null to use the player's current world
                 world == null ? "null" : world,
-                player.getCurrentServer().get().getServerInfo().getName()));
+                player.getCurrentServer().get().getServerInfo().getName(),
+                Boolean.toString(prepareRegion)));
     }
 
 }

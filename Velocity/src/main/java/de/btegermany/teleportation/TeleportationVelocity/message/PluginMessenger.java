@@ -69,6 +69,11 @@ public class PluginMessenger {
         this.sendAndConnect(player, server, new TeleportToCoordsMessage(player, x, y, z, yaw, pitch, world));
     }
 
+    // teleports a player to the specified coordinates after the backend prepared the target region if supported
+    public void teleportToCoords(Player player, RegisteredServer server, double x, double y, double z, Float yaw, Float pitch, String world, boolean prepareRegion) {
+        this.sendAndConnect(player, server, new TeleportToCoordsMessage(player, x, y, z, yaw, pitch, world, prepareRegion));
+    }
+
     // teleports a player to the normen world on the specified server
     public void teleportToNormen(Player player, RegisteredServer server, String normenWorld, float yaw, float pitch) {
         this.sendAndConnect(player, server, new TeleportToNormenMessage(player, normenWorld, yaw, pitch));
