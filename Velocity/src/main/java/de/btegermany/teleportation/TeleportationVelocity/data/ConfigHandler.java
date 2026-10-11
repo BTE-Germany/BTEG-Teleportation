@@ -116,6 +116,15 @@ public class ConfigHandler {
         return Component.text(config.node("prefix").getString(""));
     }
 
+    public int readCountryBorderTolerance() {
+        if (!this.configRoots.containsKey(Config.DEFAULT)) {
+            return 0;
+        }
+        CommentedConfigurationNode config = this.configRoots.get(Config.DEFAULT);
+
+        return config.node("country-border-tolerance").getInt(0);
+    }
+
     // read the database config and return the data (url, user, password)
     public List<String> readDataConfig() {
         List<String> data = new ArrayList<>();

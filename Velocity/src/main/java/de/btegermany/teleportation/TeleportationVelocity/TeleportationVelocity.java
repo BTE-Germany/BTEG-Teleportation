@@ -38,7 +38,9 @@ public class TeleportationVelocity {
     private final File dataDirectory;
 
     public static final MinecraftChannelIdentifier PLUGIN_CHANNEL = MinecraftChannelIdentifier.create("bteg", "teleportation");
-    private static TextComponent PREFIX;
+    private static TextComponent prefix;
+    @Getter
+    private static int countryBorderTolerance;
     private Database database;
     @Getter
     private WarpIdsManager warpIdsManager;
@@ -68,7 +70,8 @@ public class TeleportationVelocity {
         // initialize objects
         this.geoData = new GeoData(this.logger, this.dataDirectory);
         this.configHandler = new ConfigHandler(this, this.proxyServer, this.logger, this.dataDirectory, this.geoData);
-        PREFIX = configHandler.readPrefix();
+        prefix = configHandler.readPrefix();
+        countryBorderTolerance = configHandler.readCountryBorderTolerance();
         this.database = new Database(this.configHandler);
         this.database.connect();
         this.warpIdsManager = new WarpIdsManager(this.database);
@@ -131,7 +134,7 @@ public class TeleportationVelocity {
     }
 
     public static Component getMessage(Component... components) {
-        Component message = PREFIX.append(Component.text(" "));
+        Component message = prefix.append(Component.text(" "));
         for (Component component : components) {
             message = message.append(component);
         }
