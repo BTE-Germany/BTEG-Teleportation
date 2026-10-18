@@ -25,6 +25,7 @@ import static de.btegermany.teleportation.TeleportationVelocity.TeleportationVel
 
 public class PlayersOnlineExecutor implements PluginMessageNormalExecutor {
 
+    private static final double BLOCK_DIAGONAL = Math.sqrt(1 + 1);
     private final ProxyServer proxyServer;
     private final GeoData geoData;
     private final Logger logger;
@@ -125,8 +126,7 @@ public class PlayersOnlineExecutor implements PluginMessageNormalExecutor {
 
 
         // 45°
-        double blockDiagonal = Math.sqrt(1 + 1);
-        int blocksDiff = (int) Math.floor(toleranceDiff / blockDiagonal);
+        int blocksDiff = (int) Math.floor(toleranceDiff / BLOCK_DIAGONAL);
         // x +- +45°
         Optional<RegisteredServer> serverPlusX45Optional = this.getServerForMc(x + blocksDiff, z - blocksDiff, player);
         if (serverPlusX45Optional.isPresent()) {
