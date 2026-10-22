@@ -180,13 +180,14 @@ public class WarpsRegistry {
 
         CompletableFuture.runAsync(() -> {
             for (String tag : tags) {
-                this.warpTagsRegistry.unregister(tag);
                 try (PreparedStatement preparedStatement = database.getConnection().prepareStatement("DELETE FROM tags_warps WHERE tag LIKE ? AND warp_id = ?")) {
                     preparedStatement.setString(1, tag);
                     preparedStatement.setInt(2, warp.getId());
 
                     this.database.executeUpdateSync(preparedStatement);
                     warp.getTags().remove(tag);
+                    this.unregisterTagIfUnused(tag);
+
                     tagsRemoved.add(tag);
                 } catch (SQLException e) {
                     this.logger.error("Failed to remove tag {} from warp", tag, e);
@@ -197,6 +198,14 @@ public class WarpsRegistry {
                 sendMessage(player, Component.text("Folgende Tags wurden entfernt: " + tagsRemoved, NamedTextColor.GOLD));
             }
         });
+    }
+
+    private void unregisterTagIfUnused(String tag) {
+        boolean warpWithTagExists = this.warps.stream().anyMatch(warp -> warp.getTags().contains(tag));
+        if (warpWithTagExists) {
+            return;
+        }
+        this.warpTagsRegistry.unregister(tag);
     }
 
 }
