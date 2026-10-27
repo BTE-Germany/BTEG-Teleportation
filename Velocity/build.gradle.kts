@@ -17,6 +17,7 @@ dependencies {
     testImplementation(libs.junit.junit)
     compileOnly(libs.com.velocitypowered.velocity.api)
     annotationProcessor(libs.com.velocitypowered.velocity.api)
+    implementation(libs.com.alpsbte.alpslib)
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_25

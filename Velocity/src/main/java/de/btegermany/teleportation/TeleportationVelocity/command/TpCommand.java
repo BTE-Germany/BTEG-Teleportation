@@ -154,14 +154,15 @@ public class TpCommand {
                 try {
                     double[] geoCoordinates = GeoData.BTE_GENERATOR_SETTINGS.projection().toGeo(finalX, finalZ);
 
-                    Optional<RegisteredServer> serverOptional = plugin.getGeoData().getServerFromLocation(geoCoordinates[1], geoCoordinates[0]);
-                    if (serverOptional.isEmpty()) {
-                        sendMessage(player, Component.text("Der Server für dieses Bundesland ist nicht erreichbar.", NamedTextColor.RED));
-                        return;
-                    }
-                    RegisteredServer server = serverOptional.get();
+                    plugin.getGeoData().getServerFromLocation(geoCoordinates[1], geoCoordinates[0]).thenAccept(serverOptional -> {
+                        if (serverOptional.isEmpty()) {
+                            sendMessage(player, Component.text("Der Server für dieses Bundesland ist nicht erreichbar.", NamedTextColor.RED));
+                            return;
+                        }
+                        RegisteredServer server = serverOptional.get();
 
-                    teleportPlayer.accept(server);
+                        teleportPlayer.accept(server);
+                    });
                 } catch (OutOfProjectionBoundsException e) {
                     sendMessage(player, Component.text("Bitte überprüfe die Koordinaten.", NamedTextColor.RED));
                 }

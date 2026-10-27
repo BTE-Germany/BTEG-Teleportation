@@ -20,6 +20,7 @@ shadow = "9.6.0"
 spotbugs-annotations = "4.10.2"
 dev-triumphteam-triumph-gui = "3.1.13"
 net-wesjd-anvilgui = "1.10.13-SNAPSHOT"
+com-alpsbte-alpslib = "1.0.0"
 
 [libraries]
 com-google-code-gson-gson = { module = "com.google.code.gson:gson", version.ref = "com-google-code-gson-gson" }
@@ -37,6 +38,7 @@ org-json-json = { module = "org.json:json", version.ref = "org-json-json" }
 spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs-annotations" }
 dev-triumphteam-triumph-gui = { module = "dev.triumphteam:triumph-gui", version.ref = "dev-triumphteam-triumph-gui" }
 net-wesjd-anvilgui = { module = "net.wesjd:anvilgui", version.ref = "net-wesjd-anvilgui" }
+com-alpsbte-alpslib = { module = "com.alpsbte.alpslib:alpslib-geo", version.ref = "com-alpsbte-alpslib" }
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }

@@ -69,6 +69,7 @@ public class PlayersOnlineExecutor implements PluginMessageNormalExecutor {
                 }
 
                 try {
+                    // executers run async, so calling sync here is fine
                     Optional<RegisteredServer> expectedServerOptional = this.getServerWithTolerance(x, z, player);
 
                     if (expectedServerOptional.isEmpty()) {
@@ -94,7 +95,7 @@ public class PlayersOnlineExecutor implements PluginMessageNormalExecutor {
 
     private Optional<RegisteredServer> getServerWithTolerance(double x, double z, Player player) throws OutOfProjectionBoundsException {
         int toleranceDiff = TeleportationVelocity.getCountryBorderTolerance() - 1;
-        Optional<RegisteredServer> serverPlayerPosOptional = this.getServerForMc(x, z, player);
+        Optional<RegisteredServer> serverPlayerPosOptional = this.getServerForMcSync(x, z, player);
 
         // player within the border
         if (serverPlayerPosOptional.isPresent()) {
@@ -103,23 +104,23 @@ public class PlayersOnlineExecutor implements PluginMessageNormalExecutor {
 
         // player outside, x or z axis
         // x +-
-        Optional<RegisteredServer> serverPlusXOptional = this.getServerForMc(x + toleranceDiff, z, player);
+        Optional<RegisteredServer> serverPlusXOptional = this.getServerForMcSync(x + toleranceDiff, z, player);
         if (serverPlusXOptional.isPresent()) {
             return serverPlusXOptional;
         }
 
-        Optional<RegisteredServer> serverMinusXOptional = this.getServerForMc(x - toleranceDiff, z, player);
+        Optional<RegisteredServer> serverMinusXOptional = this.getServerForMcSync(x - toleranceDiff, z, player);
         if (serverMinusXOptional.isPresent()) {
             return serverMinusXOptional;
         }
 
         // z +-
-        Optional<RegisteredServer> serverPlusZOptional = this.getServerForMc(x, z + toleranceDiff, player);
+        Optional<RegisteredServer> serverPlusZOptional = this.getServerForMcSync(x, z + toleranceDiff, player);
         if (serverPlusZOptional.isPresent()) {
             return serverPlusZOptional;
         }
 
-        Optional<RegisteredServer> serverMinusZOptional = this.getServerForMc(x, z - toleranceDiff, player);
+        Optional<RegisteredServer> serverMinusZOptional = this.getServerForMcSync(x, z - toleranceDiff, player);
         if (serverMinusZOptional.isPresent()) {
             return serverMinusZOptional;
         }
@@ -128,28 +129,28 @@ public class PlayersOnlineExecutor implements PluginMessageNormalExecutor {
         // 45°
         int blocksDiff = (int) Math.floor(toleranceDiff / BLOCK_DIAGONAL);
         // x +- +45°
-        Optional<RegisteredServer> serverPlusX45Optional = this.getServerForMc(x + blocksDiff, z - blocksDiff, player);
+        Optional<RegisteredServer> serverPlusX45Optional = this.getServerForMcSync(x + blocksDiff, z - blocksDiff, player);
         if (serverPlusX45Optional.isPresent()) {
             return serverPlusX45Optional;
         }
 
-        Optional<RegisteredServer> serverMinusX45Optional = this.getServerForMc(x - blocksDiff, z + blocksDiff, player);
+        Optional<RegisteredServer> serverMinusX45Optional = this.getServerForMcSync(x - blocksDiff, z + blocksDiff, player);
         if (serverMinusX45Optional.isPresent()) {
             return serverMinusX45Optional;
         }
 
         // z +- +45°
-        Optional<RegisteredServer> serverPlusZ45Optional = this.getServerForMc(x + blocksDiff, z + blocksDiff, player);
+        Optional<RegisteredServer> serverPlusZ45Optional = this.getServerForMcSync(x + blocksDiff, z + blocksDiff, player);
         if (serverPlusZ45Optional.isPresent()) {
             return serverPlusZ45Optional;
         }
 
-        return this.getServerForMc(x - blocksDiff, z - blocksDiff, player);
+        return this.getServerForMcSync(x - blocksDiff, z - blocksDiff, player);
     }
 
-    private Optional<RegisteredServer> getServerForMc(double x, double z, Player player) throws OutOfProjectionBoundsException {
+    private Optional<RegisteredServer> getServerForMcSync(double x, double z, Player player) throws OutOfProjectionBoundsException {
         double[] coords = mcToCoords(x, z);
-        return this.geoData.getServerFromLocationCheck(coords[1], coords[0], player);
+        return this.geoData.getServerFromLocationCheck(coords[1], coords[0], player).join();
     }
 
     private double[] mcToCoords(double x, double z) throws OutOfProjectionBoundsException {

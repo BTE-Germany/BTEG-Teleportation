@@ -126,22 +126,23 @@ public class TpllCommand implements SimpleCommand {
         double mcCoordinatesY = heightRaw != null ? Double.parseDouble(heightRaw) : Double.NaN; //this.getHeight((int) mcCoordinates[1], (int) mcCoordinates[0]).join();
 
         // get the server the location is on
-        Optional<RegisteredServer> targetServerOptional = this.geoData.getServerFromLocation(coordinates.getLat(), coordinates.getLng());
-        if (targetServerOptional.isEmpty()) {
-            sendMessage(player, Component.text("Location could not be found!", NamedTextColor.RED));
-            return;
-        }
-        RegisteredServer targetServer = targetServerOptional.get();
+        this.geoData.getServerFromLocation(coordinates.getLat(), coordinates.getLng()).thenAccept(targetServerOptional -> {
+            if (targetServerOptional.isEmpty()) {
+                sendMessage(player, Component.text("Location could not be found!", NamedTextColor.RED));
+                return;
+            }
+            RegisteredServer targetServer = targetServerOptional.get();
 
-        // send teleport data and the player to the target server
-        RequestLastLocationMessage requestLastLocationMessage = new RequestLastLocationMessage(player, this.registriesProvider, () -> {
-            sendMessage(player, Component.text("Teleporting to " + coordinates.getLat() + ", " + coordinates.getLng() + ".", NamedTextColor.GOLD));
-            this.pluginMessenger.teleportToCoords(player, targetServer, mcCoordinatesFinal[0], mcCoordinatesY, mcCoordinatesFinal[1], yawFinal, pitchFinal, worldFinal);
+            // send teleport data and the player to the target server
+            RequestLastLocationMessage requestLastLocationMessage = new RequestLastLocationMessage(player, this.registriesProvider, () -> {
+                sendMessage(player, Component.text("Teleporting to " + coordinates.getLat() + ", " + coordinates.getLng() + ".", NamedTextColor.GOLD));
+                this.pluginMessenger.teleportToCoords(player, targetServer, mcCoordinatesFinal[0], mcCoordinatesY, mcCoordinatesFinal[1], yawFinal, pitchFinal, worldFinal);
+            });
+            if (player.getCurrentServer().isEmpty()) {
+                return;
+            }
+            this.pluginMessenger.sendMessageToServers(requestLastLocationMessage, player.getCurrentServer().get().getServer());
         });
-        if (player.getCurrentServer().isEmpty()) {
-            return;
-        }
-        this.pluginMessenger.sendMessageToServers(requestLastLocationMessage, player.getCurrentServer().get().getServer());
     }
 
     @Override
