@@ -23,10 +23,10 @@ public class ExecuteCommandExecutor extends PluginMessageNormalPlayerExecutor {
     public void execute(ByteArrayDataInput dataInput, Player player) {
         String command = dataInput.readUTF();
 
-        int spaceIndex = !command.contains(" ") ? 0 : command.indexOf(" ");
+        int spaceIndex = !command.contains(" ") ? command.length() : command.indexOf(" ");
         String baseCommand = command.substring(0, spaceIndex);
         if (!ALLOWED_COMMANDS_TO_EXECUTE.contains(baseCommand)) {
-            this.logger.error("Not allowed to remotely execute command '{}'", baseCommand);
+            this.logger.error("Not allowed to remotely execute command '{}': '{}'", baseCommand, command);
             return;
         }
 

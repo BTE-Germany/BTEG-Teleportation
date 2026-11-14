@@ -26,10 +26,10 @@ public class CommandPerformExecutor implements PluginMessageNormalExecutor {
         Player targetPlayer = Bukkit.getPlayer(playerUUID);
         if (targetPlayer == null || !targetPlayer.isOnline()) return;
 
-        int spaceIndex = !command.contains(" ") ? 0 : command.indexOf(" ");
+        int spaceIndex = !command.contains(" ") ? command.length() : command.indexOf(" ");
         String baseCommand = command.substring(0, spaceIndex);
         if (!ALLOWED_COMMANDS_TO_EXECUTE.contains(baseCommand)) {
-            this.plugin.getLogger().severe("Not allowed to remotely perform command '%s'".formatted(baseCommand));
+            this.plugin.getLogger().severe("Not allowed to remotely perform command '%s': '%s'".formatted(baseCommand, command));
             return;
         }
 
