@@ -24,6 +24,10 @@ java.sourceCompatibility = JavaVersion.VERSION_25
 java.targetCompatibility = JavaVersion.VERSION_25
 
 tasks.shadowJar {
+    dependencies {
+        exclude(dependency(libs.org.slf4j.api))
+    }
+
     archiveClassifier = ""
 
     relocationPrefix = "$group.TeleportationVelocity.shaded"

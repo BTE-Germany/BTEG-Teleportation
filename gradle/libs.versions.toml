@@ -39,6 +39,7 @@ spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", ve
 dev-triumphteam-triumph-gui = { module = "dev.triumphteam:triumph-gui", version.ref = "dev-triumphteam-triumph-gui" }
 net-wesjd-anvilgui = { module = "net.wesjd:anvilgui", version.ref = "net-wesjd-anvilgui" }
 com-alpsbte-alpslib = { module = "com.alpsbte.alpslib:alpslib-geo", version.ref = "com-alpsbte-alpslib" }
+org-slf4j-api = { module = "org.slf4j:slf4j-api" }
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
